@@ -235,6 +235,67 @@ Context Slim can run automatically:
     └── hashes.json      # Content hashes for dedup
 ```
 
+## Error Handling
+
+Context Slim handles compression and token management failures to prevent data loss and ensure context integrity.
+
+### Compression Failure
+
+| Scenario | Handling |
+|---|---|
+| **Semantic compression produces empty output** | Fall back to structural compression. If that also fails, keep original content unchanged and log the failure. Never replace content with an empty or corrupted summary. |
+| **Compressed output is LARGER than original** | Discard the compressed version and keep the original. This can happen with very short content blocks where the summary overhead exceeds savings. Log the event for optimization. |
+| **Compression loses critical entities (names, numbers, dates)** | Validate compressed output against a key-entity checklist extracted from the original. If any critical entity is missing, re-run compression with explicit entity preservation instructions. |
+| **Multiple compression strategies all fail** | Mark the content block as "incompressible" and exclude it from future auto-compression. Apply budget enforcement by compressing other blocks instead. |
+
+### Token Counting Errors
+
+| Scenario | Handling |
+|---|---|
+| **Token count estimate diverges from actual** | Context Slim uses heuristic estimation (approximately 1 token per 4 characters for English). Actual tokenizer counts vary by model. Build in a 10% safety margin on all budget calculations. |
+| **Model-specific tokenizer unavailable** | Fall back to the character-based heuristic. Display a warning that token counts are approximate. Never block operations due to missing tokenizer. |
+| **Negative token count calculated** | Floor all values at 0. Log the anomaly. This typically indicates a bug in the deduplication accounting — run `slim analyze` to reconcile. |
+| **Token count overflow on very large contexts** | Cap tracking at the model's maximum context window size. Any content beyond the cap is flagged for immediate compression or removal. |
+
+### Budget Overflow
+
+| Scenario | Handling |
+|---|---|
+| **Category exceeds budget after new content added** | Trigger automatic compression for that category (strategy selected by content type). If still over budget after compression, truncate oldest/lowest-priority items. Log every truncation with the removed content hash for recovery. |
+| **Multiple categories over budget simultaneously** | Process in priority order: tool_results first (most ephemeral), then conversation, then memory_files, then active_files, then system_skills (most critical, compressed last). |
+| **Total context exceeds model maximum** | Emergency mode: compress ALL categories to minimum viable content. Keep only: current user message, current task instructions, and most recent 2 conversation turns. Display warning with savings report. |
+| **Budget configuration invalid (negative values, exceeds model max)** | Reject the configuration. Display current valid budgets. Suggest `slim reset` to restore defaults. |
+
+### Deduplication Errors
+
+| Scenario | Handling |
+|---|---|
+| **False positive: non-duplicate flagged as duplicate** | Deduplication uses >80% similarity threshold. If merged content loses distinct information, undo the merge. Users can exclude specific blocks with `slim priority set <item> 5` (critical items are never deduped). |
+| **Hash collision** | Use content-length as secondary check. If two blocks have the same hash but different lengths, treat them as distinct. |
+| **Cache file corrupted** | Rebuild hash cache from scratch by re-scanning all context blocks. This is slower but ensures correctness. Store backup in `.context-slim/cache/hashes.json.bak`. |
+
+### Recovery
+
+- All compression events are logged to `.context-slim/history.jsonl` with before/after token counts and content hashes.
+- Use `slim history` to review what was compressed and when.
+- Original content can be reconstructed from disk files — Context Slim never modifies source files.
+
+## Context Slim vs Manual Context Management
+
+| Feature | Context Slim | Manual Summarization | No Management (Default) | Simple Truncation |
+|---|---|---|---|---|
+| **Token Savings** | 40-70% through intelligent compression | 30-50% (depends on skill) | 0% — context fills until error | 20-40% but loses recent context |
+| **Information Preservation** | Priority-scored: critical content kept in full | Varies — human judgment | N/A — everything kept until overflow | Poor — oldest content dropped blindly |
+| **Effort Required** | Zero — automatic or one-command (`slim optimize`) | High — manual rewriting each session | Zero but hits `context_length_exceeded` errors | Low but lossy |
+| **Deduplication** | Automatic — exact and near-duplicate detection | Manual — easy to miss duplicates | None — duplicates accumulate | None |
+| **Per-Skill Profiling** | Tracks each skill's token footprint and growth rate | Not practical manually | No visibility | No visibility |
+| **Budget Enforcement** | Hard limits per category with auto-compression | No enforcement — relies on discipline | No limits — first-come-first-served | Global limit only |
+| **Compression Strategies** | 3 specialized strategies (semantic, structural, priority) | One approach (manual rewriting) | None | One approach (drop oldest) |
+| **Recovery** | Full history log, original files untouched | Lossy — original phrasing lost | N/A | Lossy — truncated content gone |
+| **Cost** | Free (included with skill) | Engineer time per session | Free but causes errors and degraded performance | Free but loses information |
+| **Multi-Skill Awareness** | Profiles each skill, identifies unbounded growth | No cross-skill visibility | No visibility | No visibility |
+| **Automatic Triggers** | 70% warn, 80% suggest, 90% auto-compress | None — must remember to summarize | None — crashes at 100% | None — must set up manually |
+
 ## FAQ
 
 **Q: Does Context Slim modify my actual files?**
@@ -245,3 +306,24 @@ A: It estimates based on loaded skills, conversation length, and active files. E
 
 **Q: Will it remove important information?**
 A: The priority system ensures critical content (current task, recent messages) is never removed. Only low-priority and duplicate content is compressed or dropped.
+
+**Q: Which compression strategy should I use?**
+A: Use `slim compress` (automatic) and let Context Slim choose per content type. If you want manual control: use `semantic` for conversation history and documentation, `structural` for code files, and `priority` when you have many skills loaded but only need a few for the current task.
+
+**Q: How accurate are the token count estimates?**
+A: Context Slim uses a heuristic of approximately 1 token per 4 characters (English text). This is within 10-15% of actual tokenizer counts for most models. A 10% safety margin is built into all budget calculations. For precise counts, the estimates are sufficient for budget management.
+
+**Q: Can I undo a compression?**
+A: Compression only affects the in-memory context, not files on disk. If you need the full original content re-loaded, simply reference the source file again. All compression events are logged in `.context-slim/history.jsonl` for audit purposes.
+
+**Q: Does it work with all LLM models?**
+A: Yes. Context Slim is model-agnostic. It works with any model supported by OpenClaw (Claude, GPT, Gemini, etc.). Token estimates may vary slightly between models, but the 10% safety margin accounts for this difference.
+
+**Q: What is the deduplication similarity threshold?**
+A: Near-duplicate detection uses an 80% similarity threshold. Content blocks that share more than 80% of their key entities and structure are flagged as duplicates and merged into a single canonical version. You can protect specific blocks from deduplication by setting their priority to 5 (critical).
+
+**Q: How does Context Slim interact with other skills?**
+A: Context Slim monitors all loaded skills' token footprints via `slim profile`. It can identify which skills consume the most context and which have unbounded growth. It does not modify other skills' behavior — it only manages how their output is stored in context.
+
+**Q: What happens during the automatic 90% trigger?**
+A: When context usage reaches 90%, Context Slim automatically compresses the lowest-priority content blocks. It starts with priority 1 (background) content, then priority 2 (low) if needed. It never auto-compresses priority 4-5 content. A notification is displayed showing what was compressed and how many tokens were saved.

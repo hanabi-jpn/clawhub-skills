@@ -234,3 +234,36 @@ A: Minimal. The skill loads only the last 5 evolution events and current health 
 
 **Q: Does it work with all LLM providers?**
 A: Yes. The evolution engine works through standard OpenClaw tool calls and file operations. It's model-agnostic.
+
+**Q: How much does it cost in tokens per evolution cycle?**
+A: A single evolution cycle typically consumes 500-2000 tokens depending on the strategy. `repair` and `optimize` are lighter (~500-800 tokens) since they analyze structured logs. `innovate` is heavier (~1500-2000 tokens) as it reviews broader session history. The `--continuous` mode caps at 5 cycles, so worst case is ~10,000 tokens per continuous run.
+
+**Q: What happens if I hit the 5-evolutions-per-hour rate limit?**
+A: The system will log the attempt and queue the evolution for the next available window. You will see a message: "Rate limit reached. Next evolution available at [time]." No data is lost — the analysis is saved and reused when the limit resets.
+
+**Q: Can I use Capability Evolver Pro alongside other self-improvement skills?**
+A: Yes, but with boundaries. Capability Evolver Pro only modifies files within its own `.evolver-pro/` directory. It reads other skills' outputs for analysis but never writes to them without explicit user approval via `evolve --review`. Avoid running two self-modification skills simultaneously to prevent conflicting changes.
+
+**Q: Does it work offline or require network access?**
+A: Capability Evolver Pro works entirely offline. It explicitly prohibits network requests as part of its safety rules. All evolution operations use local file reads, writes, and standard tool calls. No external API calls are made.
+
+**Q: How do I customize the health score weights?**
+A: Edit `.evolver-pro/config.json` and adjust the `health_weights` object. Default weights are `error_rate: 0.3`, `task_completion: 0.3`, `response_quality: 0.2`, `efficiency: 0.2`. The values must sum to 1.0. Changes take effect on the next evolution cycle.
+
+**Q: Is my data private? Does evolution data leave my machine?**
+A: All evolution data stays local in the `.evolver-pro/` directory. No telemetry, no cloud sync, no external reporting. The safety rules explicitly forbid network requests during evolution. Your checkpoint snapshots, logs, and patterns remain entirely on your filesystem.
+
+## Error Handling
+
+| Error | Cause | Agent Action |
+|-------|-------|-------------|
+| Checkpoint creation fails | Disk full or permissions issue on `.evolver-pro/checkpoints/` | Abort evolution immediately. Report error with path and suggest checking disk space or directory permissions. Never proceed without a checkpoint. |
+| Sandbox validation timeout | Evolution strategy takes longer than 60 seconds to validate | Terminate sandbox, log the timeout in `evolution-log.jsonl`, skip this evolution. Suggest running with a simpler strategy or smaller scope. |
+| Health score drop >10 points | Applied evolution caused regression | Trigger automatic rollback to the most recent checkpoint. Log the regression pattern in `blocklist.json` to prevent future attempts. Notify user of rollback. |
+| Rate limit exceeded (5/hour) | Too many evolution requests in one hour | Queue the evolution request. Display time until next available slot. Do not retry automatically — wait for the cooldown window. |
+| Conflicting checkpoint state | Checkpoint file is corrupted or incomplete | Attempt to load the previous checkpoint. If no valid checkpoint exists, refuse to evolve and prompt user to run `evolve reset` or manually verify `.evolver-pro/checkpoints/`. |
+| Evolution log parse error | `evolution-log.jsonl` contains malformed JSON entries | Skip corrupted entries, log a warning, and continue with valid entries. Suggest running `evolve dashboard` to identify and clean corrupted records. |
+| Blocklist match | Proposed evolution matches a pattern in `blocklist.json` | Skip the evolution silently, log the skip reason, and move to the next candidate. Never attempt a blocklisted modification. |
+| File permission denied | Agent lacks read/write access to `.evolver-pro/` directory | Report the specific file path and required permission. Do not attempt workarounds or alternative paths. Suggest `chmod` or ownership fix. |
+| Core file modification attempt | Evolution strategy targets system files or other skills' files | Hard block. Log the violation attempt. Do not proceed. This is a safety rule violation — alert the user and recommend reviewing the evolution strategy. |
+| Config file missing | `.evolver-pro/config.json` not found on first run | Create default config with `conservative` tier, default health weights, and auto-learn enabled. Log the initialization event. |

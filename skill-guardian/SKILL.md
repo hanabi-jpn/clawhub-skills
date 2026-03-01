@@ -256,6 +256,23 @@ When installed, Skill Guardian hooks into the skill installation process:
 - **If score 40-60**: Warn and ask for explicit confirmation
 - **If score < 40**: Allow installation, log scan result
 
+## Skill Guardian vs Other Security Tools
+
+| Feature | Skill Guardian | Manual Code Review | npm audit / pip-audit | Generic Scanners (Snyk, SonarQube) |
+|---|---|---|---|---|
+| **Static Analysis (Layer 1)** | Dedicated SKILL.md + instruction analysis | Depends on reviewer skill | Not applicable (package-level only) | Source code patterns only |
+| **Behavioral Analysis (Layer 3)** | Simulates execution, monitors file/network access | Partial — reviewer mental model | None | Limited to known CVEs |
+| **MITRE ATT&CK Mapping** | Maps threats to MITRE framework (T1003, T1071, etc.) | Rarely done manually | None | Enterprise tools only |
+| **ClawHavoc Threat DB** | 341+ real-world malicious skill signatures | N/A | N/A | N/A — skill-specific threats not covered |
+| **Dependency Checking (Layer 2)** | URLs, repos, npm/PyPI typosquat detection | Inconsistent | Package vulnerabilities only | Package vulnerabilities only |
+| **Reputation Scoring (Layer 4)** | Author age, download count, 100/3 Rule | Subjective judgment | None | None |
+| **Semantic / Intent Analysis (Layer 5)** | AI-powered obfuscation + multi-step attack detection | Expert-level only | None | None |
+| **Auto-Scan on Install** | Hooks into `clawhub install` automatically | Must remember to review | Runs on `npm install` only | Requires CI/CD integration |
+| **Prompt Injection Detection** | Unicode, zero-width, base64, role-play attacks | Often missed | Not applicable | Not applicable |
+| **Scan Speed** | 5-15 seconds | 15-60 minutes | 2-10 seconds | 30-120 seconds |
+| **Cost** | Free (included with skill) | Engineer time ($50-200/hr) | Free (limited) / Paid (full) | Free tier limited / $20-100+/mo |
+| **ClawHub Ecosystem Awareness** | Purpose-built for OpenClaw skills | None | None | None |
+
 ## FAQ
 
 **Q: Does it catch everything?**
@@ -266,3 +283,24 @@ A: Scans take 5-15 seconds depending on skill complexity. This is a small price 
 
 **Q: Can I scan skills before they're installed?**
 A: Yes. Use `guard scan <skill-slug>` to scan from the registry without installing.
+
+**Q: How does Skill Guardian differ from npm audit or pip-audit?**
+A: Package auditors only check known CVE databases for dependency vulnerabilities. Skill Guardian analyzes the actual instructions and behavior of a skill — detecting prompt injection, credential theft patterns, data exfiltration, and social engineering that package auditors cannot see.
+
+**Q: What is the ClawHavoc database?**
+A: ClawHavoc refers to a real campaign where 341+ malicious skills were discovered on ClawHub, with 91% evading existing scanners. The threat database contains signatures from this campaign, including Atomic Stealer delivery, C2 heartbeats, credential harvesting, and update hijacking patterns.
+
+**Q: Can I add custom threat patterns?**
+A: Yes. Add patterns to `.skill-guardian/threats/known-patterns.json`. Each pattern needs a name, description, detection regex or keyword set, and severity level. Custom patterns are included in all subsequent scans.
+
+**Q: Does it work offline?**
+A: Layers 1 (Static), 3 (Behavioral), and 5 (Semantic) work fully offline. Layer 2 (Dependency Check) and Layer 4 (Reputation Check) require internet access to verify external references and author reputation. If offline, those layers are skipped and the report notes reduced coverage.
+
+**Q: What happens when a skill is blocked?**
+A: When a skill scores above 60, installation is blocked. The full scan report is displayed with specific flags explaining why. You can override with `guard allow <skill-slug>`, but this is logged for audit purposes. Blocked skills are recorded in `blocklist.json`.
+
+**Q: How does the auto-scan hook work with CI/CD?**
+A: Skill Guardian hooks into the `clawhub install` command locally. For CI/CD pipelines, run `guard scan <skill-slug> --json` as a build step and fail the pipeline if the exit code is non-zero (score > 60). The JSON output can be parsed for automated decision-making.
+
+**Q: Can it scan private or local skills (not on ClawHub)?**
+A: Yes. Use `guard scan /path/to/skill-directory` to scan any local skill folder. Layer 4 (Reputation) will be limited since there is no ClawHub metadata, but all other layers function normally.

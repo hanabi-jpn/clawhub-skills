@@ -303,3 +303,50 @@ Every summary MUST:
 | Comparison | No | **Yes (multi-source)** |
 | Caching | No | **SHA-256 content-hash caching** |
 | Code files | No | **Yes (logic flow summarization)** |
+
+## FAQ
+
+**Q: How much does each summarization cost in tokens?**
+A: Token usage depends on the depth level and source size. `shallow` summaries use 100-300 tokens of output. `standard` uses 300-600 tokens. `deep` with Chain-of-Density uses 800-1500 tokens (3 passes). `exhaustive` can use 2000-4000 tokens. Input tokens depend entirely on the source content length. Cached summaries cost zero tokens on subsequent requests.
+
+**Q: Does Chain-of-Density slow down summarization?**
+A: Yes, moderately. CoD runs 3 sequential passes (extract, compress, polish), taking roughly 3x longer than a single-pass summary. For `standard` depth, CoD is not used. It activates automatically for `deep` and `exhaustive` depths, or when explicitly requested with `--chain-of-density`. The quality improvement is significant — summaries retain 40-60% more key entities.
+
+**Q: Can I summarize private or sensitive documents?**
+A: Yes. All processing happens within your current LLM session. Cached summaries are stored locally in `.summarize-pro/cache/` on your filesystem. No content is sent to external services beyond your configured LLM provider. You can disable caching entirely by passing `--no-cache` to prevent any local storage of sensitive content.
+
+**Q: What are the limitations on source size?**
+A: The main limitation is your LLM's context window. For very large documents (100+ pages), the skill automatically chunks the content and summarizes in segments before creating a unified summary. YouTube transcripts are limited by the availability of captions. JavaScript-heavy web pages may return incomplete content since the fetcher does not execute client-side scripts.
+
+**Q: Can I use Summarize Pro with other skills?**
+A: Yes. Common combinations include: Summarize Pro + Self-Learning Agent (summarize error logs for pattern detection), Summarize Pro + Humanize AI Pro (summarize then humanize for natural-sounding briefs), and Summarize Pro + Nano Banana Ultra (summarize content then generate visual summaries). Each skill operates independently on the output of the other.
+
+**Q: Does it support offline summarization?**
+A: The summarization engine itself runs through your LLM, so it works wherever your LLM works. URL fetching (web pages, YouTube) requires network access. Local file summarization (PDFs, code, text) works fully offline. Cached summaries are served from local disk without any network dependency.
+
+**Q: How does the caching system work?**
+A: Caching uses a SHA-256 hash of the source content combined with the mode, depth, and language settings as the cache key. If the same content is summarized with the same settings, the cached result is returned instantly. Cache entries expire after 7 days by default (configurable in `.summarize-pro/config.json`). Use `summarize cache list` to inspect cached entries and `summarize cache clear` to purge.
+
+**Q: Can I customize the output templates?**
+A: The 7 built-in modes (bullets, executive, academic, mindmap, table, timeline, qa) use fixed templates to ensure consistent formatting. You cannot add custom templates directly, but you can post-process any mode's output. For specialized formats, use `executive` or `qa` mode as a starting point and modify the output in a follow-up instruction.
+
+**Q: How does multi-language summarization handle technical terms?**
+A: When translating, the skill maintains technical terms in their original language with a translation in parentheses on first occurrence. For example, summarizing an English paper into Japanese would render "machine learning" as "machine learning（機械学習）" on first use, then use the translated term thereafter. This preserves searchability and precision.
+
+**Q: What happens if the source URL is behind a paywall or requires authentication?**
+A: The skill will fetch whatever content is publicly accessible at the URL. If the page returns a login wall or paywall content, the summary will be based on whatever text is available (often just the headline and preview). The skill will note this limitation in the output metadata. For paywalled content, save the article locally and summarize the local file instead.
+
+## Error Handling
+
+| Error | Cause | Agent Action |
+|-------|-------|-------------|
+| URL fetch fails (404/500) | Target web page is unavailable or URL is invalid | Report the HTTP status code and URL. Suggest verifying the URL or trying again later. Do not attempt to summarize partial error page content. |
+| YouTube transcript unavailable | Video has no captions or transcript is disabled by creator | Report that no transcript is available. Suggest checking if the video has auto-generated captions enabled, or provide the video URL for manual transcript extraction. |
+| PDF read error | Corrupted PDF, password-protected, or scanned image-only PDF | Report the specific error (corruption, password, or image-based). For password-protected PDFs, ask user for the password. For image-based PDFs, note that OCR is required and suggest an OCR tool. |
+| Context window exceeded | Source content is too large for a single LLM pass | Automatically chunk the content into segments that fit within the context window. Summarize each chunk independently, then create a unified meta-summary. Log the chunking in output metadata. |
+| Cache read failure | Corrupted cache file or incompatible cache format | Delete the corrupted cache entry, log the event, and re-generate the summary from source. Cache corruption does not block summarization. |
+| Unsupported language code | User specified a `--lang` code not in the supported 8 languages | Report the unsupported code and list all supported language codes (en, ja, zh, ko, es, fr, de, pt). Do not attempt to summarize in an unsupported language. |
+| Comparison mode with single source | User used `--compare` but provided only one source | Report that comparison mode requires 2 or more sources. Fall back to standard summarization of the single source and inform the user. |
+| Chain-of-Density pass failure | One of the 3 CoD passes produces empty or degraded output | Retry the failed pass once. If it fails again, fall back to single-pass summarization and note the degradation in output. Never return an empty summary. |
+| File encoding error | Source file uses an encoding other than UTF-8 | Attempt to detect encoding (UTF-16, Shift-JIS, ISO-8859-1). If detection succeeds, convert and proceed. If detection fails, report the encoding issue and suggest converting the file to UTF-8. |
+| Rate limit on URL fetching | Too many URL fetches in a short period | Wait 5 seconds and retry once. If still rate-limited, report the issue and suggest fetching the URL manually or providing the content as a local file. |

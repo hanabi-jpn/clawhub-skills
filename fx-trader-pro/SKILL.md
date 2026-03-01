@@ -319,3 +319,91 @@ Store in `.fx-trader-pro/journal/trades.jsonl`
 └── risk/
     └── daily-pnl.jsonl       # Daily P&L tracking
 ```
+
+## Error Handling
+
+FX Trader Pro handles OANDA API errors and trading-specific failures gracefully. All errors are logged to `.fx-trader-pro/journal/trades.jsonl` with full context.
+
+### OANDA API Errors
+
+| HTTP Code | Error | Handling |
+|---|---|---|
+| **401 Unauthorized** | Invalid or expired API token | Stop all operations. Prompt user to verify `OANDA_API_KEY`. Do NOT retry — repeated 401s may trigger account lockout. |
+| **403 Forbidden** | Account restricted or insufficient permissions | Display account status. Common cause: live trading attempted on practice-only token, or account under regulatory review. Advise user to check OANDA account status. |
+| **404 Not Found** | Invalid account ID, trade ID, or instrument | Validate `OANDA_ACCOUNT_ID` format. For trade operations, verify the trade is still open. For instruments, check against supported pairs list. |
+| **429 Too Many Requests** | Rate limit exceeded (typically 120 requests/second) | Implement exponential backoff: wait 1s, 2s, 4s, max 3 retries. If scanning all 28 pairs, add 500ms delay between requests. Log rate limit events for monitoring. |
+| **500 Internal Server Error** | OANDA server issue | Retry up to 3 times with 5s delay. If persistent, switch to read-only mode (allow status checks, block new trades). Alert user of degraded service. |
+
+### Trading-Specific Errors
+
+| Error | Cause | Handling |
+|---|---|---|
+| **MARKET_HALTED** | Market closed (weekend, holiday, or instrument-specific halt) | Check market session schedule. Queue the signal for next market open if applicable. Never force an order when market is halted. |
+| **INSUFFICIENT_FUNDS** | Not enough margin for the requested position size | Recalculate position size at 50% of original. If still insufficient, report available margin and minimum required. Do NOT reduce stop-loss to fit — that violates risk management. |
+| **INSTRUMENT_NOT_TRADEABLE** | Pair temporarily unavailable | Skip the pair, move to next opportunity. Log the event. Retry after 30 minutes. |
+| **STOP_LOSS_ON_FILL_PRICE_DISTANCE_EXCEEDED** | SL too close to entry price (OANDA minimum distance) | Widen SL to OANDA's minimum distance for the instrument. Recalculate position size accordingly to maintain risk percentage. |
+| **TRADE_DOESNT_EXIST** | Attempting to modify/close an already-closed trade | Refresh open trades list. Inform user the trade was already closed (possibly by SL/TP). |
+| **ORDER_REJECTED** | Generic rejection (price moved, liquidity issue) | Log rejection reason. For market orders, retry once with updated price. For limit orders, adjust price to current market. |
+
+### Network and System Errors
+
+- **Connection timeout**: Retry 3 times with 2s intervals. If all fail, enter safe mode (no new trades, monitor existing positions on reconnection).
+- **JSON parse error**: Log raw response. Do NOT execute any trade based on unparseable data.
+- **Config file corrupted**: Fall back to default settings. Alert user to review `.fx-trader-pro/config.json`.
+
+### Kill Switch Behavior
+
+If any critical error occurs during trade execution (e.g., position size calculated as negative, SL/TP inverted, or API returns inconsistent state), the system:
+1. Halts ALL pending operations
+2. Logs the full error context
+3. Displays `fx stop-all` prompt to user
+4. Does NOT attempt to "fix" the trade automatically
+
+## FX Trader Pro vs Other Trading Tools
+
+| Feature | FX Trader Pro | Manual Trading (TradingView + Broker) | Crypto Bots (3Commas, Pionex) | MetaTrader 4/5 (Expert Advisors) |
+|---|---|---|---|---|
+| **Asset Class** | Traditional FX (28 pairs + metals) | Any (depends on broker) | Crypto only | FX + CFDs (broker-dependent) |
+| **AI-Powered Analysis** | Multi-timeframe technical analysis with confluence scoring | Manual chart reading | Basic indicator bots | Custom indicators (no AI) |
+| **Risk Management** | Built-in: position sizing, correlation groups, daily loss limits, kill switch | Manual discipline required | Basic SL/TP | Custom-coded or EA-dependent |
+| **Correlation Protection** | Automatic — blocks correlated pair overlap | Manual tracking required | Not applicable (crypto) | Not built-in (custom code needed) |
+| **Session Awareness** | Automatic market session detection and pair-session matching | Manual timezone tracking | 24/7 crypto markets | Manual or custom-coded |
+| **Trading Journal** | Auto-logged with entry/exit reasons, confidence, session data | Manual journaling | Basic trade history | Basic trade history |
+| **Backtesting** | Built-in via `fx backtest` command | TradingView replay (manual) | Limited strategy testing | Strategy Tester (powerful but MQL-only) |
+| **Setup Complexity** | 2 env vars (`OANDA_API_KEY`, `OANDA_ACCOUNT_ID`) | Broker account + platform install | Exchange API keys + bot config | MT4/5 install + EA purchase/coding |
+| **Cost** | Free (MIT license) + OANDA spreads | Platform fees + commissions | $15-50/mo subscription + exchange fees | EA purchase ($50-500+) + broker spreads |
+| **Broker Integration** | OANDA v20 REST API | Varies by platform | Exchange-specific | MetaQuotes protocol |
+| **Natural Language Interface** | Yes — conversational commands via OpenClaw | No | No | No |
+| **Spread Monitoring** | Automatic — blocks trades when spread > 2x typical | Manual observation | Not applicable | Custom indicator needed |
+
+## FAQ
+
+**Q: Is FX Trader Pro safe to use with real money?**
+A: FX Trader Pro defaults to practice mode. Live trading requires explicitly setting `OANDA_ENVIRONMENT=live` and every live trade requires user confirmation. Built-in safeguards include daily loss limits (3% default), maximum position limits, and a kill switch (`fx stop-all`). That said, forex trading carries inherent risk — past performance does not guarantee future results.
+
+**Q: How much does it cost to use?**
+A: The skill itself is free (MIT license). You only pay OANDA's spreads on trades. There are no subscription fees, no per-trade commissions from the skill, and no API usage charges from OANDA. Your only costs are the model API costs for running the OpenClaw agent.
+
+**Q: What are the OANDA API rate limits?**
+A: OANDA allows approximately 120 requests per second for the REST API. FX Trader Pro manages this automatically with built-in rate limiting. A full 28-pair scan uses about 30-40 requests. Normal trading operations (status, analyze, trade) use 3-10 requests each.
+
+**Q: Which currency pairs are supported?**
+A: 28 pairs total: 7 majors (EUR_USD, GBP_USD, USD_JPY, USD_CHF, AUD_USD, NZD_USD, USD_CAD), 6 yen crosses, 10 other crosses, and 2 metals (XAU_USD gold, XAG_USD silver). The full list is available via `fx pairs`.
+
+**Q: Can I backtest strategies before trading live?**
+A: Yes. Use `fx backtest <pair> <strategy> --from <date> --to <date>` to simulate trades on historical data. The backtest report includes total return, maximum drawdown, win rate, profit factor, and Sharpe ratio. Always backtest before deploying any strategy to live.
+
+**Q: What happens if the internet connection drops during an open trade?**
+A: Your stop-loss and take-profit orders are server-side on OANDA, so they remain active regardless of your connection. If FX Trader Pro loses connectivity, it enters safe mode — no new trades are placed, and it resumes monitoring on reconnection. Your existing positions are protected by their SL/TP orders.
+
+**Q: Can I use FX Trader Pro with brokers other than OANDA?**
+A: Currently, only OANDA v20 API is supported. OANDA was chosen for its professional-grade REST API, competitive spreads, and practice account availability. Support for additional brokers may be added in future versions.
+
+**Q: How does the correlation protection work?**
+A: Pairs are grouped by correlation (e.g., EUR_USD and GBP_USD are in the same group). The system allows maximum 1 position per correlation group. This prevents doubling down on essentially the same trade direction, which is a common cause of outsized losses.
+
+**Q: What timeframes should I use for analysis?**
+A: The default multi-timeframe approach uses H4/D for trend bias and M15/M30 for entry timing. For the `fx scan` command, H1 is used for quick screening. You can specify any timeframe with `fx analyze <pair> <timeframe>`. Higher timeframes produce more reliable but fewer signals.
+
+**Q: Does FX Trader Pro work during news events?**
+A: It does not have a built-in economic calendar filter. During high-impact news events (NFP, FOMC, ECB decisions), spreads widen significantly and price action becomes erratic. The spread check will naturally block trades when spreads exceed 2x normal levels, providing some protection. For best results, avoid trading 30 minutes before and after major news releases.

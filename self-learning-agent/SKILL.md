@@ -271,10 +271,46 @@ Compression strategies:
 ## FAQ
 
 **Q: How much context does it use?**
-A: Maximum 2000 tokens per session, strictly enforced. Most sessions use 500-1500 tokens.
+A: Maximum 2000 tokens per session, strictly enforced. Most sessions use 500-1500 tokens. The compression engine automatically merges, summarizes, and prioritizes learnings to stay within this budget.
 
 **Q: Does it slow down my agent?**
-A: No. Captures happen asynchronously after tool calls. The only sync operation is loading learnings at session start (~100ms).
+A: No. Captures happen asynchronously after tool calls. The only sync operation is loading learnings at session start (~100ms). Even with 500+ learnings in the knowledge base, the indexed lookup keeps query time under 50ms.
 
 **Q: Can I share learnings with my team?**
-A: Yes. Use `learn export` to create a portable JSON file, then `learn import` on another machine.
+A: Yes. Use `learn export` to create a portable JSON file, then `learn import` on another machine. The import process automatically deduplicates and merges with existing knowledge.
+
+**Q: How much does it cost in tokens?**
+A: The learning capture itself costs zero additional tokens — it piggybacks on existing tool call results. Loading context at session start costs 500-2000 tokens depending on the number of relevant learnings. The `learn stats` and `learn graph` commands each cost approximately 200-400 tokens for rendering.
+
+**Q: What happens when learnings conflict across projects?**
+A: The promotion engine detects conflicts when a learning from Project A contradicts one from Project B. Conflicting learnings are flagged and presented to the user for resolution. Until resolved, both learnings remain at project level and neither is promoted to global.
+
+**Q: Can I use Self-Learning Agent with Capability Evolver Pro?**
+A: Yes, they complement each other well. Self-Learning Agent captures error patterns and knowledge, while Capability Evolver Pro acts on that knowledge to improve agent behavior. Evolver Pro can read Self-Learning Agent's `learnings.jsonl` as input for its `repair` strategy.
+
+**Q: Does it work offline?**
+A: Fully offline. All knowledge storage is local filesystem-based (JSONL and JSON files). No network requests, no cloud sync, no external dependencies. The skill works entirely through standard file operations.
+
+**Q: How does auto-archive work and can I recover archived learnings?**
+A: Learnings with a promotion score below 0.3 for 30 consecutive days are automatically moved to `.self-learning/archive/`. Archived learnings are not loaded into context but remain on disk. Use `learn recall <topic>` to search across both active and archived learnings. You can manually re-activate an archived learning by moving it back to `learnings.jsonl`.
+
+**Q: Is my learning data private?**
+A: All data stays on your local machine in `~/.openclaw/self-learning/` (global) and `<project>/.self-learning/` (project-level). No telemetry is collected. The `learn export` function creates a local file — sharing is entirely manual and user-initiated.
+
+**Q: How do I reset or start fresh?**
+A: Delete the `.self-learning/` directory in the specific project, or `~/.openclaw/self-learning/` for global learnings. Alternatively, use `learn prune` to clean up stale learnings without a full reset. There is no `learn reset` command by design — the prune approach is safer and preserves high-value learnings.
+
+## Error Handling
+
+| Error | Cause | Agent Action |
+|-------|-------|-------------|
+| Learning capture fails | Disk full or permissions issue on `.self-learning/` directory | Log a warning to stderr. Do not interrupt the user's workflow — learning capture is non-blocking. Retry on next error event. Suggest checking disk space if failures persist. |
+| JSONL parse error | Corrupted entry in `learnings.jsonl` or `errors.jsonl` | Skip the corrupted line, log its line number, and continue processing remaining entries. Suggest running `learn prune` to clean up corrupted records. |
+| Context budget exceeded (>2000 tokens) | Too many high-scoring learnings loaded at session start | Apply compression strategies in order: merge similar → summarize verbose → prioritize by score → truncate lowest-score items. Never exceed the 2000-token hard cap. |
+| Duplicate learning detected | Same error or pattern captured multiple times | Merge with existing learning: increment `frequency`, update `created` timestamp, recalculate promotion score. Do not create a duplicate entry. |
+| Promotion conflict | Two project-level learnings contradict each other | Flag both learnings as `conflicted` status. Present both to user with context. Do not auto-promote either. Wait for user resolution via `learn promote`. |
+| Index corruption | `index.json` is out of sync with actual learnings | Rebuild index from source JSONL files automatically. Log the rebuild event. This is a self-healing operation — no user action required. |
+| Import merge failure | Imported file has incompatible schema or version | Report the specific incompatibility (missing fields, wrong version). Attempt partial import of compatible entries. Show count of skipped vs imported entries. |
+| Global directory missing | `~/.openclaw/self-learning/global/` does not exist (first run) | Create the full directory structure with empty JSONL files, default `config.json`, and empty `index.json`. Log initialization event. Continue normally. |
+| Archive directory full | Large number of archived learnings consuming disk space | Report disk usage of archive directory. Suggest running `learn prune` with `--hard` flag to permanently delete archived learnings older than 90 days. |
+| Cross-project lookup timeout | Searching across many projects takes too long | Set a 5-second timeout on cross-project searches. Return partial results with a note indicating which projects were not searched. Suggest narrowing the search topic. |

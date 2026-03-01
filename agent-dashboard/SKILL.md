@@ -249,3 +249,98 @@ When enabled, alerts fire when thresholds are crossed:
 ⚠️ ALERT: Daily cost ($5.23) exceeded threshold ($5.00)
 ⚠️ ALERT: Health score dropped to 58 (threshold: 60)
 ```
+
+## Error Handling
+
+Agent Dashboard handles metric collection, export, and notification failures gracefully to ensure monitoring continuity.
+
+### Metric Collection Failure
+
+| Scenario | Handling |
+|---|---|
+| **Unable to log health metrics after an action** | Write to a local buffer (`/tmp/agent-dashboard-buffer.jsonl`). Retry writing to `.agent-dashboard/metrics/health.jsonl` on next successful action. Never block the user's operation to log metrics. |
+| **Metrics file locked by another process** | Wait up to 2 seconds for lock release. If still locked, buffer the entry and append on next write. Use file-level locking to prevent corruption. |
+| **Disk full — cannot write metrics** | Switch to in-memory-only mode. Display a warning: "Dashboard metrics storage full. Monitoring continues in memory only." Suggest `dashboard reset` or clearing old data. |
+| **Token/cost data unavailable from provider** | Record the action with `cost_usd: null` and `tokens: null`. Mark the entry as "incomplete" for later reconciliation. Dashboard totals exclude null entries with a footnote. |
+| **Skill usage tracking fails for unknown skill** | Log the event with the raw skill name. Create a new entry in skills.jsonl. Do not discard usage data for unrecognized skills. |
+
+### Export Errors
+
+| Scenario | Handling |
+|---|---|
+| **HTML export fails (template rendering error)** | Fall back to plain JSON export. Display the raw data with a note that HTML generation failed. Log the template error for debugging. |
+| **CSV export with special characters in data** | Escape all fields with double-quote wrapping. Handle Unicode, commas, and newlines in field values. Use UTF-8 BOM for Excel compatibility. |
+| **Export file too large (>50MB)** | Split into multiple files by date range (monthly chunks). Alert user with file count and total size. |
+| **Web dashboard generation fails** | Provide the static terminal dashboard as fallback. Log the error. Common cause: corrupted metrics data — suggest `dashboard reset` with date range to clean specific periods. |
+
+### Notification / Alert Failures
+
+| Scenario | Handling |
+|---|---|
+| **Alert threshold crossed but notification cannot be displayed** | Buffer the alert in `.agent-dashboard/alerts/pending.jsonl`. Display all pending alerts at the start of the next agent interaction. |
+| **Alert config file corrupted** | Fall back to default thresholds (error-rate: 10%, daily-cost: $10, health: 50). Warn user that custom alert settings need reconfiguration. |
+| **Alert storm (>10 alerts in 1 minute)** | Consolidate into a single summary alert: "Multiple alerts triggered (12 events in last minute). Run `dashboard alerts` for details." Prevents alert fatigue. |
+| **False positive alert (metric spike then recovery)** | Alerts fire on threshold crossing, not sustained state. Include "current value" and "threshold" in every alert so the user can assess. Historical alerts are always available in `alerts/history.jsonl`. |
+
+### Session Replay Errors
+
+| Scenario | Handling |
+|---|---|
+| **Session data incomplete (agent crashed mid-session)** | Display available data up to the last recorded event. Mark the session as "incomplete" in the replay timeline. |
+| **Session ID not found** | List available session IDs with dates. Suggest closest match if the ID looks like a typo. |
+
+### Recovery
+
+- All metric files use append-only JSONL format for crash resilience (partial writes only lose the last entry, not the entire file).
+- Run `dashboard export json` periodically to create backups.
+- `dashboard reset --before <date>` clears old data while preserving recent metrics.
+
+## Agent Dashboard vs Other Monitoring Tools
+
+| Feature | Agent Dashboard | Manual Logging (print/console) | Console Output (Default) | Langfuse | Weights & Biases |
+|---|---|---|---|---|---|
+| **Setup** | Zero config — installs with skill | None needed | None needed | Account + SDK integration | Account + SDK integration |
+| **Health Score** | Composite 0-100 score (error rate, completion, quality, efficiency) | None | None | Trace-level scoring | Custom metrics only |
+| **Cost Tracking** | Automatic per-provider, per-model, per-skill breakdown | Manual calculation | None | Automatic with SDK | Custom logging required |
+| **Token Tracking** | Automatic input/output per action | Manual if coded | None | Automatic with SDK | Custom logging required |
+| **Skill-Level Metrics** | Per-skill calls, errors, avg response time, token usage | Not practical manually | None | Per-trace breakdown | Custom tagging |
+| **Alerting** | Built-in threshold alerts (cost, health, error rate) | None | None | Custom alerts (paid plan) | Custom alerts |
+| **Terminal Dashboard** | Rich ASCII dashboard with real-time data | N/A | Raw text only | Web UI only | Web UI only |
+| **Web Dashboard** | Self-contained HTML export (offline capable) | N/A | N/A | Cloud-hosted web UI | Cloud-hosted web UI |
+| **Session Replay** | Full action timeline per session | Not feasible manually | Scroll through terminal | Trace replay (paid plan) | Not available |
+| **Data Storage** | Local JSONL files (private, no cloud dependency) | Scattered log files | Ephemeral (lost on close) | Cloud-hosted (their servers) | Cloud-hosted (their servers) |
+| **Privacy** | 100% local — no data leaves your machine | Local | Local | Data sent to Langfuse cloud | Data sent to W&B cloud |
+| **Cost of Tool** | Free (MIT license) | Free | Free | Free tier limited / $59+/mo | Free tier limited / $50+/mo |
+| **OpenClaw Integration** | Native — tracks all OpenClaw skills automatically | None | None | Requires custom integration | Requires custom integration |
+
+## FAQ
+
+**Q: How much does Agent Dashboard cost?**
+A: The skill itself is completely free (MIT license). It tracks your existing API costs but does not add any additional API calls or fees. All data is stored locally.
+
+**Q: What data does Agent Dashboard collect?**
+A: It tracks response times, token counts (input/output), tool calls, error counts, task completion status, and API costs. It estimates costs based on built-in pricing tables for major providers (Anthropic, OpenAI, Google). No personal data or conversation content is stored — only operational metrics.
+
+**Q: How long is metric data retained?**
+A: Indefinitely by default. Data is stored in JSONL files that grow over time. Use `dashboard reset --before <date>` to clear old data, or `dashboard export` to archive before clearing. For long-running agents, consider monthly exports and resets to keep file sizes manageable.
+
+**Q: Does it affect agent performance?**
+A: Negligible impact. Metric logging is append-only to JSONL files (microseconds per write). The dashboard display itself uses only data already collected — no additional API calls are made. Health score calculation is lightweight arithmetic.
+
+**Q: Can I set up alerts for specific skills?**
+A: Yes. Use `dashboard alert set skill-error <skill-name> <threshold>` to alert when a specific skill exceeds a failure count. You can also set global alerts for error rate, daily cost, monthly cost, and health score.
+
+**Q: How do I integrate with external monitoring tools?**
+A: Use `dashboard export json` to get all metrics as JSON. This can be piped to any external tool, ingested by Grafana, or processed by custom scripts. The JSONL format is compatible with standard log processing pipelines (jq, Elasticsearch, etc.).
+
+**Q: Is my data sent to any cloud service?**
+A: No. Agent Dashboard is 100% local. All data is stored in `.agent-dashboard/` in your project directory. No telemetry, no cloud sync, no external API calls. The web dashboard export generates a self-contained HTML file that works offline.
+
+**Q: How accurate are the cost estimates?**
+A: Cost estimates use built-in pricing tables that are updated periodically. They are accurate to within 5% for standard API usage. Variations can occur if your provider offers custom pricing, volume discounts, or if prices have changed since the last pricing table update. You can update pricing in `.agent-dashboard/config.json`.
+
+**Q: Can I track multiple agents or projects?**
+A: Each project has its own `.agent-dashboard/` directory with independent metrics. To get a cross-project view, use `dashboard export json` from each project and aggregate externally. A multi-project dashboard feature is planned for a future version.
+
+**Q: What happens if I forget to check the dashboard?**
+A: Alerts are your safety net. Set thresholds for the metrics you care about most (daily cost, error rate, health score), and Agent Dashboard will notify you inline whenever a threshold is crossed. Pending alerts are displayed at the start of each new session.

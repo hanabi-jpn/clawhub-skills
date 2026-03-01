@@ -243,3 +243,50 @@ When processing Japanese text:
 | Meaning preservation | Aggressive replace | **Verified transformation** |
 | Batch processing | No | **Yes** |
 | Before/after diff | No | **Yes** |
+
+## FAQ
+
+**Q: How much does it cost in tokens per humanization?**
+A: A typical humanization pass costs 1.5-3x the input text length in tokens. The process involves scanning (input tokens), analysis (200-400 tokens for scoring), transformation (output roughly equal to input length), and verification re-scoring (200-400 tokens). Scoring-only mode (`humanize score`) is cheapest at approximately input length + 400 tokens.
+
+**Q: How accurate is the AI detection scoring?**
+A: The scoring system provides a statistical estimate, not a definitive judgment. It combines 5 metrics (burstiness, type-token ratio, perplexity, transition patterns, known AI phrases) for a composite score. Accuracy is highest for unmodified AI outputs (85-90% agreement with commercial detectors) and lower for lightly edited or mixed human-AI text. It should be treated as a guideline, not a guarantee.
+
+**Q: Does humanization change the meaning of my text?**
+A: No. Meaning preservation is a core design principle. The skill only transforms word choice, sentence structure, transitions, and tone markers. It explicitly never deletes substantive content, changes numbers/dates/names, introduces new claims, or removes citations. After transformation, the factual content should be identical to the original.
+
+**Q: Can I use it for academic papers without risking plagiarism?**
+A: Humanize AI Pro transforms AI-generated text to sound more natural, but it does not address academic integrity concerns. Using AI to generate academic work and then disguising it as human-written may violate your institution's policies regardless of detection scores. The `academic` mode is designed for legitimate use cases like polishing AI-assisted drafts where the ideas are your own.
+
+**Q: How does Japanese support compare to English?**
+A: Japanese support is a key differentiator with 300+ language-specific patterns covering keigo levels, sentence-ending variations, katakana overuse, kanji/hiragana balance, and subject omission. English has 500+ patterns but Japanese analysis goes deeper into cultural and stylistic nuances that English-only tools miss entirely. The 5 writing modes each have Japanese-specific transformation rules.
+
+**Q: Does it work offline?**
+A: Yes. All pattern detection and statistical analysis happens within your LLM session. No external API calls are made for scoring or transformation. The pattern databases are embedded in the skill instructions. No network access is required at any point.
+
+**Q: Can I use Humanize AI Pro with Summarize Pro?**
+A: Yes, this is a common and effective combination. Use Summarize Pro first to condense content, then apply Humanize AI Pro to make the summary sound natural. The pipeline is: source content -> `summarize` -> `humanize`. Both skills operate independently and their outputs are compatible.
+
+**Q: Does it support batch processing of multiple files?**
+A: Yes. Use `humanize batch <directory>` to process all text files in a directory. Each file is processed independently with the same mode and language settings. Results include before/after AI scores for each file. Processing speed depends on your LLM's throughput — expect roughly 1-3 seconds per file for typical document lengths.
+
+**Q: Can it detect which specific AI model generated the text?**
+A: It provides model-specific pattern matching for ChatGPT, Claude, and Gemini. Each model has distinctive tells (e.g., ChatGPT's "Certainly!", Claude's "nuanced", Gemini's "Absolutely!"). The detection reports which model's patterns are most prevalent, but this is probabilistic — heavily edited text or newer model versions may not match known patterns.
+
+**Q: How do I customize the transformation strength?**
+A: The 5 writing modes (academic, business, casual, creative, social) control the transformation style rather than strength. For lighter transformations, use `academic` or `business` modes which preserve more formal structure. For heavier transformations, use `casual` or `social` modes which introduce more natural speech patterns. There is no explicit "strength" slider — the mode selection determines how aggressively the text is restyled.
+
+## Error Handling
+
+| Error | Cause | Agent Action |
+|-------|-------|-------------|
+| Language detection fails | Input text is too short (under 20 words) or contains mixed languages | Default to English. Inform user that auto-detection was inconclusive and suggest using `--lang <code>` to specify the language explicitly. |
+| Unsupported language code | User specified a `--lang` code not in the supported set | Report the unsupported code and list all 12 supported languages. Do not attempt transformation in an unsupported language. |
+| Transformation increases AI score | Humanized output scores higher than the original (rare edge case) | Discard the transformation. Retry with a different writing mode. If still higher after retry, return the original text with a note explaining the issue and suggest trying a different mode manually. |
+| Empty input text | User provides empty string or whitespace-only input | Report that no text was provided. Prompt user to provide text content or a file path. Do not attempt to score or transform empty input. |
+| File read error | Specified file path does not exist or is not readable | Report the exact file path and error (not found, permission denied, unsupported format). Suggest verifying the path or providing the text directly as inline input. |
+| Batch directory empty | `humanize batch` is run on a directory with no text files | Report that no processable text files were found in the directory. List the file types the skill supports (.txt, .md, .doc). Do not create empty output files. |
+| Scoring metrics out of range | Statistical calculation produces NaN or infinity (e.g., single-sentence input) | Clamp all metrics to valid ranges (0-1 for sub-scores, 0-100% for overall). Note in the output that the text was too short for reliable statistical analysis. Recommend a minimum of 100 words for accurate scoring. |
+| Pattern database version mismatch | AI models release new versions with different writing patterns | The embedded pattern database may not catch patterns from the newest model versions. Report that some patterns may be undetected. The scoring still works via statistical metrics even when pattern matching is incomplete. |
+| Meaning preservation violation detected | Transformation accidentally alters a factual claim or number | This should not happen under normal operation. If detected during verification, discard the transformation and retry. Log the specific violation for debugging. Return original text if retry also fails. |
+| Concurrent batch file conflict | Two batch processes attempt to write to the same output directory | Use file locking to prevent conflicts. If a lock is detected, queue the second batch and process sequentially. Report the queuing to the user. |

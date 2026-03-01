@@ -285,6 +285,67 @@ When making team decisions via `bt decide`:
     └── {date}.md            # Generated reports
 ```
 
+## Error Handling
+
+Brain Trust handles orchestration failures gracefully to prevent task loss and ensure the team structure remains consistent.
+
+### Consensus Failure
+
+| Scenario | Handling |
+|---|---|
+| **Unanimous protocol: no agreement after 3 rounds** | Escalate to CEO for executive decision. Log all role positions and reasoning. Final output includes a "Dissent" section noting unresolved disagreements. |
+| **Majority protocol: exact tie** | Invoke weighted voting as tiebreaker (domain expert gets 2x weight). If still tied, escalate to CEO. |
+| **Weighted protocol: all weights equal** | Fall back to majority vote. If still tied, CEO decides. |
+| **No roles provide input** | Abort the decision. Report which roles failed to respond. Suggest re-running with a simpler team template. |
+
+### Role Timeout
+
+| Scenario | Handling |
+|---|---|
+| **Single role unresponsive during meeting** | Skip after 30-second timeout. Note the missing perspective in the meeting minutes. Continue with available roles. |
+| **Multiple roles unresponsive** | If >50% of roles fail, abort the meeting. Log partial results. Suggest re-running with a smaller team. |
+| **CEO unresponsive during escalation** | Fall back to CTO for technical decisions, CFO for business decisions, or the highest-ranking available role. |
+
+### Budget Exceeded
+
+| Scenario | Handling |
+|---|---|
+| **Token budget exceeded mid-task** | Complete the current role's output, then pause. Report partial results and remaining tasks. Suggest using Context Slim to free capacity before continuing. |
+| **Task generates excessive subtasks (>20)** | Cap subtask generation at 20. CEO consolidates remaining work into grouped tasks. Warn user about scope complexity. |
+| **Meeting exceeds time budget** | Summarize each remaining role's position in 1 sentence instead of full analysis. Mark the meeting as "abbreviated" in minutes. |
+
+### Model API Error
+
+| Scenario | Handling |
+|---|---|
+| **API rate limit during multi-role discussion** | Queue remaining roles and process sequentially with 2-second delays. Meeting quality is preserved but takes longer. |
+| **API timeout** | Retry the current role's response once. If it fails again, record "No response" for that role and continue. |
+| **Context length exceeded** | Compress earlier role outputs using semantic summarization. Each role's full output is preserved in `.brain-trust/meetings/` but the working context uses compressed versions. |
+| **Invalid response format** | Re-prompt the role with stricter formatting instructions. If it fails twice, have the PM role reformat the output. |
+
+### Data Integrity
+
+- **Config file corrupted**: Rebuild from template defaults. Warn user that custom role modifications may be lost.
+- **Task state inconsistency** (e.g., completed task still in active list): Run `bt status --repair` to reconcile task states.
+- **Meeting minutes incomplete**: Always write minutes incrementally (after each role speaks), not at the end. This prevents total loss on mid-meeting failure.
+
+## Brain Trust vs Other Multi-Agent Systems
+
+| Feature | Brain Trust | AutoGPT | CrewAI | LangChain Agents |
+|---|---|---|---|---|
+| **Architecture** | Single agent, multi-perspective (role adoption) | Autonomous single agent with self-prompting | Multi-agent with role-based task delegation | Modular agent chains with tool use |
+| **Cost per Run** | Zero additional cost (same context, one model call) | High — recursive self-prompting = many API calls | Medium-High — one API call per agent per task | Medium — one call per chain step |
+| **Role System** | 10+ predefined roles with custom role support | No roles — single autonomous agent | Role-based agents with backstory/goals | Tool-specialized agents |
+| **Consensus Protocols** | 4 built-in (unanimous, majority, weighted, executive) | None — single decision maker | Task output aggregation only | None — sequential chain |
+| **Meeting Types** | 5 formats (standup, review, brainstorm, retro, war-room) | None | None | None |
+| **Hierarchical Delegation** | CEO > Directors > Team — tasks flow down, results flow up | Flat — self-assigns subtasks | Flat or sequential task pipeline | Sequential chain |
+| **Templates** | 5 pre-built team templates (startup, dev-team, etc.) | N/A | Custom crew definitions | Pre-built chain templates |
+| **Setup Complexity** | `bt init [template]` — one command | Python environment + config + API keys | Python code + role definitions + API keys | Python code + tool configs + API keys |
+| **Hallucination Risk** | Low — structured roles constrain output scope | High — autonomous loops amplify errors | Medium — role constraints help | Medium — tool grounding helps |
+| **Token Efficiency** | High — all roles share one context window | Low — each loop iteration uses full context | Low — each agent has separate context | Medium — chain passes summaries |
+| **Determinism** | High — same roles + protocol = consistent structure | Low — autonomous decisions vary widely | Medium — task routing varies | Medium-High — chain structure is fixed |
+| **OpenClaw Integration** | Native — designed for OpenClaw ecosystem | Standalone Python application | Standalone Python framework | Standalone Python framework |
+
 ## FAQ
 
 **Q: Does this actually run multiple LLM instances?**
@@ -295,3 +356,24 @@ A: Start with 3-5 for most tasks. More roles = more thorough but slower. Use tem
 
 **Q: Can I customize role behaviors?**
 A: Yes. Edit the role files in `.brain-trust/agents/` to modify any role's expertise and behavior.
+
+**Q: What happens if roles disagree and consensus cannot be reached?**
+A: It depends on the protocol. In `unanimous` mode, after 3 failed rounds, the CEO makes the final call. In `majority` mode, a tie triggers weighted voting. In all cases, dissenting opinions are logged so you can review the full debate.
+
+**Q: Can I use Brain Trust for non-technical tasks (marketing, writing, strategy)?**
+A: Absolutely. The `content` template (Editor, 2 Writers, SEO Specialist, Designer) is designed for content work. The `research` template is ideal for market research and competitive analysis. You can also create fully custom teams with `bt add-role`.
+
+**Q: How does hierarchical delegation differ from just asking the agent directly?**
+A: Direct questions get one perspective. Hierarchical delegation forces structured decomposition: the CEO breaks the problem into subtasks, assigns them to specialists, collects results with confidence scores, and synthesizes a final answer. This catches blind spots that a single perspective misses.
+
+**Q: Does Brain Trust work with other skills simultaneously?**
+A: Yes. Brain Trust is an orchestration layer — it can use any other installed skill as part of its workflow. For example, the Security role might invoke Skill Guardian, or the Analyst role might use Agent Dashboard data.
+
+**Q: What is the maximum team size?**
+A: There is no hard limit, but practical effectiveness peaks at 8-10 roles. Beyond that, consensus discussions become verbose and the context window fills faster. For large projects, use hierarchical teams where each director manages 2-3 team members.
+
+**Q: Can I save and reuse team configurations across projects?**
+A: Yes. The team configuration is stored in `.brain-trust/config.json`. Copy this file to new projects or create named templates with `bt init` followed by customization. Role definitions in `.brain-trust/agents/` are portable between projects.
+
+**Q: How do I track what Brain Trust decided and why?**
+A: Every decision is logged to `.brain-trust/decisions/log.jsonl` with full reasoning from each role, the protocol used, vote counts, and the final outcome. Meeting minutes are saved to `.brain-trust/meetings/`. Use `bt report` to generate human-readable summaries.
