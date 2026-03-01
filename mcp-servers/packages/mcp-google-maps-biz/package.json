@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-google-maps-biz",
+  "version": "1.0.0",
+  "description": "Location intelligence for business — geocoding, places search, routing optimization, Google Business Profile",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/google-maps-biz",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-google-maps-biz": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-google-maps-biz"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

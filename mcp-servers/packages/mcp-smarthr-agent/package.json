@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-smarthr-agent",
+  "version": "1.0.0",
+  "description": "Automate HR and labor management — employee onboarding, documents, payroll on Japan's leading HR cloud",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/smarthr-agent",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-smarthr-agent": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-smarthr-agent"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

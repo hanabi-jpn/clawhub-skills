@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-amazon-japan-seller",
+  "version": "1.0.0",
+  "description": "Amazon.co.jp出品・FBA管理AIエージェント — SP-API連携で商品管理・広告・分析を自動化",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/amazon-japan-seller",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-amazon-japan-seller": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-amazon-japan-seller"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

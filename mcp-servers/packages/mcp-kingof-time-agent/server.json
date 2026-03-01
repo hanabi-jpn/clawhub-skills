@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hanabi-jpn/kingof-time-agent",
+  "description": "Attendance and time tracking automation — daily/monthly data, payroll sync via Japan's leading attendance system",
+  "repository": {
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@hanabi-jpn/mcp-kingof-time-agent",
+      "version": "1.0.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

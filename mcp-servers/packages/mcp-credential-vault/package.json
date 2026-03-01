@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-credential-vault",
+  "version": "1.0.0",
+  "description": "Secure API key management for Claude Code — encrypted storage, auto-rotation, leak detection, safe injection",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/credential-vault",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-credential-vault": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-credential-vault"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

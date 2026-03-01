@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hanabi-jpn/kintone-agent",
+  "description": "Build, query, and automate Cybozu kintone apps — Japan's leading no-code business platform",
+  "repository": {
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@hanabi-jpn/mcp-kintone-agent",
+      "version": "1.0.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

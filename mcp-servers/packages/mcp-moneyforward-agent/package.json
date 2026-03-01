@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-moneyforward-agent",
+  "version": "1.0.0",
+  "description": "Cloud accounting automation — invoices, expenses, journal entries, bank reconciliation on Japan's leading fintech",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/moneyforward-agent",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-moneyforward-agent": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-moneyforward-agent"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

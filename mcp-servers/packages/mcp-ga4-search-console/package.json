@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-ga4-search-console",
+  "version": "1.0.0",
+  "description": "Query GA4 analytics and Google Search Console data in natural language — traffic, SEO, conversions",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/ga4-search-console",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-ga4-search-console": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-ga4-search-console"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

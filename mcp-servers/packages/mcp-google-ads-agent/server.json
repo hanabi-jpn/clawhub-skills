@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hanabi-jpn/google-ads-agent",
+  "description": "AI-powered Google Ads campaign management — create, optimize, audit, and report on PPC campaigns",
+  "repository": {
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@hanabi-jpn/mcp-google-ads-agent",
+      "version": "1.0.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

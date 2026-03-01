@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hanabi-jpn/base-stores-agent",
+  "description": "Manage Japanese EC shops on BASE and STORES — products, orders, inventory for instant-commerce",
+  "repository": {
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@hanabi-jpn/mcp-base-stores-agent",
+      "version": "1.0.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-chatwork-agent",
+  "version": "1.0.0",
+  "description": "Automate Japan's #1 business chat — messages, tasks, rooms, bots via ChatWork API v2",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/chatwork-agent",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-chatwork-agent": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-chatwork-agent"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

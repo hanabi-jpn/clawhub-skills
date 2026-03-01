@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hanabi-jpn/chatwork-agent",
+  "description": "Automate Japan's #1 business chat — messages, tasks, rooms, bots via ChatWork API v2",
+  "repository": {
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@hanabi-jpn/mcp-chatwork-agent",
+      "version": "1.0.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

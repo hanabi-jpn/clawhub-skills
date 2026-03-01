@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-google-workspace-agent",
+  "version": "1.0.0",
+  "description": "Unified Gmail, Calendar, Drive, Sheets, and Docs management from Claude Code",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/google-workspace-agent",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-google-workspace-agent": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-google-workspace-agent"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

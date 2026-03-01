@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-repo-guardian",
+  "version": "1.0.0",
+  "description": "Pre-clone security scanner — detect malicious hooks, poisoned MCP configs, credential-harvesting patterns before Claud",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/repo-guardian",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-repo-guardian": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-repo-guardian"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

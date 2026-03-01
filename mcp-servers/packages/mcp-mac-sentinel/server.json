@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hanabi-jpn/mac-sentinel",
+  "description": "macOS security hardening for Claude Code — pre-execution validation, malicious config detection, credential hygiene, e",
+  "repository": {
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@hanabi-jpn/mcp-mac-sentinel",
+      "version": "1.0.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

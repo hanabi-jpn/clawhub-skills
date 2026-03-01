@@ -12,60 +12,64 @@ import os
 import re
 import sys
 
-# All 40 skill directories
-SKILL_DIRS = [
-    # ── Wave 1 (Original 20) ──
-    # P1 — Premium
-    "capability-evolver-pro",
-    "self-learning-agent",
-    "summarize-pro",
-    "humanize-ai-pro",
-    "nano-banana-ultra",
-    # P2 — Standard
-    "skill-guardian",
-    "fx-trader-pro",
-    "brain-trust",
-    "context-slim",
-    "agent-dashboard",
-    # P3 — Lite
-    "line-agent",
-    "ec-cube-operator",
-    "freee-agent",
-    "rakuten-seller",
-    "paypay-biz",
-    "jp-tax-calc",
-    "notion-jp",
-    "jp-humanizer",
-    "lark-workflow",
-    "jp-seo-writer",
+# All 43 skill directories (organized by package)
+# Maps skill_slug → package_dir/skill_slug
+SKILL_PACKAGES = {
+    # ── ec-master-pack (9) ──
+    "ec-cube-operator": "ec-master-pack",
+    "rakuten-seller": "ec-master-pack",
+    "stripe-japan-agent": "ec-master-pack",
+    "base-stores-agent": "ec-master-pack",
+    "amazon-japan-seller": "ec-master-pack",
+    "yahoo-shopping-agent": "ec-master-pack",
+    "mercari-shops-agent": "ec-master-pack",
+    "shopify-japan": "ec-master-pack",
+    "makeshop-agent": "ec-master-pack",
 
-    # ── Wave 2 (New 20) ──
-    # P1 — Google Suite
-    "google-ads-agent",
-    "google-workspace-agent",
-    "ga4-search-console",
-    "google-maps-biz",
-    # P2 — Payment & Social
-    "stripe-japan-agent",
-    "social-media-publisher",
-    # P2 — Japan SaaS
-    "chatwork-agent",
-    "kintone-agent",
-    # P3 — Japan HR/Biz SaaS
-    "smarthr-agent",
-    "backlog-agent",
-    "sansan-agent",
-    "moneyforward-agent",
-    "kingof-time-agent",
-    "line-works-agent",
-    "jooto-agent",
-    "base-stores-agent",
-    "yayoi-agent",
-    # P3 — Security Suite
-    "mac-sentinel",
-    "repo-guardian",
-    "credential-vault",
-]
+    # ── finance-accounting-pack (10) ──
+    "freee-agent": "finance-accounting-pack",
+    "paypay-biz": "finance-accounting-pack",
+    "jp-tax-calc": "finance-accounting-pack",
+    "moneyforward-agent": "finance-accounting-pack",
+    "yayoi-agent": "finance-accounting-pack",
+    "misoca-agent": "finance-accounting-pack",
+    "airpay-agent": "finance-accounting-pack",
+    "square-japan": "finance-accounting-pack",
+    "e-tax-agent": "finance-accounting-pack",
+    "japan-invoice": "finance-accounting-pack",
+
+    # ── marketing-growth-pack (8) ──
+    "jp-humanizer": "marketing-growth-pack",
+    "jp-seo-writer": "marketing-growth-pack",
+    "google-ads-agent": "marketing-growth-pack",
+    "ga4-search-console": "marketing-growth-pack",
+    "google-maps-biz": "marketing-growth-pack",
+    "social-media-publisher": "marketing-growth-pack",
+    "sansan-agent": "marketing-growth-pack",
+    "hubspot-japan": "marketing-growth-pack",
+
+    # ── business-ops-pack (13) ──
+    "line-agent": "business-ops-pack",
+    "lark-workflow": "business-ops-pack",
+    "notion-jp": "business-ops-pack",
+    "google-workspace-agent": "business-ops-pack",
+    "chatwork-agent": "business-ops-pack",
+    "kintone-agent": "business-ops-pack",
+    "smarthr-agent": "business-ops-pack",
+    "backlog-agent": "business-ops-pack",
+    "kingof-time-agent": "business-ops-pack",
+    "line-works-agent": "business-ops-pack",
+    "jooto-agent": "business-ops-pack",
+    "slack-japan-agent": "business-ops-pack",
+    "cybozu-garoon": "business-ops-pack",
+
+    # ── security-devops-pack (3) ──
+    "mac-sentinel": "security-devops-pack",
+    "repo-guardian": "security-devops-pack",
+    "credential-vault": "security-devops-pack",
+}
+
+SKILL_DIRS = list(SKILL_PACKAGES.keys())
 
 # Metadata for each skill (display_name, description, tier)
 SKILL_META = {

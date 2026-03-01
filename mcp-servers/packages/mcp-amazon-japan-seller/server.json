@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hanabi-jpn/amazon-japan-seller",
+  "description": "Amazon.co.jp出品・FBA管理AIエージェント — SP-API連携で商品管理・広告・分析を自動化",
+  "repository": {
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@hanabi-jpn/mcp-amazon-japan-seller",
+      "version": "1.0.0",
+      "transport": { "type": "stdio" }
+    }
+  ]
+}

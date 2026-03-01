@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-mercari-shops-agent",
+  "version": "1.0.0",
+  "description": "メルカリShops出品・販売管理AIエージェント — API連携で商品・注文・配送・分析を自動化",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/mercari-shops-agent",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-mercari-shops-agent": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-mercari-shops-agent"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

@@ -1,0 +1,32 @@
+{
+  "name": "@hanabi-jpn/mcp-hubspot-japan",
+  "version": "1.0.0",
+  "description": "HubSpot日本語CRM・マーケティング管理エージェント — CRM・MA・営業支援をAIで完全統合",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/hubspot-japan",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-hubspot-japan": "dist/index.js"
+  },
+  "files": ["dist", "server.json", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-hubspot-japan"
+  },
+  "keywords": ["mcp", "mcp-server", "ai-agent", "japan"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}
