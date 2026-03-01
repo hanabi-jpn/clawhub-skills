@@ -1,0 +1,236 @@
+{
+  "version": "1.0.0",
+  "description": "Default configuration for Agent Dashboard monitoring, alerting, and cost tracking.",
+  "alert_thresholds": {
+    "error_rate": {
+      "warning": 5,
+      "critical": 15,
+      "unit": "percent",
+      "window_minutes": 60,
+      "description": "Percentage of agent invocations returning errors within the window."
+    },
+    "response_time": {
+      "warning": 30000,
+      "critical": 120000,
+      "unit": "milliseconds",
+      "description": "Agent response time per invocation."
+    },
+    "token_usage_per_turn": {
+      "warning": 50000,
+      "critical": 100000,
+      "unit": "tokens",
+      "description": "Total tokens (input + output) consumed per agent turn."
+    },
+    "cost_per_hour": {
+      "warning": 5.00,
+      "critical": 15.00,
+      "unit": "usd",
+      "description": "Hourly cost rate across all active agents."
+    },
+    "cost_per_day": {
+      "warning": 50.00,
+      "critical": 150.00,
+      "unit": "usd",
+      "description": "Daily cost across all agents."
+    },
+    "cost_per_month": {
+      "warning": 400.00,
+      "critical": 1000.00,
+      "unit": "usd",
+      "description": "Monthly cost projection based on current burn rate."
+    },
+    "agent_idle_time": {
+      "warning": 1800,
+      "critical": 7200,
+      "unit": "seconds",
+      "description": "Time since last activity for an active agent."
+    },
+    "context_utilization": {
+      "warning": 70,
+      "critical": 90,
+      "unit": "percent",
+      "description": "Percentage of context window consumed."
+    },
+    "task_failure_streak": {
+      "warning": 3,
+      "critical": 5,
+      "unit": "count",
+      "description": "Consecutive failed tasks for a single agent."
+    },
+    "memory_usage": {
+      "warning": 512,
+      "critical": 1024,
+      "unit": "megabytes",
+      "description": "Process memory usage for agent runtime."
+    }
+  },
+  "token_pricing": {
+    "last_updated": "2026-03-01",
+    "note": "Prices in USD per 1,000 tokens. Update when providers change pricing.",
+    "providers": {
+      "anthropic": {
+        "claude-opus-4-6": {
+          "input_per_1k": 0.015,
+          "output_per_1k": 0.075,
+          "cache_write_per_1k": 0.01875,
+          "cache_read_per_1k": 0.0015,
+          "max_context": 200000,
+          "max_output": 32000
+        },
+        "claude-sonnet-4": {
+          "input_per_1k": 0.003,
+          "output_per_1k": 0.015,
+          "cache_write_per_1k": 0.00375,
+          "cache_read_per_1k": 0.0003,
+          "max_context": 200000,
+          "max_output": 16000
+        },
+        "claude-haiku-3.5": {
+          "input_per_1k": 0.0008,
+          "output_per_1k": 0.004,
+          "cache_write_per_1k": 0.001,
+          "cache_read_per_1k": 0.00008,
+          "max_context": 200000,
+          "max_output": 8192
+        }
+      },
+      "google": {
+        "gemini-2.5-pro": {
+          "input_per_1k": 0.00125,
+          "output_per_1k": 0.01,
+          "thinking_per_1k": 0.00625,
+          "max_context": 1000000,
+          "max_output": 65536,
+          "free_tier_rpm": 5,
+          "free_tier_tpd": 25000
+        },
+        "gemini-2.5-flash": {
+          "input_per_1k": 0.000075,
+          "output_per_1k": 0.0003,
+          "thinking_per_1k": 0.000375,
+          "max_context": 1000000,
+          "max_output": 65536,
+          "free_tier_rpm": 15,
+          "free_tier_tpd": 1000000
+        }
+      },
+      "subscriptions": {
+        "claude-max": {
+          "monthly_cost": 200.00,
+          "included_usage": "unlimited",
+          "models_included": ["claude-opus-4-6", "claude-sonnet-4", "claude-haiku-3.5"],
+          "rate_limits": "Higher than API but subject to fair use"
+        },
+        "claude-pro": {
+          "monthly_cost": 20.00,
+          "included_usage": "5x free tier",
+          "models_included": ["claude-opus-4-6", "claude-sonnet-4"],
+          "rate_limits": "Standard rate limits apply"
+        }
+      }
+    }
+  },
+  "monitoring_settings": {
+    "poll_interval_seconds": 30,
+    "metrics_retention_hours": 168,
+    "aggregation_intervals": ["1m", "5m", "15m", "1h", "6h", "24h"],
+    "enable_real_time": true,
+    "enable_historical": true,
+    "enable_cost_tracking": true,
+    "enable_performance_tracking": true,
+    "enable_error_tracking": true,
+    "log_level": "info"
+  },
+  "dashboard_settings": {
+    "default_time_range": "24h",
+    "available_time_ranges": ["1h", "6h", "24h", "7d", "30d"],
+    "refresh_interval_seconds": 60,
+    "theme": "dark",
+    "chart_colors": {
+      "primary": "#3B82F6",
+      "success": "#10B981",
+      "warning": "#F59E0B",
+      "error": "#EF4444",
+      "info": "#8B5CF6",
+      "neutral": "#6B7280",
+      "series": ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#8B5CF6", "#EC4899", "#14B8A6", "#F97316"]
+    },
+    "layout": {
+      "sidebar_width": 240,
+      "header_height": 64,
+      "card_gap": 16,
+      "border_radius": 12
+    }
+  },
+  "notification_settings": {
+    "channels": {
+      "console": {
+        "enabled": true,
+        "min_severity": "warning"
+      },
+      "discord": {
+        "enabled": false,
+        "webhook_url": "",
+        "min_severity": "critical",
+        "mention_role": "@here"
+      },
+      "lark": {
+        "enabled": false,
+        "webhook_url": "",
+        "min_severity": "warning"
+      },
+      "email": {
+        "enabled": false,
+        "smtp_config": {},
+        "recipients": [],
+        "min_severity": "critical"
+      }
+    },
+    "cooldown_minutes": 15,
+    "max_notifications_per_hour": 10,
+    "escalation": {
+      "enabled": true,
+      "escalate_after_minutes": 30,
+      "escalation_channel": "discord"
+    }
+  },
+  "agent_profiles": {
+    "default": {
+      "expected_response_time_ms": 15000,
+      "expected_tokens_per_turn": 5000,
+      "max_concurrent_tasks": 3,
+      "health_check_interval_seconds": 300
+    },
+    "brain-trust-executive": {
+      "expected_response_time_ms": 30000,
+      "expected_tokens_per_turn": 10000,
+      "max_concurrent_tasks": 1,
+      "health_check_interval_seconds": 600,
+      "model_preference": "claude-opus-4-6"
+    },
+    "brain-trust-worker": {
+      "expected_response_time_ms": 15000,
+      "expected_tokens_per_turn": 5000,
+      "max_concurrent_tasks": 5,
+      "health_check_interval_seconds": 300,
+      "model_preference": "gemini-2.5-pro"
+    },
+    "fx-scanner": {
+      "expected_response_time_ms": 60000,
+      "expected_tokens_per_turn": 20000,
+      "max_concurrent_tasks": 1,
+      "health_check_interval_seconds": 1800,
+      "model_preference": "claude-opus-4-6",
+      "custom_alerts": {
+        "trade_execution_failure": {
+          "severity": "critical",
+          "description": "Trade signal generated but execution failed"
+        },
+        "scanner_offline": {
+          "severity": "critical",
+          "description": "Scanner process not running during market hours"
+        }
+      }
+    }
+  }
+}
