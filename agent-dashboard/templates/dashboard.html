@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Dashboard</title>
+<style>
+  :root {
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: #1e293b;
+    --bg-card-hover: #273548;
+    --border: #334155;
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --accent-blue: #3b82f6;
+    --accent-green: #10b981;
+    --accent-yellow: #f59e0b;
+    --accent-red: #ef4444;
+    --accent-purple: #8b5cf6;
+    --accent-pink: #ec4899;
+    --accent-teal: #14b8a6;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+    --transition: all 0.2s ease;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Header */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 24px;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .header-logo {
+    width: 32px;
+    height: 32px;
+    background: var(--accent-blue);
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  .header-title {
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .header-subtitle {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .status-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .status-badge.healthy { background: rgba(16, 185, 129, 0.15); color: var(--accent-green); }
+  .status-badge.warning { background: rgba(245, 158, 11, 0.15); color: var(--accent-yellow); }
+  .status-badge.critical { background: rgba(239, 68, 68, 0.15); color: var(--accent-red); }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  .status-dot.healthy { background: var(--accent-green); }
+  .status-dot.warning { background: var(--accent-yellow); }
+  .status-dot.critical { background: var(--accent-red); }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+
+  .time-selector {
+    display: flex;
+    gap: 4px;
+    background: var(--bg-primary);
+    padding: 4px;
+    border-radius: var(--radius-sm);
+  }
+
+  .time-btn {
+    padding: 4px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: var(--transition);
+  }
+
+  .time-btn.active {
+    background: var(--accent-blue);
+    color: white;
+  }
+
+  .time-btn:hover:not(.active) {
+    color: var(--text-primary);
+    background: var(--bg-card-hover);
+  }
+
+  /* Main Layout */
+  .main {
+    padding: 24px;
+    max-width: 1440px;
+    margin: 0 auto;
+  }
+
+  /* KPI Cards */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    transition: var(--transition);
+  }
+
+  .kpi-card:hover {
+    background: var(--bg-card-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
+
+  .kpi-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .kpi-trend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 8px;
+    font-size: 12px;
+  }
+
+  .kpi-trend.up { color: var(--accent-green); }
+  .kpi-trend.down { color: var(--accent-red); }
+  .kpi-trend.neutral { color: var(--text-muted); }
+
+  /* Section Grid */
+  .section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 24px;
+  }
+
+  .section-grid.full {
+    grid-template-columns: 1fr;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .card-action {
+    font-size: 12px;
+    color: var(--accent-blue);
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .card-body {
+    padding: 20px;
+  }
+
+  /* Chart Placeholder */
+  .chart-placeholder {
+    width: 100%;
+    height: 240px;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), rgba(139, 92, 246, 0.05));
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-sm);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 13px;
+    gap: 8px;
+  }
+
+  .chart-placeholder .chart-icon {
+    font-size: 24px;
+    opacity: 0.5;
+  }
+
+  /* Agent Table */
+  .agent-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .agent-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+    font-weight: 500;
+  }
+
+  .agent-table td {
+    padding: 12px 16px;
+    font-size: 13px;
+    border-bottom: 1px solid rgba(51, 65, 85, 0.5);
+  }
+
+  .agent-table tr:last-child td {
+    border-bottom: none;
+  }
+
+  .agent-table tr:hover td {
+    background: rgba(59, 130, 246, 0.03);
+  }
+
+  .agent-name {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .agent-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .model-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  .model-badge.opus { background: rgba(139, 92, 246, 0.15); color: var(--accent-purple); }
+  .model-badge.sonnet { background: rgba(59, 130, 246, 0.15); color: var(--accent-blue); }
+  .model-badge.gemini-pro { background: rgba(20, 184, 166, 0.15); color: var(--accent-teal); }
+  .model-badge.gemini-flash { background: rgba(245, 158, 11, 0.15); color: var(--accent-yellow); }
+
+  /* Progress Bar */
+  .progress-bar {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-primary);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-fill.green { background: var(--accent-green); }
+  .progress-fill.yellow { background: var(--accent-yellow); }
+  .progress-fill.red { background: var(--accent-red); }
+  .progress-fill.blue { background: var(--accent-blue); }
+
+  /* Alert List */
+  .alert-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .alert-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+  }
+
+  .alert-item.critical { background: rgba(239, 68, 68, 0.08); border-left: 3px solid var(--accent-red); }
+  .alert-item.warning { background: rgba(245, 158, 11, 0.08); border-left: 3px solid var(--accent-yellow); }
+  .alert-item.info { background: rgba(59, 130, 246, 0.08); border-left: 3px solid var(--accent-blue); }
+
+  .alert-time {
+    color: var(--text-muted);
+    font-size: 11px;
+    white-space: nowrap;
+    min-width: 60px;
+  }
+
+  .alert-message {
+    flex: 1;
+  }
+
+  .alert-agent {
+    color: var(--text-muted);
+    font-size: 11px;
+  }
+
+  /* Cost Breakdown */
+  .cost-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .cost-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .cost-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+
+  .cost-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .cost-value {
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .cost-bar-container {
+    margin-top: 16px;
+  }
+
+  .cost-stacked-bar {
+    display: flex;
+    width: 100%;
+    height: 12px;
+    border-radius: 6px;
+    overflow: hidden;
+    gap: 2px;
+  }
+
+  .cost-segment {
+    height: 100%;
+    transition: var(--transition);
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-muted);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 24px;
+  }
+
+  /* Empty State */
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-muted);
+  }
+
+  .empty-state .icon {
+    font-size: 32px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .section-grid { grid-template-columns: 1fr; }
+    .kpi-grid { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+  }
+
+  @media (max-width: 768px) {
+    .header { flex-direction: column; gap: 12px; padding: 12px 16px; }
+    .header-right { width: 100%; justify-content: space-between; flex-wrap: wrap; }
+    .main { padding: 16px; }
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .kpi-value { font-size: 22px; }
+    .agent-table { font-size: 12px; }
+    .agent-table th, .agent-table td { padding: 8px 10px; }
+    .agent-avatar { display: none; }
+  }
+
+  @media (max-width: 480px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+    .time-selector { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <div class="header-left">
+    <div class="header-logo">AD</div>
+    <div>
+      <div class="header-title">Agent Dashboard</div>
+      <div class="header-subtitle">Real-time monitoring &amp; cost tracking</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="status-badge healthy">
+      <span class="status-dot healthy"></span>
+      System Healthy
+    </div>
+    <div class="time-selector">
+      <button class="time-btn">1H</button>
+      <button class="time-btn">6H</button>
+      <button class="time-btn active">24H</button>
+      <button class="time-btn">7D</button>
+      <button class="time-btn">30D</button>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content -->
+<main class="main">
+
+  <!-- KPI Cards -->
+  <section class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Active Agents</div>
+      <div class="kpi-value" id="kpi-agents">7</div>
+      <div class="kpi-trend up">
+        <span>+2 from yesterday</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Cost (24h)</div>
+      <div class="kpi-value" id="kpi-cost">$12.47</div>
+      <div class="kpi-trend down">
+        <span>-18% vs avg</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Invocations</div>
+      <div class="kpi-value" id="kpi-invocations">342</div>
+      <div class="kpi-trend up">
+        <span>+12% vs avg</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Avg Response Time</div>
+      <div class="kpi-value" id="kpi-response">8.2s</div>
+      <div class="kpi-trend neutral">
+        <span>No change</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Error Rate</div>
+      <div class="kpi-value" id="kpi-errors">2.1%</div>
+      <div class="kpi-trend up">
+        <span>Within threshold</span>
+      </div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tokens Used</div>
+      <div class="kpi-value" id="kpi-tokens">1.8M</div>
+      <div class="kpi-trend down">
+        <span>-8% vs avg</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts Row -->
+  <section class="section-grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Token Usage Over Time</span>
+        <a class="card-action">View Details</a>
+      </div>
+      <div class="card-body">
+        <div class="chart-placeholder" id="chart-tokens">
+          <div class="chart-icon">|||</div>
+          <div>Token usage chart</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Connect data source to populate</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Cost Breakdown</span>
+        <a class="card-action">View Details</a>
+      </div>
+      <div class="card-body">
+        <div class="cost-breakdown">
+          <div class="cost-row">
+            <span class="cost-label"><span class="cost-dot" style="background: var(--accent-purple)"></span> Opus 4.6</span>
+            <span class="cost-value">$7.82</span>
+          </div>
+          <div class="cost-row">
+            <span class="cost-label"><span class="cost-dot" style="background: var(--accent-teal)"></span> Gemini 2.5 Pro</span>
+            <span class="cost-value">$3.15</span>
+          </div>
+          <div class="cost-row">
+            <span class="cost-label"><span class="cost-dot" style="background: var(--accent-yellow)"></span> Gemini 2.5 Flash</span>
+            <span class="cost-value">$0.92</span>
+          </div>
+          <div class="cost-row">
+            <span class="cost-label"><span class="cost-dot" style="background: var(--accent-blue)"></span> Sonnet 4</span>
+            <span class="cost-value">$0.58</span>
+          </div>
+          <div class="cost-bar-container">
+            <div class="cost-stacked-bar">
+              <div class="cost-segment" style="width: 62.7%; background: var(--accent-purple)"></div>
+              <div class="cost-segment" style="width: 25.3%; background: var(--accent-teal)"></div>
+              <div class="cost-segment" style="width: 7.4%; background: var(--accent-yellow)"></div>
+              <div class="cost-segment" style="width: 4.6%; background: var(--accent-blue)"></div>
+            </div>
+          </div>
+          <div class="cost-row" style="margin-top: 8px; padding-top: 12px; border-top: 1px solid var(--border);">
+            <span class="cost-label" style="font-weight: 600;">Total (24h)</span>
+            <span class="cost-value" style="font-size: 16px;">$12.47</span>
+          </div>
+          <div class="cost-row">
+            <span class="cost-label" style="color: var(--text-muted); font-size: 12px;">Projected monthly</span>
+            <span class="cost-value" style="color: var(--text-muted); font-size: 12px;">$374.10</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Agent Table -->
+  <section class="section-grid full">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Active Agents</span>
+        <a class="card-action">Manage Agents</a>
+      </div>
+      <div class="card-body" style="padding: 0;">
+        <table class="agent-table">
+          <thead>
+            <tr>
+              <th>Agent</th>
+              <th>Role</th>
+              <th>Model</th>
+              <th>Status</th>
+              <th>Invocations</th>
+              <th>Tokens</th>
+              <th>Cost</th>
+              <th>Context</th>
+            </tr>
+          </thead>
+          <tbody id="agent-table-body">
+            <tr>
+              <td><div class="agent-name"><div class="agent-avatar" style="background: rgba(139, 92, 246, 0.2); color: var(--accent-purple);">HN</div><div><div style="font-weight: 500;">Hinata</div><div style="font-size: 11px; color: var(--text-muted);">CEO</div></div></div></td>
+              <td>Executive Council</td>
+              <td><span class="model-badge opus">Opus 4.6</span></td>
+              <td><span class="status-badge healthy" style="font-size: 11px; padding: 3px 8px;"><span class="status-dot healthy" style="width: 6px; height: 6px;"></span>Active</span></td>
+              <td>48</td>
+              <td>420K</td>
+              <td>$4.21</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="progress-bar" style="width: 80px;"><div class="progress-fill yellow" style="width: 68%;"></div></div>
+                  <span style="font-size: 11px; color: var(--text-muted);">68%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="agent-name"><div class="agent-avatar" style="background: rgba(59, 130, 246, 0.2); color: var(--accent-blue);">ST</div><div><div style="font-weight: 500;">Satoshi</div><div style="font-size: 11px; color: var(--text-muted);">CTO</div></div></div></td>
+              <td>Executive Council</td>
+              <td><span class="model-badge opus">Opus 4.6</span></td>
+              <td><span class="status-badge healthy" style="font-size: 11px; padding: 3px 8px;"><span class="status-dot healthy" style="width: 6px; height: 6px;"></span>Active</span></td>
+              <td>62</td>
+              <td>510K</td>
+              <td>$3.61</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="progress-bar" style="width: 80px;"><div class="progress-fill green" style="width: 45%;"></div></div>
+                  <span style="font-size: 11px; color: var(--text-muted);">45%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="agent-name"><div class="agent-avatar" style="background: rgba(20, 184, 166, 0.2); color: var(--accent-teal);">KZ</div><div><div style="font-weight: 500;">Kazuma</div><div style="font-size: 11px; color: var(--text-muted);">Lead Dev</div></div></div></td>
+              <td>Engineering</td>
+              <td><span class="model-badge gemini-pro">Gemini Pro</span></td>
+              <td><span class="status-badge healthy" style="font-size: 11px; padding: 3px 8px;"><span class="status-dot healthy" style="width: 6px; height: 6px;"></span>Active</span></td>
+              <td>98</td>
+              <td>380K</td>
+              <td>$2.14</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="progress-bar" style="width: 80px;"><div class="progress-fill green" style="width: 32%;"></div></div>
+                  <span style="font-size: 11px; color: var(--text-muted);">32%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="agent-name"><div class="agent-avatar" style="background: rgba(236, 72, 153, 0.2); color: var(--accent-pink);">EL</div><div><div style="font-weight: 500;">Elena</div><div style="font-size: 11px; color: var(--text-muted);">Designer</div></div></div></td>
+              <td>Design</td>
+              <td><span class="model-badge gemini-pro">Gemini Pro</span></td>
+              <td><span class="status-badge healthy" style="font-size: 11px; padding: 3px 8px;"><span class="status-dot healthy" style="width: 6px; height: 6px;"></span>Active</span></td>
+              <td>35</td>
+              <td>190K</td>
+              <td>$1.01</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="progress-bar" style="width: 80px;"><div class="progress-fill green" style="width: 28%;"></div></div>
+                  <span style="font-size: 11px; color: var(--text-muted);">28%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="agent-name"><div class="agent-avatar" style="background: rgba(245, 158, 11, 0.2); color: var(--accent-yellow);">FX</div><div><div style="font-weight: 500;">FX Scanner</div><div style="font-size: 11px; color: var(--text-muted);">Consensus</div></div></div></td>
+              <td>Trading</td>
+              <td><span class="model-badge opus">Opus 4.6</span></td>
+              <td><span class="status-badge warning" style="font-size: 11px; padding: 3px 8px;"><span class="status-dot warning" style="width: 6px; height: 6px;"></span>Idle</span></td>
+              <td>24</td>
+              <td>180K</td>
+              <td>$0.98</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="progress-bar" style="width: 80px;"><div class="progress-fill green" style="width: 15%;"></div></div>
+                  <span style="font-size: 11px; color: var(--text-muted);">15%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="agent-name"><div class="agent-avatar" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-green);">W1</div><div><div style="font-weight: 500;">Worker-1</div><div style="font-size: 11px; color: var(--text-muted);">Dev</div></div></div></td>
+              <td>Engineering</td>
+              <td><span class="model-badge gemini-flash">Gemini Flash</span></td>
+              <td><span class="status-badge healthy" style="font-size: 11px; padding: 3px 8px;"><span class="status-dot healthy" style="width: 6px; height: 6px;"></span>Active</span></td>
+              <td>52</td>
+              <td>85K</td>
+              <td>$0.34</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="progress-bar" style="width: 80px;"><div class="progress-fill green" style="width: 12%;"></div></div>
+                  <span style="font-size: 11px; color: var(--text-muted);">12%</span>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td><div class="agent-name"><div class="agent-avatar" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-green);">W2</div><div><div style="font-weight: 500;">Worker-2</div><div style="font-size: 11px; color: var(--text-muted);">Research</div></div></div></td>
+              <td>Research</td>
+              <td><span class="model-badge gemini-flash">Gemini Flash</span></td>
+              <td><span class="status-badge healthy" style="font-size: 11px; padding: 3px 8px;"><span class="status-dot healthy" style="width: 6px; height: 6px;"></span>Active</span></td>
+              <td>23</td>
+              <td>55K</td>
+              <td>$0.18</td>
+              <td>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                  <div class="progress-bar" style="width: 80px;"><div class="progress-fill green" style="width: 8%;"></div></div>
+                  <span style="font-size: 11px; color: var(--text-muted);">8%</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Alerts and Activity -->
+  <section class="section-grid">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Recent Alerts</span>
+        <a class="card-action">View All</a>
+      </div>
+      <div class="card-body">
+        <div class="alert-list" id="alert-list">
+          <div class="alert-item warning">
+            <span class="alert-time">14:32</span>
+            <div>
+              <div class="alert-message">Context utilization exceeded 70% threshold</div>
+              <div class="alert-agent">Hinata (CEO) | Auto-resolved</div>
+            </div>
+          </div>
+          <div class="alert-item info">
+            <span class="alert-time">13:15</span>
+            <div>
+              <div class="alert-message">FX Scanner idle for 30+ minutes during market hours</div>
+              <div class="alert-agent">FX Scanner | Weekend - Expected</div>
+            </div>
+          </div>
+          <div class="alert-item warning">
+            <span class="alert-time">11:48</span>
+            <div>
+              <div class="alert-message">Hourly cost rate approaching warning threshold ($4.82/hr)</div>
+              <div class="alert-agent">System | Resolved - spike ended</div>
+            </div>
+          </div>
+          <div class="alert-item info">
+            <span class="alert-time">09:00</span>
+            <div>
+              <div class="alert-message">Daily monitoring cycle started. 7 agents registered.</div>
+              <div class="alert-agent">System | Informational</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Response Time Distribution</span>
+        <a class="card-action">View Details</a>
+      </div>
+      <div class="card-body">
+        <div class="chart-placeholder" id="chart-response">
+          <div class="chart-icon">|||</div>
+          <div>Response time histogram</div>
+          <div style="font-size: 11px; color: var(--text-muted);">Connect data source to populate</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  Agent Dashboard v1.0.0 | Last updated: <span id="last-update">--</span> | Auto-refresh: 60s
+</footer>
+
+<script>
+  // Time selector interaction
+  document.querySelectorAll('.time-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      updateDashboard(this.textContent.trim());
+    });
+  });
+
+  // Update timestamp
+  function updateTimestamp() {
+    const now = new Date();
+    const timeStr = now.toLocaleTimeString('en-US', { hour12: false });
+    const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    document.getElementById('last-update').textContent = `${dateStr} ${timeStr}`;
+  }
+
+  // Dashboard update placeholder
+  function updateDashboard(timeRange) {
+    console.log(`Dashboard: Switching to ${timeRange} view`);
+    // In production, this would fetch data from the monitoring API
+    // and update all KPIs, charts, and tables
+  }
+
+  // Auto-refresh
+  function startAutoRefresh(intervalSeconds) {
+    updateTimestamp();
+    setInterval(() => {
+      updateTimestamp();
+      // In production: fetch fresh data and update DOM
+    }, intervalSeconds * 1000);
+  }
+
+  // Initialize
+  document.addEventListener('DOMContentLoaded', function() {
+    startAutoRefresh(60);
+  });
+</script>
+</body>
+</html>
