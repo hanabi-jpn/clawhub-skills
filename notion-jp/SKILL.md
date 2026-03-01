@@ -361,6 +361,120 @@ Notion JP is designed to work alongside other skills in the ecosystem. Below are
 
 ---
 
+## Error Handling
+
+| Error Code | Meaning | Agent Action |
+|------------|---------|-------------|
+| 400 | Invalid request (malformed JSON, missing required fields) | Parse error details, show which field is invalid, suggest correction |
+| 401 | Unauthorized (invalid or expired API key) | Prompt user to check `NOTION_API_KEY` and re-create Integration if needed |
+| 403 | Restricted resource (Integration not connected to page/DB) | Guide user: page「...」→「コネクト」→ Integration追加 |
+| 404 | Object not found (page/DB deleted or ID wrong) | Verify page/DB ID, suggest `notion search` to find correct resource |
+| 409 | Conflict (transaction conflict on concurrent edits) | Retry once after 1s, if persists, show conflict details to user |
+| 429 | Rate limited (3 req/sec exceeded) | Auto-wait per `Retry-After` header, queue remaining requests |
+| 500 | Notion internal server error | Retry up to 3 times with exponential backoff (1s, 2s, 4s) |
+| 502/503 | Service unavailable / maintenance | Check [Notion Status](https://status.notion.so/), retry after 30s |
+
+**Retry strategy:** On 429 or 5xx errors, retry up to 3 times with delays of 1s, 2s, 4s. Log each retry attempt. For 403 errors, never retry — always prompt user action.
+
+---
+
+## Additional Template Examples
+
+### 日報テンプレート (Daily Report)
+
+```markdown
+# 日報 — [YYYY-MM-DD] [名前]
+
+## 本日の業務内容
+| 時間帯    | 業務内容               | 区分   | 進捗  |
+|----------|----------------------|--------|------|
+| 09:00-10:00 | [業務1]             | 開発   | 完了  |
+| 10:00-12:00 | [業務2]             | MTG    | -    |
+| 13:00-15:00 | [業務3]             | 調査   | 80%  |
+| 15:00-17:30 | [業務4]             | 開発   | 50%  |
+
+## 完了タスク
+- [x] [タスク1]
+- [x] [タスク2]
+
+## 明日の予定
+- [ ] [予定1]
+- [ ] [予定2]
+
+## 課題・相談事項
+- [課題]: [対応状況]
+
+## 所感
+[一言コメント]
+```
+
+### OKR管理テンプレート (OKR Tracker)
+
+```markdown
+# OKR — [YYYY年 Q1/Q2/Q3/Q4]
+
+## Objective 1: [目標]
+進捗: ██████████░░░░░░░░░░ 50%
+
+| Key Result | 目標値 | 現在値 | 達成率 | ステータス |
+|-----------|-------|-------|-------|----------|
+| KR1: [指標] | 100   | 62    | 62%   | 🟡 要注意 |
+| KR2: [指標] | 50    | 48    | 96%   | 🟢 順調  |
+| KR3: [指標] | 200   | 89    | 45%   | 🔴 遅延  |
+
+## Objective 2: [目標]
+進捗: ████████████████░░░░ 80%
+
+| Key Result | 目標値 | 現在値 | 達成率 | ステータス |
+|-----------|-------|-------|-------|----------|
+| KR1: [指標] | 30    | 28    | 93%   | 🟢 順調  |
+| KR2: [指標] | 15    | 11    | 73%   | 🟡 要注意 |
+
+## 振り返り・Next Action
+- [学び]
+- [次のアクション]
+```
+
+### 1on1テンプレート (1on1 Meeting)
+
+```markdown
+# 1on1 — [上司名] × [部下名] — [YYYY-MM-DD]
+
+## 前回のフォローアップ
+- [ ] [前回TODO 1] → 状況:
+- [ ] [前回TODO 2] → 状況:
+
+## 今週のトピック
+### 業務の進捗
+- [プロジェクトA]: [状況]
+- [プロジェクトB]: [状況]
+
+### 困っていること・相談
+- [相談1]
+- [相談2]
+
+### キャリア・成長
+- [学びたいこと / 挑戦したいこと]
+
+### フィードバック
+**良かった点:**
+- [ポジティブFB]
+
+**改善点:**
+- [建設的FB]
+
+## アクションアイテム
+| TODO | 担当 | 期限 |
+|------|------|------|
+| [アクション1] | [名前] | [日付] |
+| [アクション2] | [名前] | [日付] |
+
+## 次回日程
+[候補日時]
+```
+
+---
+
 ## Data Storage & Persistence
 
 ```

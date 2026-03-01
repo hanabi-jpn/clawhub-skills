@@ -454,6 +454,45 @@ Action:   1. lark webhook --card incident_alert --data <payload>
 
 ---
 
+## Error Handling
+
+| Error Code | Meaning | Agent Action |
+|------------|---------|-------------|
+| 99991400 | Invalid params (missing or malformed field) | Parse `msg` field for specific error, show which param needs fixing |
+| 99991401 | Authentication failed (invalid app credentials) | Prompt user to verify `LARK_APP_ID` and `LARK_APP_SECRET` |
+| 99991402 | Insufficient permissions (scope not granted) | Show required scope, guide: Lark Admin → App → Permissions → Add scope |
+| 99991663 | Tenant token expired | Auto-refresh token via `/auth/v3/tenant_access_token/internal` |
+| 99991672 | User token expired | Prompt user to re-authorize via OAuth2 flow |
+| 99991400 | Chat not found (invalid chat_id) | Verify chat_id with `lark chats`, suggest search |
+| 99991668 | Rate limit exceeded | Auto-wait, exponential backoff (1s, 2s, 4s), max 3 retries |
+| 99991403 | Bot not in chat (cannot send message) | Guide: Group Settings → Bots → Add this app's bot |
+| 230001 | Approval definition not found | Verify approval code, list available with `lark approval list` |
+| 230004 | Approval instance already completed | Show current status, no action possible |
+| 1254043 | Document permission denied | Guide: Share document with app or use user token |
+| 500 | Lark internal server error | Retry up to 3 times with exponential backoff |
+
+**Retry strategy:** On rate limit or 5xx errors, retry up to 3 times with delays of 1s, 2s, 4s. Token expiry errors trigger automatic token refresh before retry.
+
+---
+
+## Lark Workflow vs Other Collaboration Tools
+
+| Feature | Lark Workflow | Slack Bot | Microsoft Teams Bot |
+|---------|-------------|----------|-------------------|
+| Platform | Lark / Feishu | Slack | Microsoft Teams |
+| **Approval Workflows** | **Native (20段承認)** | Third-party app | Power Automate |
+| Message Cards | **Interactive Cards** | Block Kit | Adaptive Cards |
+| Document Integration | **Native Docs/Sheets** | Third-party | Office 365 |
+| Calendar | **Built-in** | Google Cal integration | Outlook |
+| Spreadsheet | **Native Sheets** | None | Excel Online |
+| Webhook Setup | **1-step (URL only)** | 3-step (app + scope) | 5-step (Azure AD) |
+| Multi-language | **JP/EN/CN native** | EN-first | EN-first |
+| Pricing | Free tier generous | Free tier limited | Requires M365 |
+| China Support | **Feishu (飛書) native** | Blocked in China | Limited |
+| Bot Development | Simple JSON cards | Complex Block Kit | Azure Bot Framework |
+
+---
+
 ## FAQ
 
 **Q: Lark Suite と Feishu の違いは？**
