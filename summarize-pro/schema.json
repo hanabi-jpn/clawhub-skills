@@ -1,0 +1,559 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clawhub.dev/skills/summarize-pro/schema.json",
+  "title": "Summarize Pro - Summary Output Schema",
+  "description": "JSON Schema for summary outputs, cache entries, comparison results, and Chain-of-Density passes produced by Summarize Pro.",
+  "oneOf": [
+    { "$ref": "#/$defs/summaryOutput" },
+    { "$ref": "#/$defs/cacheEntry" },
+    { "$ref": "#/$defs/comparisonOutput" },
+    { "$ref": "#/$defs/chainOfDensityResult" }
+  ],
+  "$defs": {
+    "summaryOutput": {
+      "type": "object",
+      "description": "Primary summary output structure returned after processing a single source",
+      "required": ["id", "timestamp", "mode", "depth", "language", "content", "source"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^sum-[0-9]{8}-[0-9]{6}$",
+          "description": "Unique summary ID in format sum-YYYYMMDD-HHMMSS",
+          "examples": ["sum-20260301-143022"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the summary was generated"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["bullets", "executive", "academic", "mindmap", "table", "timeline", "qa"],
+          "description": "Output format mode used for this summary"
+        },
+        "depth": {
+          "type": "string",
+          "enum": ["shallow", "standard", "deep", "exhaustive"],
+          "description": "Depth level used for this summary"
+        },
+        "language": {
+          "type": "string",
+          "enum": ["en", "ja", "zh", "ko", "es", "fr", "de", "pt"],
+          "description": "ISO 639-1 language code of the summary output"
+        },
+        "source_language": {
+          "type": "string",
+          "enum": ["en", "ja", "zh", "ko", "es", "fr", "de", "pt"],
+          "description": "Detected language of the original source content"
+        },
+        "content": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The generated summary text in the selected mode format"
+        },
+        "source": {
+          "$ref": "#/$defs/sourceInfo"
+        },
+        "chain_of_density_used": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether Chain-of-Density compression was applied"
+        },
+        "word_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Word count of the generated summary"
+        },
+        "source_word_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Word count of the original source content"
+        },
+        "compression_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Ratio of summary length to source length (lower = more compressed)"
+        },
+        "entities_preserved": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Named entities, key numbers, dates, and facts preserved in the summary"
+        },
+        "chunked": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the source was chunked due to context window limits"
+        },
+        "chunk_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of chunks the source was split into (1 if not chunked)"
+        },
+        "tokens_used": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total tokens consumed during summarization"
+        },
+        "cached": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether this result was served from cache"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Processing time in milliseconds"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "sourceInfo": {
+      "type": "object",
+      "description": "Metadata about the summarized source",
+      "required": ["type", "identifier"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["url", "youtube", "pdf", "code", "text", "markdown"],
+          "description": "Type of source content"
+        },
+        "identifier": {
+          "type": "string",
+          "description": "URL, file path, or other identifier for the source",
+          "examples": ["https://example.com/article", "/path/to/document.pdf"]
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the source document or page"
+        },
+        "author": {
+          "type": "string",
+          "description": "Author of the source content if available"
+        },
+        "published_date": {
+          "type": "string",
+          "format": "date",
+          "description": "Publication date of the source if available"
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hash of the source content for cache keying"
+        },
+        "encoding": {
+          "type": "string",
+          "description": "Detected character encoding of the source",
+          "examples": ["UTF-8", "Shift-JIS", "ISO-8859-1"]
+        },
+        "youtube_metadata": {
+          "type": "object",
+          "description": "Additional metadata for YouTube sources",
+          "properties": {
+            "video_id": { "type": "string" },
+            "channel": { "type": "string" },
+            "duration_seconds": { "type": "integer", "minimum": 0 },
+            "transcript_available": { "type": "boolean" }
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "cacheEntry": {
+      "type": "object",
+      "description": "Cache entry stored in .summarize-pro/cache/ for previously generated summaries",
+      "required": ["cache_key", "content_hash", "summary", "mode", "depth", "language", "created_at", "ttl_seconds"],
+      "properties": {
+        "cache_key": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hash of content + mode + depth + language, used as the cache key"
+        },
+        "content_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA-256 hash of the original source content alone"
+        },
+        "source_identifier": {
+          "type": "string",
+          "description": "URL or file path of the original source"
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The cached summary text"
+        },
+        "mode": {
+          "type": "string",
+          "enum": ["bullets", "executive", "academic", "mindmap", "table", "timeline", "qa"],
+          "description": "Output mode used when generating this cached summary"
+        },
+        "depth": {
+          "type": "string",
+          "enum": ["shallow", "standard", "deep", "exhaustive"],
+          "description": "Depth level used when generating this cached summary"
+        },
+        "language": {
+          "type": "string",
+          "enum": ["en", "ja", "zh", "ko", "es", "fr", "de", "pt"],
+          "description": "Output language of the cached summary"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this cache entry was created"
+        },
+        "expires_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this cache entry expires"
+        },
+        "ttl_seconds": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 604800,
+          "description": "Time-to-live in seconds (default: 604800 = 7 days)"
+        },
+        "hit_count": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0,
+          "description": "Number of times this cache entry has been served"
+        },
+        "last_accessed": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of the last cache hit"
+        },
+        "word_count": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Word count of the cached summary"
+        },
+        "tokens_saved": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Estimated tokens saved by serving from cache instead of regenerating"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "comparisonOutput": {
+      "type": "object",
+      "description": "Output structure for comparison mode when analyzing multiple sources",
+      "required": ["id", "timestamp", "sources", "agreement_points", "disagreements", "synthesis"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^cmp-[0-9]{8}-[0-9]{6}$",
+          "description": "Unique comparison ID in format cmp-YYYYMMDD-HHMMSS",
+          "examples": ["cmp-20260301-143022"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the comparison was generated"
+        },
+        "language": {
+          "type": "string",
+          "enum": ["en", "ja", "zh", "ko", "es", "fr", "de", "pt"],
+          "description": "Output language of the comparison"
+        },
+        "depth": {
+          "type": "string",
+          "enum": ["shallow", "standard", "deep", "exhaustive"],
+          "description": "Depth level used for the comparison analysis"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/sourceInfo" },
+          "description": "Array of sources being compared (minimum 2)"
+        },
+        "agreement_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["point", "source_indices"],
+            "properties": {
+              "point": {
+                "type": "string",
+                "description": "A point on which the sources agree"
+              },
+              "source_indices": {
+                "type": "array",
+                "items": { "type": "integer", "minimum": 0 },
+                "description": "Indices of sources that agree on this point"
+              },
+              "confidence": {
+                "type": "number",
+                "minimum": 0,
+                "maximum": 1,
+                "description": "Confidence level that the agreement is genuine (not superficial)"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Points where all or multiple sources agree"
+        },
+        "disagreements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["topic", "positions"],
+            "properties": {
+              "topic": {
+                "type": "string",
+                "description": "The topic or claim on which sources disagree"
+              },
+              "positions": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["source_index", "stance"],
+                  "properties": {
+                    "source_index": {
+                      "type": "integer",
+                      "minimum": 0,
+                      "description": "Index of the source in the sources array"
+                    },
+                    "stance": {
+                      "type": "string",
+                      "description": "This source's position on the topic"
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                "description": "Each source's position on the disagreement"
+              },
+              "severity": {
+                "type": "string",
+                "enum": ["minor", "moderate", "major"],
+                "description": "How significant the disagreement is"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Points where sources disagree or contradict each other"
+        },
+        "unique_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source_index", "points"],
+            "properties": {
+              "source_index": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Index of the source with unique content"
+              },
+              "points": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Points found only in this source"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Points unique to each individual source"
+        },
+        "synthesis": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Overall assessment considering all sources together"
+        },
+        "tokens_used": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total tokens consumed during comparison"
+        },
+        "duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Processing time in milliseconds"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "chainOfDensityResult": {
+      "type": "object",
+      "description": "Detailed output of the 3-pass Chain-of-Density compression process",
+      "required": ["id", "timestamp", "source", "passes", "final_summary"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^cod-[0-9]{8}-[0-9]{6}$",
+          "description": "Unique Chain-of-Density ID in format cod-YYYYMMDD-HHMMSS",
+          "examples": ["cod-20260301-143022"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the CoD process started"
+        },
+        "source": {
+          "$ref": "#/$defs/sourceInfo"
+        },
+        "language": {
+          "type": "string",
+          "enum": ["en", "ja", "zh", "ko", "es", "fr", "de", "pt"],
+          "description": "Language of the CoD output"
+        },
+        "passes": {
+          "type": "object",
+          "description": "Output from each of the 3 Chain-of-Density passes",
+          "required": ["pass1", "pass2", "pass3"],
+          "properties": {
+            "pass1": {
+              "type": "object",
+              "description": "Pass 1 — Entity Extraction: verbose summary capturing all key entities",
+              "required": ["content", "word_count", "entity_count"],
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "description": "Verbose summary text (~500 words)"
+                },
+                "word_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Word count of pass 1 output"
+                },
+                "entity_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Number of named entities captured"
+                },
+                "entities": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "List of named entities extracted"
+                },
+                "duration_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Processing time for this pass"
+                }
+              },
+              "additionalProperties": false
+            },
+            "pass2": {
+              "type": "object",
+              "description": "Pass 2 — Density Compression: 50% shorter while preserving all entities",
+              "required": ["content", "word_count", "entity_count"],
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "description": "Compressed summary text (~250 words)"
+                },
+                "word_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Word count of pass 2 output"
+                },
+                "entity_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Number of entities retained after compression"
+                },
+                "entities_lost": {
+                  "type": "array",
+                  "items": { "type": "string" },
+                  "description": "Entities that were lost during compression (ideally empty)"
+                },
+                "compression_ratio": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "Ratio of pass 2 length to pass 1 length"
+                },
+                "duration_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Processing time for this pass"
+                }
+              },
+              "additionalProperties": false
+            },
+            "pass3": {
+              "type": "object",
+              "description": "Pass 3 — Polish: final readability pass with logical flow verification",
+              "required": ["content", "word_count"],
+              "properties": {
+                "content": {
+                  "type": "string",
+                  "description": "Final polished summary text (~150-200 words)"
+                },
+                "word_count": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "description": "Word count of final polished output"
+                },
+                "entity_count": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Number of entities in the final output"
+                },
+                "readability_score": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 100,
+                  "description": "Readability score of the final polished summary"
+                },
+                "information_loss": {
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1,
+                  "description": "Estimated information loss from source to final (0 = none, 1 = total)"
+                },
+                "duration_ms": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "description": "Processing time for this pass"
+                }
+              },
+              "additionalProperties": false
+            }
+          },
+          "additionalProperties": false
+        },
+        "final_summary": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The final Chain-of-Density summary (identical to passes.pass3.content)"
+        },
+        "total_compression_ratio": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Overall compression ratio from source to final summary"
+        },
+        "entity_retention_rate": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Proportion of pass 1 entities retained in the final output"
+        },
+        "total_duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total processing time across all 3 passes"
+        },
+        "total_tokens_used": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total tokens consumed across all 3 passes"
+        },
+        "fallback_used": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether single-pass fallback was used due to a CoD pass failure"
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}

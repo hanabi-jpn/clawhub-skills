@@ -1,0 +1,638 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clawhub.dev/skills/nano-banana-ultra/schema.json",
+  "title": "Nano Banana Ultra - Image Generation Schema",
+  "description": "JSON Schema for generation requests, image metadata, batch state, and gallery entries produced by Nano Banana Ultra.",
+  "oneOf": [
+    { "$ref": "#/$defs/generationRequest" },
+    { "$ref": "#/$defs/imageMetadata" },
+    { "$ref": "#/$defs/batchState" },
+    { "$ref": "#/$defs/galleryEntry" }
+  ],
+  "$defs": {
+    "generationRequest": {
+      "type": "object",
+      "description": "Input request for generating one or more images from a prompt",
+      "required": ["id", "timestamp", "prompt", "model"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^req-[0-9]{8}-[0-9]{6}$",
+          "description": "Unique request ID in format req-YYYYMMDD-HHMMSS",
+          "examples": ["req-20260301-143022"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the generation was requested"
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4000,
+          "description": "The text prompt describing the desired image"
+        },
+        "enhanced_prompt": {
+          "type": "string",
+          "description": "The prompt after template modifiers have been applied"
+        },
+        "model": {
+          "type": "string",
+          "enum": ["gemini", "dalle", "stability"],
+          "description": "AI model used for image generation"
+        },
+        "model_fallback_used": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether auto-fallback was triggered due to primary model failure"
+        },
+        "model_originally_requested": {
+          "type": "string",
+          "enum": ["gemini", "dalle", "stability"],
+          "description": "The model originally requested before fallback (if different from model)"
+        },
+        "template": {
+          "type": ["string", "null"],
+          "description": "Prompt template name(s) applied, comma-separated if multiple",
+          "examples": ["product-photo", "logo-design,minimalist"]
+        },
+        "resolution": {
+          "type": "string",
+          "enum": ["1k", "2k", "4k"],
+          "default": "1k",
+          "description": "Target resolution (1k=1024x1024, 2k=2048x2048, 4k=4096x4096)"
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+$",
+          "default": "1:1",
+          "description": "Aspect ratio for the generated image",
+          "examples": ["1:1", "16:9", "4:3", "9:16"]
+        },
+        "negative_prompt": {
+          "type": ["string", "null"],
+          "description": "Terms to exclude from the generation (Stability AI / advanced models)",
+          "examples": ["blurry, low quality, distorted, watermark"]
+        },
+        "variations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "default": 1,
+          "description": "Number of image variations to generate from this prompt"
+        },
+        "output_dir": {
+          "type": "string",
+          "description": "Target output directory for generated images",
+          "examples": ["./generated-images/"]
+        },
+        "compare_mode": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to generate on all available models for side-by-side comparison"
+        },
+        "style_transfer": {
+          "type": ["string", "null"],
+          "description": "Artistic style to apply (for edit commands)",
+          "examples": ["oil painting", "watercolor", "pencil sketch", "pop art"]
+        },
+        "upscale_target": {
+          "type": ["string", "null"],
+          "enum": ["1k", "2k", "4k", null],
+          "description": "Target resolution for upscaling an existing image"
+        },
+        "source_image": {
+          "type": ["string", "null"],
+          "description": "Path to source image for editing, style transfer, or upscaling"
+        },
+        "edit_instruction": {
+          "type": ["string", "null"],
+          "description": "Natural language instruction for image editing (inpainting)"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "imageMetadata": {
+      "type": "object",
+      "description": "Metadata sidecar (.meta.json) stored alongside each generated image",
+      "required": ["id", "prompt", "model", "resolution", "file_path", "created_at"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^img-[0-9]{8}-[0-9]{6}-[0-9]{1,3}$",
+          "description": "Unique image ID in format img-YYYYMMDD-HHMMSS-{variation}",
+          "examples": ["img-20260301-143022-1"]
+        },
+        "prompt": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The original user prompt (before template enhancement)"
+        },
+        "enhanced_prompt": {
+          "type": "string",
+          "description": "The full prompt sent to the model (after template modifiers)"
+        },
+        "model": {
+          "type": "string",
+          "enum": ["gemini", "dalle", "stability"],
+          "description": "AI model that generated this image"
+        },
+        "template": {
+          "type": ["string", "null"],
+          "description": "Prompt template(s) applied, comma-separated if multiple",
+          "examples": ["product-photo", "landscape", "anime,minimalist"]
+        },
+        "resolution": {
+          "type": "string",
+          "enum": ["1k", "2k", "4k"],
+          "description": "Resolution of the generated image"
+        },
+        "resolution_pixels": {
+          "type": "object",
+          "description": "Actual pixel dimensions of the generated image",
+          "properties": {
+            "width": { "type": "integer", "minimum": 1 },
+            "height": { "type": "integer", "minimum": 1 }
+          },
+          "required": ["width", "height"],
+          "additionalProperties": false
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "pattern": "^[0-9]+:[0-9]+$",
+          "description": "Aspect ratio of the generated image"
+        },
+        "file_path": {
+          "type": "string",
+          "description": "Relative path to the generated image file from the output directory",
+          "examples": ["2026-03-01/143022-sunset-mountain-landscape.png"]
+        },
+        "file_size_bytes": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "File size of the generated image in bytes"
+        },
+        "format": {
+          "type": "string",
+          "enum": ["png", "jpg", "webp"],
+          "default": "png",
+          "description": "Image file format"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the image was generated"
+        },
+        "generation_time_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Time taken to generate this image in milliseconds"
+        },
+        "quality_score": {
+          "type": ["object", "null"],
+          "description": "AI-powered quality analysis scores (null if not yet analyzed)",
+          "properties": {
+            "composition": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10,
+              "description": "Composition quality score"
+            },
+            "color_harmony": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10,
+              "description": "Color harmony and palette score"
+            },
+            "prompt_adherence": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10,
+              "description": "How well the image matches the original prompt"
+            },
+            "overall": {
+              "type": "number",
+              "minimum": 1,
+              "maximum": 10,
+              "description": "Overall quality score (average of all sub-scores)"
+            }
+          },
+          "required": ["composition", "color_harmony", "prompt_adherence", "overall"],
+          "additionalProperties": false
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "description": "User-assigned and auto-generated tags for gallery search"
+        },
+        "variation_index": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Which variation number this is (1-based) within a multi-variation request"
+        },
+        "total_variations": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Total number of variations generated in the same request"
+        },
+        "request_id": {
+          "type": "string",
+          "pattern": "^req-[0-9]{8}-[0-9]{6}$",
+          "description": "ID of the generation request that produced this image"
+        },
+        "upscaled_from": {
+          "type": ["string", "null"],
+          "description": "Original image ID if this image was produced by upscaling"
+        },
+        "style_transferred_from": {
+          "type": ["string", "null"],
+          "description": "Original image ID if this image was produced by style transfer"
+        },
+        "edited_from": {
+          "type": ["string", "null"],
+          "description": "Original image ID if this image was produced by editing/inpainting"
+        },
+        "starred": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether the user has marked this image as a favorite"
+        },
+        "cost_usd": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Estimated API cost in USD for generating this image"
+        },
+        "negative_prompt": {
+          "type": ["string", "null"],
+          "description": "Negative prompt used during generation (if any)"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "batchState": {
+      "type": "object",
+      "description": "Batch processing state tracked in .banana-batch-state.json for resume capability",
+      "required": ["batch_id", "timestamp", "total", "completed", "failed", "status", "items"],
+      "properties": {
+        "batch_id": {
+          "type": "string",
+          "pattern": "^batch-[0-9]{8}-[0-9]{6}$",
+          "description": "Unique batch ID in format batch-YYYYMMDD-HHMMSS",
+          "examples": ["batch-20260301-143022"]
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the batch was initiated"
+        },
+        "source_file": {
+          "type": "string",
+          "description": "Path to the CSV or JSON input file",
+          "examples": ["batch-input.csv", "prompts.json"]
+        },
+        "output_dir": {
+          "type": "string",
+          "description": "Output directory for generated images"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Total number of generation items in the batch"
+        },
+        "completed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of items successfully completed"
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of items that failed generation"
+        },
+        "pending": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of items not yet attempted"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["running", "paused", "completed", "failed", "interrupted"],
+          "description": "Current status of the batch process"
+        },
+        "started_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when batch processing began"
+        },
+        "finished_at": {
+          "type": ["string", "null"],
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when batch processing ended (null if still running)"
+        },
+        "estimated_remaining_ms": {
+          "type": ["integer", "null"],
+          "minimum": 0,
+          "description": "Estimated milliseconds remaining based on average item processing time"
+        },
+        "items": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["index", "prompt", "status"],
+            "properties": {
+              "index": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Zero-based index of this item in the batch"
+              },
+              "prompt": {
+                "type": "string",
+                "description": "The generation prompt for this item"
+              },
+              "template": {
+                "type": ["string", "null"],
+                "description": "Template specified for this item"
+              },
+              "resolution": {
+                "type": "string",
+                "enum": ["1k", "2k", "4k"],
+                "default": "1k",
+                "description": "Target resolution for this item"
+              },
+              "variations": {
+                "type": "integer",
+                "minimum": 1,
+                "default": 1,
+                "description": "Number of variations requested for this item"
+              },
+              "status": {
+                "type": "string",
+                "enum": ["pending", "in_progress", "completed", "failed", "skipped"],
+                "description": "Processing status of this batch item"
+              },
+              "image_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^img-[0-9]{8}-[0-9]{6}-[0-9]{1,3}$"
+                },
+                "description": "IDs of generated images for this item (populated on completion)"
+              },
+              "error": {
+                "type": ["string", "null"],
+                "description": "Error message if this item failed"
+              },
+              "model_used": {
+                "type": "string",
+                "enum": ["gemini", "dalle", "stability"],
+                "description": "Which model was actually used (may differ from requested if fallback occurred)"
+              },
+              "duration_ms": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "Processing time for this item in milliseconds"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Array of individual batch items with their processing status"
+        },
+        "rate_limit_delay_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 3000,
+          "description": "Delay between requests in milliseconds for rate limiting"
+        },
+        "total_cost_usd": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Cumulative API cost in USD for the batch so far"
+        },
+        "total_duration_ms": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Total elapsed processing time for the batch"
+        }
+      },
+      "additionalProperties": false
+    },
+
+    "galleryEntry": {
+      "type": "object",
+      "description": "Gallery index structure for browsing, searching, and managing generated images",
+      "required": ["gallery_id", "last_updated", "images", "statistics"],
+      "properties": {
+        "gallery_id": {
+          "type": "string",
+          "pattern": "^gal-[0-9]{8}$",
+          "description": "Gallery identifier, typically date-based in format gal-YYYYMMDD",
+          "examples": ["gal-20260301"]
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp of when the gallery index was last rebuilt"
+        },
+        "output_dir": {
+          "type": "string",
+          "description": "Root output directory the gallery indexes"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "file_path", "prompt", "model", "created_at"],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^img-[0-9]{8}-[0-9]{6}-[0-9]{1,3}$",
+                "description": "Unique image identifier"
+              },
+              "file_path": {
+                "type": "string",
+                "description": "Relative path to the image file"
+              },
+              "prompt": {
+                "type": "string",
+                "description": "Original prompt used to generate the image"
+              },
+              "model": {
+                "type": "string",
+                "enum": ["gemini", "dalle", "stability"],
+                "description": "Model that generated the image"
+              },
+              "template": {
+                "type": ["string", "null"],
+                "description": "Template(s) applied"
+              },
+              "resolution": {
+                "type": "string",
+                "enum": ["1k", "2k", "4k"],
+                "description": "Image resolution tier"
+              },
+              "created_at": {
+                "type": "string",
+                "format": "date-time",
+                "description": "When the image was generated"
+              },
+              "quality_score": {
+                "type": ["number", "null"],
+                "minimum": 1,
+                "maximum": 10,
+                "description": "Overall quality score (null if not analyzed)"
+              },
+              "tags": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Searchable tags assigned to the image"
+              },
+              "starred": {
+                "type": "boolean",
+                "default": false,
+                "description": "Whether the image is marked as a favorite"
+              },
+              "file_size_bytes": {
+                "type": "integer",
+                "minimum": 0,
+                "description": "File size in bytes"
+              }
+            },
+            "additionalProperties": false
+          },
+          "description": "Array of all images in the gallery"
+        },
+        "statistics": {
+          "type": "object",
+          "description": "Aggregate statistics for the gallery",
+          "required": ["total_images", "total_size_bytes"],
+          "properties": {
+            "total_images": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Total number of images in the gallery"
+            },
+            "total_size_bytes": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Total disk space used by all images in bytes"
+            },
+            "total_size_human": {
+              "type": "string",
+              "description": "Human-readable total size (e.g., '234 MB')",
+              "examples": ["234 MB", "1.2 GB"]
+            },
+            "average_quality_score": {
+              "type": ["number", "null"],
+              "minimum": 1,
+              "maximum": 10,
+              "description": "Average quality score across all scored images"
+            },
+            "images_by_model": {
+              "type": "object",
+              "description": "Count of images generated by each model",
+              "properties": {
+                "gemini": { "type": "integer", "minimum": 0 },
+                "dalle": { "type": "integer", "minimum": 0 },
+                "stability": { "type": "integer", "minimum": 0 }
+              },
+              "additionalProperties": false
+            },
+            "images_by_template": {
+              "type": "object",
+              "description": "Count of images generated using each template",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "images_by_date": {
+              "type": "object",
+              "description": "Count of images generated per date (YYYY-MM-DD keys)",
+              "additionalProperties": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "starred_count": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of starred/favorited images"
+            },
+            "total_cost_usd": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Total estimated API cost for all images in the gallery"
+            }
+          },
+          "additionalProperties": false
+        },
+        "filters": {
+          "type": "object",
+          "description": "Available filter options derived from gallery contents",
+          "properties": {
+            "available_models": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["gemini", "dalle", "stability"]
+              },
+              "description": "Models that have images in this gallery"
+            },
+            "available_templates": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Templates that have been used in this gallery"
+            },
+            "available_tags": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "All unique tags across gallery images"
+            },
+            "date_range": {
+              "type": "object",
+              "description": "Date range of images in the gallery",
+              "properties": {
+                "earliest": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Date of the oldest image"
+                },
+                "latest": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Date of the newest image"
+                }
+              },
+              "additionalProperties": false
+            },
+            "quality_range": {
+              "type": "object",
+              "description": "Range of quality scores in the gallery",
+              "properties": {
+                "min": { "type": "number", "minimum": 1, "maximum": 10 },
+                "max": { "type": "number", "minimum": 1, "maximum": 10 }
+              },
+              "additionalProperties": false
+            },
+            "resolution_options": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["1k", "2k", "4k"]
+              },
+              "description": "Resolution tiers present in the gallery"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    }
+  }
+}
