@@ -20,7 +20,7 @@
 
 `📊 Real-Time` `💰 Cost Tracking` `🔔 Alerts` `🌐 Web Export` `v1.0.0`
 
-[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() [![Commands](https://img.shields.io/badge/Commands-12+-orange)]()
 
 > Real-time monitoring and analytics for OpenClaw agents. Track performance, costs, task completion, and skill health with terminal and web dashboards.
 
@@ -147,11 +147,65 @@ where:
 
 **`dashboard health`** — Detailed health breakdown
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║           Agent Health — Detailed Breakdown           ║
+╠══════════════════════════════════════════════════════╣
+║  Overall Health Score: 82/100                        ║
+║  ████████████████░░░░ 82%                            ║
+║                                                      ║
+║  Component Scores:                                   ║
+║  ──────────────────────────────────────────────       ║
+║  Error Rate:         92/100  (2.1% error rate)       ║
+║    Weight: 30% │ Contribution: 27.6                  ║
+║                                                      ║
+║  Task Completion:    88/100  (47/52 completed)       ║
+║    Weight: 30% │ Contribution: 26.4                  ║
+║                                                      ║
+║  Response Quality:   75/100  (5 corrections in 52)   ║
+║    Weight: 20% │ Contribution: 15.0                  ║
+║                                                      ║
+║  Efficiency:         65/100  (avg 3,500 tokens/task) ║
+║    Weight: 20% │ Contribution: 13.0                  ║
+║                                                      ║
+║  Trend: ▲ +4 points from yesterday (78 → 82)        ║
+║  Recommendation: Response quality can improve —      ║
+║    review common correction patterns.                ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`dashboard tasks [--period day|week|month]`** — Task analytics:
 - Completed, failed, in-progress counts
 - Average completion time
 - Success rate trend
 - Most common task types
+
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║          Task Analytics — This Week                  ║
+╠══════════════════════════════════════════════════════╣
+║  Completed: 47  │  Failed: 3  │  Active: 2           ║
+║  Success Rate: 94.0%  (▲ +2.1% from last week)      ║
+║  Avg Completion Time: 45 seconds                     ║
+║                                                      ║
+║  Daily Breakdown:                                    ║
+║  Mon: ████████████ 12 tasks (100% success)           ║
+║  Tue: ██████████░ 10 tasks (90% success)             ║
+║  Wed: ████████░░ 8 tasks (87.5% success)             ║
+║  Thu: ███████████ 11 tasks (100% success)            ║
+║  Fri: █████████░ 9 tasks (88.9% success)             ║
+║  Sat: ██░░░░░░░░ 2 tasks (100% success)              ║
+║                                                      ║
+║  Most Common Task Types:                             ║
+║  1. Code analysis/editing:     18 (34%)              ║
+║  2. FX trading operations:     12 (23%)              ║
+║  3. Content generation:         8 (15%)              ║
+║  4. File search/navigation:     7 (13%)              ║
+║  5. Other:                      7 (13%)              ║
+╚══════════════════════════════════════════════════════╝
+```
 
 **`dashboard skills`** — Skill performance ranking:
 - Most used skills
@@ -160,6 +214,31 @@ where:
 - Token consumption per skill
 - Unused skills (installed but never called)
 
+Output:
+```
+╔══════════════════════════════════════════════════════════╗
+║            Skill Performance Ranking                     ║
+╠══════════════════════════════════════════════════════════╣
+║  Skill              │ Calls │ Errs │ Avg ms │ Tokens    ║
+║  ───────────────────┼───────┼──────┼────────┼────────── ║
+║  summarize-pro      │  23   │  0   │ 2,300  │ 131,100   ║
+║  fx-trader-pro      │  18   │  1   │ 4,700  │  84,600   ║
+║  brain-trust        │  12   │  0   │ 8,100  │  97,200   ║
+║  humanize-ai-pro    │   8   │  0   │ 1,900  │  45,600   ║
+║  skill-guardian     │   5   │  0   │ 12,400 │  62,000   ║
+║  context-slim       │   3   │  0   │  800   │   2,400   ║
+║  agent-dashboard    │   2   │  0   │  200   │   1,200   ║
+║                                                          ║
+║  Fastest: context-slim (800ms avg)                       ║
+║  Slowest: skill-guardian (12,400ms avg)                   ║
+║  Most tokens: summarize-pro (131,100 total)              ║
+║                                                          ║
+║  Unused Skills (installed but never called):             ║
+║  • byterover (installed 14 days ago)                     ║
+║  • capability-evolver (installed 21 days ago)            ║
+╚══════════════════════════════════════════════════════════╝
+```
+
 **`dashboard cost [--period day|week|month]`** — Cost analytics:
 - Cost by provider (Anthropic, OpenAI, Google)
 - Cost by skill
@@ -167,14 +246,83 @@ where:
 - Daily/weekly/monthly trends
 - Projected monthly cost
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║          Cost Analytics — This Month                 ║
+╠══════════════════════════════════════════════════════╣
+║  Total:    $28.91 (1 day into March)                 ║
+║  Projected: $867.30 /month (at current rate)        ║
+║                                                      ║
+║  By Provider:                                        ║
+║  Anthropic:  $19.84  ██████████████░░  69%           ║
+║  Google:      $5.78  █████░░░░░░░░░░░  20%           ║
+║  OpenAI:      $3.29  ███░░░░░░░░░░░░░  11%           ║
+║                                                      ║
+║  By Skill:                                           ║
+║  brain-trust:     $9.72  (34%)                       ║
+║  summarize-pro:   $6.55  (23%)                       ║
+║  fx-trader-pro:   $5.20  (18%)                       ║
+║  skill-guardian:  $3.89  (13%)                       ║
+║  other:           $3.55  (12%)                       ║
+║                                                      ║
+║  Cost per Task: $0.56 avg                            ║
+║  Cheapest task:  $0.02 (file search)                 ║
+║  Most expensive: $4.82 (full security audit)         ║
+║                                                      ║
+║  Daily Trend:                                        ║
+║  Feb 24: $3.21 │ Feb 25: $4.89 │ Feb 26: $3.78     ║
+║  Feb 27: $5.12 │ Feb 28: $4.23 │ Mar 01: $4.23     ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`dashboard alerts`** — Show active alerts
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║            Active Alerts                             ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║  ⚠️ [Mar 01 14:25] Daily cost ($5.23) exceeded       ║
+║     threshold ($5.00). Current: $5.23                ║
+║     Triggered by: brain-trust meeting ($1.82)        ║
+║                                                      ║
+║  ⚠️ [Mar 01 14:25] fx-trader-pro error count: 3      ║
+║     threshold: 3. Last error: API timeout on         ║
+║     candle fetch for GBP_NZD                         ║
+║                                                      ║
+║  Resolved Today:                                     ║
+║  ✅ [Mar 01 10:15] Health score dropped to 58        ║
+║     Recovered to 82 after 2 successful tasks         ║
+║                                                      ║
+║  Alert Configuration:                                ║
+║  error-rate: 10% │ daily-cost: $5 │ health: 60      ║
+║  monthly-cost: $50 │ fx-trader-pro errors: 3         ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`dashboard alert set <type> <threshold>`** — Configure alerts:
-- `error-rate 10` — Alert if error rate exceeds 10%
-- `daily-cost 5` — Alert if daily cost exceeds $5
-- `monthly-cost 50` — Alert if monthly cost exceeds $50
-- `skill-error <skill> 3` — Alert if skill fails 3+ times
-- `health 60` — Alert if health score drops below 60
+- `error-rate 10` -- Alert if error rate exceeds 10%
+- `daily-cost 5` -- Alert if daily cost exceeds $5
+- `monthly-cost 50` -- Alert if monthly cost exceeds $50
+- `skill-error <skill> 3` -- Alert if skill fails 3+ times
+- `health 60` -- Alert if health score drops below 60
+
+Output:
+```
+✅ Alert configured: daily-cost → $8.00
+
+  Current Alert Thresholds:
+  ─────────────────────────────────────────
+  error-rate:       10%     (current: 2.1%)    ✅
+  daily-cost:       $8.00   (current: $5.23)   ✅
+  monthly-cost:     $50.00  (current: $28.91)  ✅
+  health:           60      (current: 82)      ✅
+  fx-trader-pro:    3 errors (current: 1)      ✅
+
+  Saved to: .agent-dashboard/alerts/config.json
+```
 
 **`dashboard report [daily|weekly|monthly]`** — Generate markdown report:
 - Summary statistics
@@ -183,6 +331,34 @@ where:
 - Issues and recommendations
 - Cost forecast
 
+Output:
+```
+📄 Weekly Report generated: .agent-dashboard/reports/2026-03-01.md
+
+  # Agent Dashboard Weekly Report — 2026-03-01
+
+  ## Summary
+  - Tasks completed: 47 (94% success rate)
+  - Total cost: $28.91 ($4.13/day avg)
+  - Health score: 82 (▲ +4 from last week)
+  - Most active skill: summarize-pro (23 calls)
+  - API calls: 1,247 (Anthropic: 842, Google: 312, OpenAI: 93)
+
+  ## Highlights
+  - Zero errors on summarize-pro (23 consecutive successes)
+  - Health score trending upward 3 days straight
+  - Cost per task decreased 12% from last week
+
+  ## Issues
+  - fx-trader-pro: 1 API timeout (auto-recovered)
+  - Response quality dip on Wednesday (3 corrections)
+
+  ## Cost Forecast
+  - Projected March total: $124.00 (within $150 budget)
+
+  Report saved to .agent-dashboard/reports/2026-03-01.md (5.1 KB)
+```
+
 **`dashboard --web`** — Generate HTML dashboard:
 - Self-contained HTML file with inline CSS/JS
 - Interactive charts (line graphs, pie charts)
@@ -190,14 +366,118 @@ where:
 - Mobile responsive
 - Auto-refresh every 60 seconds if served locally
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║         Web Dashboard Generated                      ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║  Output: .agent-dashboard/web/dashboard.html         ║
+║  Size:   142 KB (self-contained, no dependencies)    ║
+║                                                      ║
+║  Includes:                                           ║
+║  ✅ Health score gauge with trend chart              ║
+║  ✅ Task completion line graph (7 days)              ║
+║  ✅ Cost breakdown pie chart by provider             ║
+║  ✅ Skill performance table (sortable)               ║
+║  ✅ Recent activity timeline                         ║
+║  ✅ Alert history panel                              ║
+║  ✅ Dark mode toggle                                 ║
+║  ✅ Mobile responsive layout                         ║
+║                                                      ║
+║  To view: open .agent-dashboard/web/dashboard.html   ║
+║  To serve: python3 -m http.server 8080               ║
+║           (auto-refresh every 60s)                    ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`dashboard replay [--session <id>]`** — Session replay:
 - Timeline of all actions in a session
 - Filter by skill, outcome, or time range
 - Debug failed operations
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║       Session Replay: sess-abc123                    ║
+║       Started: 2026-03-01 14:00 UTC                  ║
+║       Duration: 47 minutes                           ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║  14:00:12  [START] Session initialized               ║
+║  14:01:30  [fx-trader-pro] fx status                 ║
+║            ✅ 2,300ms │ 4,500 in / 1,200 out         ║
+║  14:05:45  [fx-trader-pro] fx scan                   ║
+║            ✅ 12,400ms │ 28,000 in / 8,400 out       ║
+║  14:08:22  [fx-trader-pro] fx signal GBP_JPY         ║
+║            ✅ 4,700ms │ 8,200 in / 2,100 out         ║
+║  14:12:00  [fx-trader-pro] fx trade GBP_JPY buy      ║
+║            ✅ 3,100ms │ 6,400 in / 1,800 out         ║
+║  14:20:10  [brain-trust] bt meeting standup           ║
+║            ✅ 8,100ms │ 12,000 in / 6,200 out        ║
+║  14:25:33  [summarize-pro] summarize report.pdf       ║
+║            ❌ TIMEOUT │ Retried → ✅ 4,200ms          ║
+║  14:32:15  [context-slim] slim optimize               ║
+║            ✅ 800ms │ 2,400 in / 600 out              ║
+║  14:47:00  [END] Session complete                    ║
+║                                                      ║
+║  Session totals: 7 actions │ 1 error │ $4.23 cost    ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`dashboard export <json|csv|html>`** — Export all data
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║         Data Export — JSON                           ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║  Exporting all metric data...                        ║
+║                                                      ║
+║  Files generated:                                    ║
+║  ✅ health-metrics.json      (1,247 entries, 2.1 MB) ║
+║  ✅ task-records.json        (  312 entries, 840 KB) ║
+║  ✅ skill-usage.json         (  189 entries, 420 KB) ║
+║  ✅ cost-tracking.json       (  892 entries, 1.4 MB) ║
+║  ✅ session-data.json        (   42 sessions, 3.2 MB)║
+║  ✅ alert-history.json       (   28 entries, 64 KB)  ║
+║                                                      ║
+║  Total: 6 files, 8.0 MB                             ║
+║  Output: .agent-dashboard/exports/2026-03-01/        ║
+║                                                      ║
+║  Format: JSON (UTF-8, pretty-printed)                ║
+║  Compatible with: jq, Elasticsearch, Grafana, etc.   ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`dashboard reset`** — Clear all tracking data (confirmation required)
+
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║         Dashboard Reset                              ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║  ⚠️ This will permanently delete all tracking data.  ║
+║                                                      ║
+║  Data to be cleared:                                 ║
+║    Health metrics:    1,247 entries (2.1 MB)          ║
+║    Task records:        312 entries (840 KB)          ║
+║    Skill usage:         189 entries (420 KB)          ║
+║    Cost tracking:       892 entries (1.4 MB)          ║
+║    Session replays:      42 sessions (3.2 MB)        ║
+║    Alert history:        28 entries (64 KB)           ║
+║                                                      ║
+║  Tip: Run `dashboard export json` first to backup.   ║
+║                                                      ║
+║  Confirm reset? (yes/no): yes                        ║
+║                                                      ║
+║  ✅ All tracking data cleared.                        ║
+║  Alert configuration preserved.                      ║
+║  Health score reset to 100 (fresh start).            ║
+╚══════════════════════════════════════════════════════╝
+```
 
 ### Token Pricing (built-in)
 

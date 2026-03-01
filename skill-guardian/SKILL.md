@@ -21,7 +21,7 @@
 
 `🛡 5-Layer Scan` `🔍 ClawHavoc DB` `⚠ Auto-Block` `📋 Audit` `v1.0.0`
 
-[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() [![Commands](https://img.shields.io/badge/Commands-9+-orange)]()
 
 > AI-powered security scanner for OpenClaw skills. Detects malicious code, supply chain attacks, data exfiltration, and C2 backdoors. Protect your agent before installing any skill.
 
@@ -218,22 +218,182 @@ Output:
 - Verify file integrity (checksums)
 - Generate full audit report
 
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║             Skill Guardian — Full Audit               ║
+╠═══════════════════════════════════════════════════════╣
+║  Scanning 8 installed skills...                       ║
+║                                                       ║
+║  Skill                  │ Score │ Status  │ Integrity  ║
+║  ───────────────────────┼───────┼─────────┼──────────  ║
+║  fx-trader-pro          │  8    │ ✅ Safe │ ✅ Match   ║
+║  brain-trust            │  5    │ ✅ Safe │ ✅ Match   ║
+║  context-slim           │  3    │ ✅ Safe │ ✅ Match   ║
+║  agent-dashboard        │  6    │ ✅ Safe │ ✅ Match   ║
+║  summarize-pro          │ 12    │ ✅ Safe │ ✅ Match   ║
+║  humanize-ai-pro        │ 14    │ ✅ Safe │ ⚠️ Changed ║
+║  self-learning          │  9    │ ✅ Safe │ ✅ Match   ║
+║  byterover              │ 22    │ ⚠️ Low  │ ✅ Match   ║
+║                                                       ║
+║  ⚠️ humanize-ai-pro: files changed since last scan    ║
+║     Modified: SKILL.md (2026-02-28)                   ║
+║     Recommend: Re-scan with `guard scan humanize-ai`  ║
+║                                                       ║
+║  Summary: 7 Safe │ 1 Low Risk │ 0 Blocked             ║
+║  Audit completed in 18.4 seconds                      ║
+╚═══════════════════════════════════════════════════════╝
+```
+
 **`guard report`** — Generate comprehensive security report (markdown)
+
+Output:
+```
+📄 Security Report generated: .skill-guardian/reports/2026-03-01.md
+
+  # Skill Guardian Security Report — 2026-03-01
+
+  ## Summary
+  - Skills scanned: 8
+  - Overall risk level: LOW
+  - Threats detected: 0 critical, 0 high, 1 medium, 2 low
+  - New skills since last report: 1 (byterover)
+  - Updated skills since last report: 1 (humanize-ai-pro)
+
+  ## Recommendations
+  1. Re-scan humanize-ai-pro (file integrity mismatch)
+  2. Review byterover external dependency (score 22)
+  3. Update threat database (last updated 5 days ago)
+
+  Report saved to .skill-guardian/reports/2026-03-01.md (4.2 KB)
+```
 
 **`guard monitor`** — Continuous monitoring:
 - Watch for skill updates
 - Re-scan updated skills
 - Alert if risk score increases
 
+Output:
+```
+╔═══════════════════════════════════════════════╗
+║       Skill Guardian — Monitor Active         ║
+╠═══════════════════════════════════════════════╣
+║  Watching 8 installed skills for changes...   ║
+║  Check interval: every 60 seconds             ║
+║                                               ║
+║  14:30:00 ─ All skills nominal                ║
+║  14:31:02 ─ All skills nominal                ║
+║  14:32:05 ─ ⚠️ CHANGE DETECTED               ║
+║             humanize-ai-pro/SKILL.md modified ║
+║             Re-scanning...                    ║
+║  14:32:12 ─ humanize-ai-pro: 14/100 ✅ Safe  ║
+║             (no score change)                 ║
+║  14:33:08 ─ All skills nominal                ║
+║                                               ║
+║  Press Ctrl+C to stop monitoring              ║
+╚═══════════════════════════════════════════════╝
+```
+
 **`guard score <skill-slug>`** — Quick risk score only
+
+Output:
+```
+╔═══════════════════════════════════════╗
+║  Skill:  summarize-pro               ║
+║  Score:  12/100 ✅ Safe               ║
+║                                       ║
+║  L1 Static:     8   ✅               ║
+║  L2 Deps:      15   ✅               ║
+║  L3 Behavior:  10   ✅               ║
+║  L4 Repute:    18   ✅               ║
+║  L5 Semantic:   6   ✅               ║
+║                                       ║
+║  Verdict: SAFE — install with         ║
+║  confidence.                          ║
+╚═══════════════════════════════════════╝
+```
 
 **`guard block <skill-slug>`** — Add to blocklist (prevent installation)
 
+Output:
+```
+🚫 Blocked: shady-helper
+
+  Added to blocklist: .skill-guardian/blocklist.json
+  Reason: Manual block by user
+  Timestamp: 2026-03-01T14:35:00Z
+
+  This skill will be prevented from installation.
+  To unblock, run: guard allow shady-helper
+
+  Blocklist now contains 3 skills:
+    1. crypto-miner-hidden  (blocked 2026-02-15, score 94)
+    2. data-sender-v2       (blocked 2026-02-20, score 87)
+    3. shady-helper         (blocked 2026-03-01, manual)
+```
+
 **`guard allow <skill-slug>`** — Remove from blocklist
+
+Output:
+```
+✅ Unblocked: shady-helper
+
+  Removed from blocklist: .skill-guardian/blocklist.json
+  Timestamp: 2026-03-01T14:40:00Z
+
+  ⚠️ Warning: This skill was blocked for a reason.
+  Last scan score: 47/100 (Medium Risk)
+  Recommend running `guard scan shady-helper` before installing.
+
+  Blocklist now contains 2 skills.
+```
 
 **`guard update-db`** — Update threat signature database
 
+Output:
+```
+╔═══════════════════════════════════════════════╗
+║     Threat Database Update                    ║
+╠═══════════════════════════════════════════════╣
+║  Previous version: 2026-02-24 (v1.3.2)       ║
+║  New version:      2026-03-01 (v1.4.0)       ║
+║                                               ║
+║  Changes:                                     ║
+║  + 12 new malware signatures added            ║
+║  + 3 C2 endpoint patterns updated             ║
+║  + 5 typosquat names added to watchlist       ║
+║  ~ 2 false-positive patterns corrected        ║
+║                                               ║
+║  Total signatures: 376 (was 341)              ║
+║  Database saved to:                           ║
+║    .skill-guardian/threats/known-patterns.json ║
+║                                               ║
+║  ✅ Threat database is now up to date.        ║
+╚═══════════════════════════════════════════════╝
+```
+
 **`guard history`** — Show scan history with results
+
+Output:
+```
+╔════════════════════════════════════════════════════════╗
+║            Scan History (last 30 days)                 ║
+╠════════════════════════════════════════════════════════╣
+║  Date        │ Skill             │ Score │ Verdict     ║
+║  ────────────┼───────────────────┼───────┼──────────── ║
+║  2026-03-01  │ summarize-pro     │  12   │ ✅ Safe     ║
+║  2026-03-01  │ byterover         │  22   │ ⚠️ Low Risk ║
+║  2026-02-28  │ humanize-ai-pro   │  14   │ ✅ Safe     ║
+║  2026-02-27  │ fx-trader-pro     │   8   │ ✅ Safe     ║
+║  2026-02-27  │ brain-trust       │   5   │ ✅ Safe     ║
+║  2026-02-25  │ shady-helper      │  47   │ ⚠️⚠️ Medium ║
+║  2026-02-20  │ data-sender-v2    │  87   │ ☠️ Critical ║
+║  2026-02-15  │ crypto-miner-hid  │  94   │ ☠️ Critical ║
+║                                                        ║
+║  Total scans: 14 │ Blocked: 2 │ Avg score: 18.3       ║
+║  Scan data: .skill-guardian/scans/                     ║
+╚════════════════════════════════════════════════════════╝
+```
 
 ### Data Storage
 

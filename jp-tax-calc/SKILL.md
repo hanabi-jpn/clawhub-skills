@@ -41,9 +41,75 @@
 
 JP Tax Calc handles Japanese tax calculations: income tax (所得税), consumption tax (消費税), corporate tax (法人税), and supports 確定申告 preparation. Built-in knowledge of Japanese tax law updated for 2026.
 
+## Environment Variables
+
+The following environment variables can be set to extend JP Tax Calc's capabilities. All are optional; the skill works fully offline without them.
+
+| Variable | Description | Required | Default |
+|---|---|---|---|
+| `ETAX_API_KEY` | e-Tax API key for direct electronic filing (e-Tax 電子申告 API) | Optional | `None` (manual filing mode) |
+| `MYNUMBER_VERIFY_KEY` | MyNumber verification API key for identity validation (マイナンバー照合API) | Optional | `None` (skip verification) |
+| `FREEE_ACCESS_TOKEN` | freee会計 OAuth access token for importing transaction data (freee連携用) | Optional | `None` (manual input) |
+| `JP_TAX_YEAR` | Target tax year for calculations (対象年度). Format: `YYYY` | Optional | Current year (e.g., `2026`) |
+
+**Setup example (`.env` or shell):**
+```bash
+export ETAX_API_KEY="etax_live_xxxxxxxxxxxxxxxxxxxx"
+export MYNUMBER_VERIFY_KEY="mn_verify_xxxxxxxxxxxx"
+export FREEE_ACCESS_TOKEN="freee_at_xxxxxxxxxxxxxxxxxxxx"
+export JP_TAX_YEAR="2025"   # 令和7年分の確定申告
+```
+
+> **Note:** `ETAX_API_KEY` requires prior registration at [e-Tax](https://www.e-tax.nta.go.jp/). `FREEE_ACCESS_TOKEN` is obtained via freee's OAuth 2.0 flow. Tokens should be stored securely and never committed to version control.
+
+---
+
+## Error Handling
+
+When an error occurs, the skill returns a structured error object with a code, message, and suggested resolution. All error codes use the `E0xx` prefix.
+
+| Code | Error | Description | Resolution |
+|------|-------|-------------|------------|
+| `E001` | Invalid income amount | The income value is negative, non-numeric, or exceeds the 64-bit integer range | Provide a positive numeric value in yen (e.g., `6000000`) |
+| `E002` | Tax year out of range | The specified `JP_TAX_YEAR` is before 1989 (平成元年) or more than 1 year in the future | Use a year between `1989` and the current year |
+| `E003` | Missing required deduction docs | A deduction was claimed but the supporting document type was not specified | Add `--docs` flag or specify document evidence for the claimed deduction |
+| `E004` | Invalid MyNumber format | The MyNumber (個人番号) is not a valid 12-digit number or fails the check digit algorithm | Verify the 12-digit MyNumber and re-enter |
+| `E005` | Calculation overflow | The computed tax amount exceeds safe numeric bounds (>= 999,999,999,999 yen) | Split computation or verify input amounts are in yen (not in 万円) |
+| `E006` | Unsupported tax type | The requested tax type is not one of: `income`, `consumption`, `corporate`, `furusato` | Use a supported tax type; run `tax --help` for the full list |
+| `E007` | e-Tax API connection failed | The e-Tax API endpoint is unreachable or returned a non-200 status | Check `ETAX_API_KEY`, network connectivity, and e-Tax maintenance schedule |
+| `E008` | Rate limit exceeded | Too many API requests within the allowed window (e-Tax or freee) | Wait 60 seconds and retry; consider batching requests |
+| `E009` | Invalid deduction JSON | The `--deductions` JSON argument is malformed or contains unknown keys | Validate JSON syntax; run `tax deductions` to see valid keys |
+| `E010` | Fiscal year mismatch | The income period does not match the target tax year | Ensure income data aligns with `JP_TAX_YEAR` setting |
+
+**Error response format:**
+```json
+{
+  "error": true,
+  "code": "E001",
+  "message": "Invalid income amount: value must be a positive integer in yen",
+  "hint": "Provide income as a whole number, e.g., tax income 6000000",
+  "docs": "https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1400.htm"
+}
+```
+
+---
+
 ## System Prompt Instructions
 
 You are equipped with **JP Tax Calc** for Japanese tax calculations and compliance.
+
+### Behavioral Guidelines
+
+1. **Language:** Respond in Japanese by default. If the user writes in English, respond in English but keep tax terminology in Japanese with English translations in parentheses, e.g., "所得税 (income tax)".
+2. **Accuracy first:** Always apply the exact tax bracket, rate, and deduction amounts from the built-in rate tables below. Never approximate rates. When in doubt, cite the applicable 国税庁 (NTA) guidance.
+3. **Show your work:** Every calculation must display the step-by-step formula, intermediate values, and final result. Users must be able to verify each step.
+4. **Conservative estimates:** When input is ambiguous (e.g., social insurance premiums not specified), use standard percentage-based estimates and clearly label them as "概算" (estimates).
+5. **Proactive advice:** After every calculation, suggest at least one applicable tax optimization (e.g., iDeCo, ふるさと納税, 青色申告) if the user has not already applied it.
+6. **Disclaimer:** End every tax calculation with a reminder that this is an estimate and formal filing should be reviewed by a 税理士 (certified tax accountant).
+7. **Year awareness:** Always use the tax year set in `JP_TAX_YEAR` (default: current year). If the user asks about a different year, warn that rates may differ and switch context accordingly.
+8. **Formatting:** Use the box-drawing output formats defined in the "Command Output Format Examples" section below. Consistent formatting helps users compare results across sessions.
+9. **Edge cases:** Handle zero income, negative business income (losses), and multi-source income (e.g., salary + side business + rental) correctly by applying income aggregation rules (総合課税 vs 分離課税).
+10. **Privacy:** Never store or log raw MyNumber values. If MyNumber verification is used, only retain the verification result (valid/invalid), not the number itself.
 
 ### Core Capabilities
 
@@ -339,34 +405,235 @@ When the user runs `tax furusato <年収>`, the agent MUST produce output in the
   - 医療費が10万円超なら医療費控除の申請を検討
 ```
 
+### `tax consumption 30000000 18000000` Output:
+
+```
+┌───────────────────────────────────────────────────────┐
+│              消費税計算結果                              │
+├───────────────────────────────────────────────────────┤
+│ 【課税売上】                                            │
+│   課税売上高 (税抜):     30,000,000円                    │
+│   売上に係る消費税額:     3,000,000円 (10%)              │
+│                                                       │
+│ 【課税仕入】                                            │
+│   課税仕入高 (税抜):     18,000,000円                    │
+│   仕入に係る消費税額:     1,800,000円 (10%)              │
+├───────────────────────────────────────────────────────┤
+│ 【本則課税 (原則課税方式)】                               │
+│   納付税額:  3,000,000 - 1,800,000 = 1,200,000円        │
+│                                                       │
+│ 【簡易課税との比較】(第5種: サービス業, みなし仕入率50%)    │
+│   簡易課税の場合: 3,000,000 x (1 - 50%) = 1,500,000円   │
+│   → 本則課税の方が 300,000円 有利                        │
+│                                                       │
+│ 【2割特例との比較】(インボイス経過措置)                    │
+│   2割特例の場合:  3,000,000 x 20% = 600,000円           │
+│   → 2割特例の方が 600,000円 有利                         │
+│   ※ 適用要件: 免税→課税転換の場合のみ (2026年9月迄)       │
+├───────────────────────────────────────────────────────┤
+│ 【推奨】                                                │
+│   2割特例が適用可能であれば最も有利です。                   │
+│   適用不可の場合は本則課税を選択してください。              │
+│                                                       │
+│   インボイス登録番号: 要確認                              │
+│   申告期限: 2026年3月31日                                │
+└───────────────────────────────────────────────────────┘
+```
+
+### `tax corporate 10000000 --type small` Output:
+
+```
+┌───────────────────────────────────────────────────────┐
+│              法人税計算結果                              │
+│              (中小法人)                                  │
+├───────────────────────────────────────────────────────┤
+│ 【法人所得】                                            │
+│   課税所得金額:          10,000,000円                    │
+│   法人区分:              中小法人（資本金1億円以下）       │
+├───────────────────────────────────────────────────────┤
+│ 【法人税額】                                            │
+│   800万円以下の部分:  8,000,000 x 15.0% =  1,200,000円  │
+│   800万円超の部分:    2,000,000 x 23.2% =    464,000円  │
+│   法人税額合計:                             1,664,000円  │
+├───────────────────────────────────────────────────────┤
+│ 【地方法人税】                                          │
+│   法人税額 x 10.3%:  1,664,000 x 10.3% =    171,392円  │
+├───────────────────────────────────────────────────────┤
+│ 【法人事業税】(標準税率)                                 │
+│   400万円以下:   4,000,000 x 3.5%  =  140,000円         │
+│   400万超~800万: 4,000,000 x 5.3%  =  212,000円         │
+│   800万円超:     2,000,000 x 7.0%  =  140,000円         │
+│   事業税合計:                          492,000円         │
+│   特別法人事業税: 492,000 x 37% =      182,040円         │
+├───────────────────────────────────────────────────────┤
+│ 【法人住民税】(東京都特別区の場合)                        │
+│   法人税割: 1,664,000 x 7.0%  =       116,480円         │
+│   均等割:                                70,000円        │
+│   住民税合計:                          186,480円         │
+├───────────────────────────────────────────────────────┤
+│ 【税負担サマリー】                                      │
+│   法人税:              1,664,000円                      │
+│   地方法人税:            171,392円                      │
+│   法人事業税:            492,000円                      │
+│   特別法人事業税:        182,040円                      │
+│   法人住民税:            186,480円                      │
+│   ──────────────────────────────                      │
+│   税負担合計:          2,695,912円                      │
+│   実効税率:               約27.0%                      │
+│   税引後利益:          7,304,088円                      │
+├───────────────────────────────────────────────────────┤
+│ 💡 個人事業との比較:                                     │
+│   同所得で個人の場合: 所得税+住民税+事業税 ≒ 2,474,000円  │
+│   → 法人の方が約22万円多いが、役員報酬の設定次第で逆転可能 │
+└───────────────────────────────────────────────────────┘
+```
+
+### `tax checklist` Output:
+
+```
+╔═══════════════════════════════════════════════════════════╗
+║           確定申告チェックリスト (2025年分)                  ║
+║           申告期限: 2026年3月16日 (月)                      ║
+╠═══════════════════════════════════════════════════════════╣
+║                                                           ║
+║ 【必要書類】                                               ║
+║  ☐ 源泉徴収票 (給与所得者)                                 ║
+║  ☐ マイナンバーカード or 通知カード+本人確認書類             ║
+║  ☐ 還付先の銀行口座情報                                    ║
+║                                                           ║
+║ 【所得関連】                                               ║
+║  ☐ 事業所得: 青色申告決算書 or 収支内訳書                   ║
+║  ☐ 不動産所得: 不動産収支内訳書                             ║
+║  ☐ 株式・配当: 年間取引報告書                               ║
+║  ☐ 雑所得: 収入と経費の明細                                 ║
+║                                                           ║
+║ 【控除証明書】                                             ║
+║  ☐ 社会保険料控除証明書 (国民年金・国保)                    ║
+║  ☐ 生命保険料控除証明書                                    ║
+║  ☐ 地震保険料控除証明書                                    ║
+║  ☐ 小規模企業共済等掛金控除証明書 (iDeCo)                   ║
+║  ☐ 住宅ローン残高証明書 (初年度は登記簿等も)                ║
+║  ☐ 医療費の領収書 or 医療費通知 (10万円超の場合)            ║
+║  ☐ ふるさと納税 寄附金受領証明書                            ║
+║                                                           ║
+║ 【電子申告 (e-Tax)】                                       ║
+║  ☐ マイナンバーカード + ICカードリーダー or スマホ           ║
+║  ☐ 利用者識別番号 (初回のみ取得)                            ║
+║  ☐ e-Taxソフト or 確定申告書等作成コーナー                   ║
+║                                                           ║
+║ 【注意事項】                                               ║
+║  ⚠ 青色申告65万円控除には e-Tax提出 が必須                  ║
+║  ⚠ ワンストップ特例を使った場合は確定申告で再申請が必要      ║
+║  ⚠ 医療費控除のセルフメディケーション税制は通常と併用不可    ║
+║                                                           ║
+╚═══════════════════════════════════════════════════════════╝
+```
+
 ---
 
 ## Data Storage & Persistence
 
-The agent stores calculation sessions in the following structure for audit trails and re-use:
+The agent stores calculation sessions locally for audit trails, year-over-year comparison, and re-use. All data is stored under the user's home directory and is never transmitted externally unless the user explicitly invokes e-Tax or freee API integration.
+
+### Directory Structure
 
 ```
 ~/.jp-tax-calc/
-  config.yaml          # User profile (family, insurance, prior year data)
-  sessions/
-    2026-03-01_001.json # Each calculation session is saved
-  templates/
-    kakutei_shinkoku.json   # 確定申告 template
-    furusato_sim.json       # ふるさと納税 simulation template
-  cache/
-    tax_brackets_2026.json  # Current year tax brackets
+├── config.yaml              # User profile (family, insurance, employer, prior year data)
+├── sessions/
+│   ├── 2025-03-15_001.json  # Each calculation session is saved with timestamp
+│   ├── 2025-03-15_002.json
+│   └── 2026-03-01_001.json
+├── templates/
+│   ├── kakutei_shinkoku.json    # 確定申告 template
+│   ├── furusato_sim.json        # ふるさと納税 simulation template
+│   └── consumption_tax.json     # 消費税申告 template
+├── cache/
+│   ├── tax_brackets_2026.json   # Current year tax brackets (auto-updated)
+│   └── deduction_limits_2026.json # Deduction ceilings for current year
+├── exports/
+│   ├── etax_2025.xtx            # e-Tax形式エクスポート
+│   └── csv_2025_income.csv      # CSV形式（freee/MFインポート用）
+└── logs/
+    └── error.log                # Error log for debugging (rotated monthly)
 ```
 
-**Session JSON structure:**
+### config.yaml Example
+
+```yaml
+# ~/.jp-tax-calc/config.yaml
+user_profile:
+  name: "山田太郎"
+  filing_type: "blue"          # blue (青色) or white (白色)
+  business_type: "個人事業主"   # or "会社員", "法人"
+  industry_code: 3              # 簡易課税みなし仕入率の業種番号 (1-6)
+
+family:
+  spouse:
+    income: 800000              # 配偶者の年収
+    deduction_eligible: true    # 配偶者控除対象
+  dependents:
+    - age: 17                   # 扶養控除（一般）
+    - age: 20                   # 特定扶養控除
+    - age: 72                   # 老人扶養控除
+
+insurance:
+  health_rate: 0.049            # 健康保険料率（協会けんぽ東京支部）
+  pension_rate: 0.0915          # 厚生年金保険料率
+  employment_rate: 0.006        # 雇用保険料率
+
+prior_year:
+  income_tax_paid: 208998
+  resident_tax_paid: 307200
+  furusato_donations: 60000
+
+preferences:
+  currency_format: "japanese"   # 1,000,000円 style
+  show_english: false           # bilingual labels
+  auto_save_sessions: true
+```
+
+### Session JSON Structure
+
 ```json
 {
   "session_id": "2026-03-01_001",
   "timestamp": "2026-03-01T14:30:00+09:00",
-  "input": { "income": 6000000, "deductions": {} },
-  "result": { "income_tax": 208998, "resident_tax": 307200, "take_home": 4604802 },
-  "warnings": ["iDeCo未加入", "ふるさと納税未活用"]
+  "tax_year": 2025,
+  "calculation_type": "income",
+  "input": {
+    "income": 6000000,
+    "income_type": "salary",
+    "deductions": {
+      "basic": 480000,
+      "social_insurance": 858000
+    }
+  },
+  "result": {
+    "gross_income": 6000000,
+    "employment_deduction": 1640000,
+    "taxable_income": 3022000,
+    "income_tax": 204700,
+    "reconstruction_tax": 4298,
+    "total_income_tax": 208998,
+    "resident_tax": 307200,
+    "take_home": 4604802
+  },
+  "warnings": ["iDeCo未加入 — 年間約55,200円の節税可能", "ふるさと納税未活用 — 上限約60,000円"],
+  "applied_rates": {
+    "income_tax_bracket": "10%",
+    "marginal_rate": 0.10,
+    "effective_rate": 0.0348
+  }
 }
 ```
+
+### Data Retention & Privacy
+
+- **Session data** is retained indefinitely by default for year-over-year comparison. Users can purge sessions with `tax sessions --purge --before 2024-01-01`.
+- **MyNumber** values are **never stored**. Only the verification result (`valid`/`invalid`) is logged.
+- **API tokens** (e-Tax, freee) are read from environment variables at runtime and never written to disk.
+- **Export files** (`.xtx`, `.csv`) are generated on demand and stored in `exports/` for manual upload to e-Tax or accounting software.
 
 ---
 
@@ -393,6 +660,12 @@ A: それぞれ以下の意味です:
 
 **Q: 法人成りのタイミングは？**
 A: 一般的に事業所得が年間800万円を超えるあたりで法人化のメリットが出始めます。`tax compare` で個人事業主と法人の税負担を比較できます。法人税の実効税率（約33%）と個人の最高税率（所得税45%+住民税10%=55%）の差が判断材料です。
+
+**Q: 医療費控除とセルフメディケーション税制はどちらを使うべき？**
+A: 両制度は併用不可です。医療費控除は年間医療費が10万円（または所得の5%）を超えた分が対象で上限200万円。セルフメディケーション税制はスイッチOTC医薬品の購入額が12,000円を超えた分が対象で上限88,000円です。一般的に、医療費が10万円を大きく超える年は医療費控除、薬代中心で10万円に届かない年はセルフメディケーション税制が有利です。`tax deductions --medical` で両方の控除額を比較計算します。
+
+**Q: 暗号資産（仮想通貨）の利益はどう申告する？**
+A: 暗号資産の売却益・交換差益は原則として「雑所得」に分類され、総合課税の対象です（株式のような申告分離課税は適用不可）。給与所得者で暗号資産の利益が20万円以下の場合は所得税の確定申告は不要ですが、住民税の申告は必要です。利益の計算方法は「移動平均法」または「総平均法」を選択でき、一度選択すると変更には届出が必要です。`tax income <給与収入> --deductions '{"crypto_gain": 500000}'` のように雑所得として加算して計算できます。
 
 ---
 

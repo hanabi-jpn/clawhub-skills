@@ -361,6 +361,33 @@ Notion JP is designed to work alongside other skills in the ecosystem. Below are
 
 ---
 
+## Comparison: Notion JP vs Other Documentation Platforms
+
+| Feature                          | Notion JP (本スキル)            | Confluence                      | Google Docs                     | Kibela                          |
+|----------------------------------|--------------------------------|--------------------------------|--------------------------------|--------------------------------|
+| API連携                          | Notion API完全対応 + AI拡張    | REST API v2対応                 | Google Docs API対応             | API提供あり（基本CRUD）         |
+| 日本語テンプレート               | 20+種類同梱（議事録/日報/OKR等）| 英語テンプレート中心            | テンプレートギャラリー          | 日本語テンプレート少数          |
+| 議事録自動生成                   | AI要約 + TODO自動抽出          | 手動作成                        | 手動作成                        | 手動作成                        |
+| プロジェクト管理                 | DB + スプリント + ガントビュー | Jira連携で高機能                | 非対応（Sheets連携が必要）      | 基本的なタスク管理              |
+| リアルタイム共同編集             | Notion標準機能                  | 対応                            | 最も得意（業界最高水準）        | 対応                            |
+| データベース機能                 | リレーション/フィルタ/ビュー   | 非対応（表形式のみ）            | 非対応                          | 非対応                          |
+| CLI/エージェント操作             | 全機能CLIコマンド対応          | CLI非公式のみ                   | Google Apps Script              | Web UIのみ                      |
+| 日本語検索                       | 形態素解析 + 部分一致再検索    | 日本語対応あり                  | 高精度                          | 日本語対応                      |
+| 料金                             | Notion Free〜 + 本スキル無料   | Standard $6.05/user/月          | 無料 (Google Workspace内)       | ¥550/user/月〜                  |
+| オフライン対応                   | 一部対応                        | 対応                            | 限定的                          | 非対応                          |
+| Slack/Lark連携                   | Webhook通知対応                 | Slack連携あり                   | Google Chat連携                 | Slack連携あり                   |
+| 学習コスト                       | Notion + CLI操作               | 高い（機能が複雑）              | 低い（直感的UI）                | 低い                            |
+| 対象規模                         | 個人〜中小チーム                | 中堅〜大企業                    | 個人〜大企業                    | 小〜中規模チーム                |
+
+**When to use Notion JP:**
+- 日本語テンプレートで即座に議事録/日報を運用したい → **Notion JP**
+- AIで議事録を自動要約し、TODOを自動抽出したい → **Notion JP**
+- Jiraレベルのプロジェクト管理が必要 → Confluence + Jira
+- Google Workspace中心の組織 → Google Docs
+- 日本のスタートアップでシンプルに情報共有 → Kibela
+
+---
+
 ## Error Handling
 
 | Error Code | Meaning | Agent Action |

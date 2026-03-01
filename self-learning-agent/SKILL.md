@@ -21,7 +21,7 @@
 
 `🧠 Cross-Project` `⚡ Auto-Capture` `📊 Analytics` `🗜 Compressed` `v1.0.0`
 
-[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() [![Memory](https://img.shields.io/badge/memory-cross--project-blueviolet)]()
 
 > Cross-project learning engine with automatic failure capture, intelligent knowledge promotion, and context-aware memory compression.
 
@@ -158,16 +158,78 @@ Compression strategies:
 3. Store in project learnings
 4. Check if similar learning exists globally (merge if so)
 
+```
+> learn
+
+🧠 What did you learn?
+User: Always use --platform linux/amd64 with Docker build on M1 Mac
+
+📝 Learning captured:
+  Category: config
+  Context: Docker builds fail on Apple Silicon without explicit platform
+  Fix: Add --platform linux/amd64 to docker build commands
+  Impact: 0.7
+  Project: web-api
+
+  ✅ Stored in web-api/.self-learning/learnings.jsonl
+  🔍 Similar global learning found — merged (frequency: 3 → 4)
+```
+
 **`learn --auto`** — Toggle automatic learning mode:
 - When ON: capture all errors and corrections automatically
 - When OFF: only manual logging
 - Status persists in `.self-learning/config.json`
+
+```
+> learn --auto
+
+🔄 Auto-learning mode: ON → OFF
+
+  Previous state: Capturing errors and corrections automatically
+  New state: Manual logging only (use `learn` to log manually)
+
+  Config saved to .self-learning/config.json
+  To re-enable: run `learn --auto` again
+```
 
 **`learn recall <topic>`** — Search knowledge base:
 1. Search project learnings for topic
 2. Search global learnings for topic
 3. Rank by relevance and score
 4. Display top 10 matches with context
+
+```
+> learn recall docker
+
+🔍 Searching knowledge base for "docker"...
+
+Results (5 matches):
+
+[1] ⭐ Score: 9.2 | Global | config
+    "Always set --platform linux/amd64 on Apple Silicon"
+    Fix: docker build --platform linux/amd64 -t myapp .
+    Used: 7 times across 4 projects
+
+[2] Score: 7.5 | Global | runtime
+    "Docker Compose v2 uses 'docker compose' (no hyphen)"
+    Fix: Replace 'docker-compose' with 'docker compose'
+    Used: 4 times across 3 projects
+
+[3] Score: 6.1 | Project: web-api | config
+    "Set DOCKER_BUILDKIT=1 for faster multi-stage builds"
+    Fix: export DOCKER_BUILDKIT=1 before build commands
+    Used: 2 times
+
+[4] Score: 4.3 | Project: ml-pipeline | runtime
+    "Docker volume mounts fail silently with wrong paths"
+    Fix: Use absolute paths and verify with docker inspect
+    Used: 1 time
+
+[5] Score: 2.1 | Project: web-api | dependency (archived)
+    "Pin base image versions in Dockerfile"
+    Fix: Use python:3.11-slim instead of python:latest
+    Used: 1 time (last used: 45 days ago)
+```
 
 **`learn stats`** — Show learning analytics:
 ```
@@ -197,14 +259,76 @@ Compression strategies:
 - Promote qualifying ones to global
 - Show what was promoted
 
+```
+> learn promote
+
+🔄 Running promotion check across all projects...
+
+  Scanning: web-api (67 learnings)
+  Scanning: ml-pipeline (41 learnings)
+  Scanning: mobile-app (34 learnings)
+
+📊 Promotion Results:
+  ✅ Promoted to global (score > 0.7):
+    - "Use --frozen-lockfile with npm ci in CI" (score: 0.82, seen in 4 projects)
+    - "Set timeout on all HTTP client calls" (score: 0.75, seen in 3 projects)
+
+  💡 Candidates (score 0.3-0.7):
+    - "Prefer pathlib over os.path in Python" (score: 0.55, seen in 2 projects)
+
+  🗄 Archived (score < 0.3 for 30+ days):
+    - "Pin Node.js to v16" (score: 0.12, stale 45 days)
+
+  Summary: 2 promoted, 1 candidate, 1 archived
+```
+
 **`learn export`** — Export all learnings as JSON:
 - Global + all project learnings in one file
 - Portable format for backup or sharing
+
+```
+> learn export
+
+📦 Exporting all learnings...
+
+  Global learnings: 37 entries
+  Project learnings:
+    web-api: 67 entries
+    ml-pipeline: 41 entries
+    mobile-app: 34 entries
+
+  ✅ Exported to self-learning-export-20260301.json
+  File size: 48 KB
+  Total entries: 179 (including 23 archived)
+  Format: Self-Learning Agent v1.0.0 portable JSON
+```
 
 **`learn import <file>`** — Import learnings:
 - Merge with existing knowledge
 - Deduplicate automatically
 - Report conflicts
+
+```
+> learn import team-learnings.json
+
+📥 Importing from team-learnings.json...
+
+  Source: 215 entries (Self-Learning Agent v1.0.0 format)
+
+  Processing:
+    ✅ New learnings added: 89
+    🔄 Merged with existing: 43 (frequency updated)
+    ⏭ Duplicates skipped: 78
+    ⚠ Conflicts detected: 5
+
+  Conflicts (require resolution):
+    1. "Use Jest" vs existing "Use Vitest" for testing framework
+    2. "Tabs for indentation" vs existing "Spaces for indentation"
+    ... (3 more)
+
+  Run `learn promote` to resolve conflicts.
+  Import complete: 132 entries processed, 89 new.
+```
 
 **`learn prune`** — Clean up knowledge base:
 - Archive stale learnings (no use in 30 days)
@@ -212,10 +336,72 @@ Compression strategies:
 - Recalculate all scores
 - Report space savings
 
+```
+> learn prune
+
+🧹 Pruning knowledge base...
+
+  [1/4] Archiving stale learnings (unused >30 days)...
+        Archived: 12 entries
+
+  [2/4] Merging duplicates...
+        Merged: 8 pairs → 8 unified entries
+        Removed: 8 redundant entries
+
+  [3/4] Recalculating all scores...
+        Updated: 142 entries
+        Score changes: 23 entries rescored
+
+  [4/4] Compressing context...
+        Before: 2,847 tokens
+        After: 1,623 tokens
+        Saved: 1,224 tokens (43%)
+
+  ✅ Prune complete
+  Entries: 162 → 142 (−20)
+  Disk saved: 12 KB
+  Context budget: 1,623 / 2,000 tokens
+```
+
 **`learn graph`** — Show knowledge graph:
 - Category tree with learning counts
 - Cross-project connections
 - Most connected learnings (hub nodes)
+
+```
+> learn graph
+
+🌐 Knowledge Graph
+
+Category Tree:
+├── errors (67)
+│   ├── runtime (28)
+│   ├── config (19)
+│   ├── dependency (12)
+│   └── permission (8)
+├── patterns (41)
+│   ├── workflow (18)
+│   ├── coding (15)
+│   └── deployment (8)
+├── preferences (19)
+│   ├── tooling (11)
+│   └── style (8)
+└── workflows (15)
+    ├── CI/CD (9)
+    └── testing (6)
+
+Cross-Project Connections:
+  web-api ←→ ml-pipeline: 12 shared learnings
+  web-api ←→ mobile-app: 8 shared learnings
+  ml-pipeline ←→ mobile-app: 3 shared learnings
+
+Hub Nodes (most connected):
+  1. "Docker platform flag" → 4 projects, 7 uses
+  2. "npm ci --frozen-lockfile" → 4 projects, 6 uses
+  3. "Set HTTP timeout" → 3 projects, 5 uses
+
+Total: 142 active | 23 archived | 37 global
+```
 
 ### Session Lifecycle
 
@@ -267,6 +453,23 @@ Compression strategies:
 | Knowledge search | File-based | **Indexed + scored** |
 | Import/Export | No | **Yes** |
 | Deduplication | No | **Automatic** |
+
+## Comparison with Alternatives
+
+| Feature | Manual Notes | Mem0 | LangChain Memory | **Self-Learning Agent** |
+|---------|-------------|------|------------------|------------------------|
+| Cross-project memory | No (file-based) | Yes (cloud) | Yes (vector store) | **Yes (local filesystem)** |
+| Automatic error capture | No | No | No | **Yes (auto-capture on failure)** |
+| Knowledge promotion | Manual | Manual tags | Manual | **Automatic scoring + promotion** |
+| Context budget control | Unbounded | Token-aware | Configurable | **2000 token hard cap + compression** |
+| Stale knowledge cleanup | Manual delete | Manual | Manual | **30-day auto-archive** |
+| Privacy | Local files | Cloud-hosted | Depends on store | **Fully local, no network** |
+| Import/Export | Copy/paste | API export | Varies | **Portable JSON format** |
+| Deduplication | Manual | Basic | No | **Automatic with merge** |
+| Indexed search | No (text search) | Vector search | Vector search | **Keyword index + scoring** |
+| Cost | Free (time cost) | $20+/mo | Free (self-hosted) | **Free (zero token overhead for capture)** |
+| Conflict detection | No | No | No | **Auto-detect + user resolution** |
+| Integration with evolution | No | No | No | **Feeds into Capability Evolver Pro** |
 
 ## FAQ
 

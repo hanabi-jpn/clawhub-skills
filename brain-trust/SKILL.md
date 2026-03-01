@@ -22,7 +22,7 @@
 
 `🏛 Multi-Agent` `👥 10+ Roles` `🗳 Consensus` `📋 Meetings` `v1.0.0`
 
-[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() [![Platform](https://img.shields.io/badge/Platform-OpenClaw-blueviolet)]()
 
 > Multi-agent hierarchical orchestration engine. Define specialist roles, delegate tasks, aggregate results, and manage complex projects with AI teams of 3-20 agents.
 
@@ -227,6 +227,30 @@ When making team decisions via `bt decide`:
 - Set up team from template (or custom)
 - Generate initial config
 
+Output:
+```
+╔═══════════════════════════════════════════╗
+║     Brain Trust — Initialization          ║
+╠═══════════════════════════════════════════╣
+║  Template: startup                        ║
+║                                           ║
+║  Creating .brain-trust/ directory...  ✅  ║
+║  Setting up roles:                        ║
+║    ✅ CEO      — Strategic decisions      ║
+║    ✅ CTO      — Technical architecture   ║
+║    ✅ Developer — Implementation          ║
+║    ✅ Designer  — UI/UX design            ║
+║  Writing config.json...              ✅   ║
+║  Creating tasks/ directory...        ✅   ║
+║  Creating decisions/ directory...    ✅   ║
+║  Creating meetings/ directory...     ✅   ║
+║                                           ║
+║  Brain Trust initialized with 4 agents.   ║
+║  Run `bt team` to see your team.          ║
+║  Run `bt delegate <task>` to get started. ║
+╚═══════════════════════════════════════════╝
+```
+
 **`bt team`** — Show current team:
 ```
 ╔═══════════════════════════════════════╗
@@ -245,13 +269,132 @@ When making team decisions via `bt decide`:
 
 **`bt add-role <name> <description>`** — Add custom role
 
+Output:
+```
+✅ Role added: data-engineer
+
+  Name:        data-engineer
+  Description: ETL pipeline design, data warehouse architecture,
+               SQL optimization, and data quality monitoring
+  Reports to:  CTO
+  Saved to:    .brain-trust/agents/data-engineer.md
+
+  Team size: 4 → 5 agents
+  Run `bt team` to see updated roster.
+```
+
 **`bt assign <task> --to <role>`** — Assign task to specific role
+
+Output:
+```
+╔═══════════════════════════════════════════╗
+║         Task Assigned                     ║
+╠═══════════════════════════════════════════╣
+║  Task:     Review API rate limiting logic ║
+║  ID:       task-007                       ║
+║  Assigned: security                       ║
+║  Priority: high                           ║
+║  Status:   in_progress                    ║
+║                                           ║
+║  Security specialist is now analyzing     ║
+║  the rate limiting implementation for     ║
+║  bypass vulnerabilities and DDoS          ║
+║  protection gaps...                       ║
+╚═══════════════════════════════════════════╝
+```
 
 **`bt delegate <task>`** — Auto-delegate (CEO routes to best role)
 
+Output:
+```
+╔═══════════════════════════════════════════════════╗
+║         CEO — Task Delegation                     ║
+╠═══════════════════════════════════════════════════╣
+║  Task: "Redesign the checkout flow for mobile"    ║
+║                                                   ║
+║  CEO Analysis:                                    ║
+║  This task requires UX research, UI design, and   ║
+║  frontend implementation. Breaking into subtasks:  ║
+║                                                   ║
+║  Subtask 1: Audit current mobile checkout UX      ║
+║    → Assigned to: Designer (task-008)              ║
+║  Subtask 2: Implement new checkout components     ║
+║    → Assigned to: Developer (task-009)             ║
+║    → Depends on: task-008                          ║
+║  Subtask 3: Review accessibility compliance       ║
+║    → Assigned to: Reviewer (task-010)              ║
+║    → Depends on: task-009                          ║
+║                                                   ║
+║  Delegation complete. 3 subtasks created.         ║
+║  Run `bt tasks` to track progress.                ║
+╚═══════════════════════════════════════════════════╝
+```
+
 **`bt meeting <type>`** — Run meeting protocol
 
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║         Brain Trust — Standup Meeting                 ║
+║         2026-03-01 14:00 UTC                          ║
+╠═══════════════════════════════════════════════════════╣
+║                                                       ║
+║  🧑 CEO:                                              ║
+║    Done: Reviewed Q1 roadmap priorities               ║
+║    Now:  Evaluating partnership proposal              ║
+║    Blockers: None                                     ║
+║                                                       ║
+║  👨‍💻 CTO:                                              ║
+║    Done: Merged auth refactor PR (#142)               ║
+║    Now:  Designing database migration plan            ║
+║    Blockers: Need CFO approval on cloud budget        ║
+║                                                       ║
+║  🔧 Developer:                                        ║
+║    Done: Checkout component v2 (task-009)             ║
+║    Now:  Writing unit tests for checkout              ║
+║    Blockers: None                                     ║
+║                                                       ║
+║  🎨 Designer:                                          ║
+║    Done: Mobile checkout wireframes (task-008) ✅     ║
+║    Now:  High-fidelity mockups for review             ║
+║    Blockers: Waiting for brand color update           ║
+║                                                       ║
+║  Minutes saved to: .brain-trust/meetings/             ║
+║    2026-03-01-standup.md                              ║
+╚═══════════════════════════════════════════════════════╝
+```
+
 **`bt decide <question> --protocol <type>`** — Make team decision
+
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║     Brain Trust Decision — Weighted Protocol          ║
+╠═══════════════════════════════════════════════════════╣
+║  Question: "Should we migrate from REST to GraphQL?"  ║
+║                                                       ║
+║  CTO (weight 3x):        ✅ YES                       ║
+║    "Reduces over-fetching by 60%. Client teams        ║
+║     already requesting flexible queries."             ║
+║                                                       ║
+║  Developer (weight 2x):  ⚠️ CONDITIONAL YES           ║
+║    "Yes, but phase it. Start with read queries,       ║
+║     keep REST for writes until tooling matures."      ║
+║                                                       ║
+║  Security (weight 1x):   ❌ NO                        ║
+║    "GraphQL introduces new attack vectors: deep       ║
+║     queries, introspection leaks. Need rate limiting."║
+║                                                       ║
+║  Designer (weight 1x):   ✅ YES                       ║
+║    "Faster frontend iteration with query flexibility."║
+║                                                       ║
+║  ═══════════════════════════════════════════════════   ║
+║  Result: YES (weighted score: 8/10)                   ║
+║  Action: Phased migration, read-first approach        ║
+║  Dissent logged: Security concerns noted              ║
+║  Decision saved to: .brain-trust/decisions/log.jsonl  ║
+╚═══════════════════════════════════════════════════════╝
+```
 
 **`bt status`** — Project overview:
 - Active tasks by role
@@ -259,13 +402,127 @@ When making team decisions via `bt decide`:
 - Blockers
 - Next milestones
 
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║           Brain Trust — Project Status                ║
+╠═══════════════════════════════════════════════════════╣
+║  Active Tasks: 5 │ Completed: 12 │ Blocked: 1        ║
+║                                                       ║
+║  By Role:                                             ║
+║  CEO       │ 1 active  │ 3 completed │ 0 blocked     ║
+║  CTO       │ 1 active  │ 4 completed │ 1 blocked     ║
+║  Developer │ 2 active  │ 3 completed │ 0 blocked     ║
+║  Designer  │ 1 active  │ 2 completed │ 0 blocked     ║
+║                                                       ║
+║  Blockers:                                            ║
+║  🚫 task-011: DB migration plan (CTO)                 ║
+║     Waiting on: CFO budget approval                   ║
+║                                                       ║
+║  Next Milestones:                                     ║
+║  📌 Mar 05 — Checkout redesign complete               ║
+║  📌 Mar 10 — API v2 beta release                      ║
+║  📌 Mar 15 — Security audit complete                  ║
+╚═══════════════════════════════════════════════════════╝
+```
+
 **`bt report [daily|weekly]`** — Generate report
+
+Output:
+```
+📄 Weekly Report generated: .brain-trust/reports/2026-03-01.md
+
+  # Brain Trust Weekly Report — 2026-03-01
+
+  ## Summary
+  - Tasks completed this week: 8
+  - Tasks in progress: 5
+  - Blocked tasks: 1
+  - Decisions made: 3
+  - Meetings held: 5 (3 standups, 1 review, 1 brainstorm)
+
+  ## Highlights
+  - Checkout redesign wireframes approved
+  - Auth refactor merged (PR #142)
+  - GraphQL migration decision: approved (phased)
+
+  ## Risks
+  - DB migration blocked on budget approval (3 days)
+  - Designer waiting on brand color update
+
+  Report saved to .brain-trust/reports/2026-03-01.md (3.8 KB)
+```
 
 **`bt tasks`** — List all tasks
 
+Output:
+```
+╔═══════════════════════════════════════════════════════════╗
+║                Brain Trust — All Tasks                    ║
+╠═══════════════════════════════════════════════════════════╣
+║  ID       │ Task                        │ Role      │ St  ║
+║  ─────────┼─────────────────────────────┼───────────┼──── ║
+║  task-008 │ Mobile checkout wireframes  │ Designer  │ ✅  ║
+║  task-009 │ Checkout components v2      │ Developer │ ●   ║
+║  task-010 │ Accessibility review        │ Reviewer  │ ○   ║
+║  task-011 │ DB migration plan           │ CTO       │ 🚫  ║
+║  task-012 │ Unit tests for checkout     │ Developer │ ●   ║
+║  task-013 │ Partnership evaluation      │ CEO       │ ●   ║
+║  task-014 │ Hi-fi mockups              │ Designer  │ ●   ║
+║  task-015 │ Rate limiting review        │ Security  │ ●   ║
+║                                                           ║
+║  Legend: ✅ completed │ ● in_progress │ ○ pending │ 🚫 blocked ║
+║  Total: 1 completed │ 5 active │ 1 pending │ 1 blocked   ║
+╚═══════════════════════════════════════════════════════════╝
+```
+
 **`bt escalate <task>`** — Escalate blocked task to higher level
 
+Output:
+```
+╔═══════════════════════════════════════════════════╗
+║         Task Escalation                           ║
+╠═══════════════════════════════════════════════════╣
+║  Task:      task-011 (DB migration plan)          ║
+║  From:      CTO                                   ║
+║  Escalated: CEO                                   ║
+║  Reason:    Blocked 3 days — awaiting CFO budget  ║
+║             approval for cloud infrastructure     ║
+║                                                   ║
+║  CEO Response:                                    ║
+║  "Approving $2,400/month cloud budget directly.   ║
+║   CFO to reconcile in Q2 review. CTO proceed     ║
+║   with migration plan immediately."               ║
+║                                                   ║
+║  ✅ Blocker resolved. task-011 status: in_progress║
+║  Decision logged to decisions/log.jsonl           ║
+╚═══════════════════════════════════════════════════╝
+```
+
 **`bt disband`** — Remove Brain Trust from project
+
+Output:
+```
+╔═══════════════════════════════════════════════════╗
+║         Brain Trust — Disband                     ║
+╠═══════════════════════════════════════════════════╣
+║                                                   ║
+║  ⚠️ This will remove the Brain Trust team from    ║
+║  this project. Data will be preserved.            ║
+║                                                   ║
+║  Current state:                                   ║
+║    Active tasks: 5 (will be marked abandoned)     ║
+║    Completed tasks: 12 (preserved in archive)     ║
+║    Decisions: 3 (preserved in log)                ║
+║    Meetings: 9 minutes saved                      ║
+║                                                   ║
+║  Confirm disband? (yes/no): yes                   ║
+║                                                   ║
+║  ✅ Brain Trust disbanded.                         ║
+║  Archive saved to: .brain-trust/archive/          ║
+║  Run `bt init` to create a new team.              ║
+╚═══════════════════════════════════════════════════╝
+```
 
 ### Data Storage
 

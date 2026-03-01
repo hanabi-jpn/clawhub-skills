@@ -21,7 +21,7 @@
 
 `🗜 -70% Tokens` `📊 Dashboard` `🔍 Dedup` `⚡ Auto-Compress` `v1.0.0`
 
-[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() [![Updated](https://img.shields.io/badge/Updated-2026-blue)]()
 
 > Intelligent context window optimizer. Compresses, prioritizes, and manages context to prevent overflow while preserving critical information. Save 40-70% of your context budget.
 
@@ -180,23 +180,199 @@ Context Slim can run automatically:
 
 **`slim status`** — Quick context usage overview
 
+Output:
+```
+╔══════════════════════════════════════════╗
+║          Context Slim Status             ║
+╠══════════════════════════════════════════╣
+║ Total Usage:  87,400 / 128,000 tokens   ║
+║ Budget Used:  ████████████████░░░  68%   ║
+╠══════════════════════════════════════════╣
+║ Breakdown:                               ║
+║  System/Skills:  12,300  (14%)  ████     ║
+║  Conversation:   34,200  (39%)  ████████ ║
+║  Memory/Files:   28,900  (33%)  ███████  ║
+║  Tool Results:   12,000  (14%)  ████     ║
+╠══════════════════════════════════════════╣
+║ ⚠️ Warning: 68% used. Optimize soon.    ║
+╚══════════════════════════════════════════╝
+```
+
 **`slim analyze`** — Detailed analysis with top consumers, duplicates, recommendations
 
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║           Context Slim — Deep Analysis                ║
+╠═══════════════════════════════════════════════════════╣
+║  Total Usage: 87,400 / 128,000 tokens (68%)          ║
+║                                                       ║
+║  Top Consumers:                                       ║
+║  ──────────────────────────────────────────────        ║
+║  1. Conversation (42 turns):   34,200 tokens (39%)   ║
+║  2. byterover context:         18,200 tokens (21%)   ║
+║  3. project README.md:          6,400 tokens  (7%)   ║
+║  4. self-learning data:         4,300 tokens  (5%)   ║
+║  5. skill-guardian threats:     3,200 tokens  (4%)   ║
+║                                                       ║
+║  Duplicates Found: 3                                  ║
+║  ──────────────────────────────────────────────        ║
+║  • Project description appears in 3 skill contexts    ║
+║    (est. 2,100 tokens recoverable)                    ║
+║  • Auth config repeated in 2 memory files             ║
+║    (est. 1,200 tokens recoverable)                    ║
+║  • Package.json contents duplicated in tool results   ║
+║    (est. 900 tokens recoverable)                      ║
+║                                                       ║
+║  Stale Content: 5 items (est. 8,100 tokens)          ║
+║  ──────────────────────────────────────────────        ║
+║  • 12 conversation turns older than 30 minutes        ║
+║  • 3 tool results from completed tasks                ║
+║                                                       ║
+║  Recommendations:                                     ║
+║  1. Run `slim dedup` to save ~4,200 tokens           ║
+║  2. Compress conversation (save ~17,000 tokens)       ║
+║  3. Set budget for byterover (currently unbounded)    ║
+║  4. Total potential savings: ~29,300 tokens (34%)    ║
+╚═══════════════════════════════════════════════════════╝
+```
+
 **`slim compress`** — Auto-compress (picks best strategy per content type):
-- Conversation history → semantic compression
-- Code/structured docs → structural compression
-- Skill instructions → priority compression
+- Conversation history -> semantic compression
+- Code/structured docs -> structural compression
+- Skill instructions -> priority compression
+
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║           Context Slim — Auto-Compress                ║
+╠═══════════════════════════════════════════════════════╣
+║  Analyzing content types and selecting strategies...  ║
+║                                                       ║
+║  Conversation (42 turns) → semantic compression       ║
+║    Before: 34,200 tokens                              ║
+║    After:  12,400 tokens                              ║
+║    Saved:  21,800 tokens (63.7%)  ✅                  ║
+║                                                       ║
+║  Code files → structural compression                  ║
+║    Before: 8,200 tokens                               ║
+║    After:  4,100 tokens                               ║
+║    Saved:  4,100 tokens (50.0%)  ✅                   ║
+║                                                       ║
+║  Skill instructions → priority compression            ║
+║    Before: 12,300 tokens                              ║
+║    After:  8,900 tokens                               ║
+║    Saved:  3,400 tokens (27.6%)  ✅                   ║
+║                                                       ║
+║  Tool results → semantic compression                  ║
+║    Before: 12,000 tokens                              ║
+║    After:  5,200 tokens                               ║
+║    Saved:  6,800 tokens (56.7%)  ✅                   ║
+║                                                       ║
+║  ═══════════════════════════════════════════════════   ║
+║  Total saved: 36,100 tokens (41.3%)                   ║
+║  New usage: 51,300 / 128,000 tokens (40%)            ║
+║  Status: ████████░░░░░░░░░░░░ 40% — HEALTHY          ║
+╚═══════════════════════════════════════════════════════╝
+```
 
 **`slim compress --strategy <semantic|structural|priority>`** — Force strategy
+
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║     Context Slim — Semantic Compression               ║
+╠═══════════════════════════════════════════════════════╣
+║  Strategy: semantic (forced)                          ║
+║  Target: All compressible content blocks              ║
+║                                                       ║
+║  Processing 6 content blocks...                       ║
+║  [1/6] Conversation history:  34,200 → 11,800  ✅    ║
+║  [2/6] byterover context:    18,200 →  6,400  ✅    ║
+║  [3/6] Tool results:          12,000 →  4,800  ✅    ║
+║  [4/6] self-learning data:     4,300 →  2,100  ✅    ║
+║  [5/6] README.md:              6,400 →  3,200  ✅    ║
+║  [6/6] Skill instructions:   12,300 →  9,800  ✅    ║
+║                                                       ║
+║  Total saved: 39,000 tokens (44.6%)                   ║
+║  Key entities preserved: 142/142 (100%)              ║
+║  New usage: 48,400 / 128,000 tokens (38%)            ║
+╚═══════════════════════════════════════════════════════╝
+```
 
 **`slim budget set <category> <tokens>`** — Set budget:
 - Categories: system_skills, conversation, memory_files, active_files, tool_results
 
+Output:
+```
+✅ Budget updated: conversation → 30,000 tokens
+
+  Category         │ Old Budget │ New Budget │ Current Use
+  ─────────────────┼────────────┼────────────┼───────────
+  system_skills    │    3,000   │    3,000   │   2,800
+  conversation     │   40,000   │   30,000   │  34,200 ⚠️
+  memory_files     │   15,000   │   15,000   │  12,400
+  active_files     │   20,000   │   20,000   │   8,200
+  tool_results     │   10,000   │   10,000   │   6,800
+  buffer           │    5,000   │    5,000   │     —
+
+  ⚠️ conversation is currently over the new budget.
+  Run `slim compress` to bring it within limits.
+```
+
 **`slim budget show`** — Show current budgets and usage
+
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║          Context Slim — Budget Overview               ║
+╠═══════════════════════════════════════════════════════╣
+║  Category       │ Budget  │ Used    │ %    │ Status   ║
+║  ───────────────┼─────────┼─────────┼──────┼──────── ║
+║  system_skills  │  3,000  │  2,800  │ 93%  │ ⚠️      ║
+║  conversation   │ 30,000  │ 12,400  │ 41%  │ ✅      ║
+║  memory_files   │ 15,000  │ 12,400  │ 83%  │ ⚠️      ║
+║  active_files   │ 20,000  │  8,200  │ 41%  │ ✅      ║
+║  tool_results   │ 10,000  │  6,800  │ 68%  │ ✅      ║
+║  buffer         │  5,000  │    —    │  —   │ ✅      ║
+║  ───────────────┼─────────┼─────────┼──────┼──────── ║
+║  Total          │ 83,000  │ 42,600  │ 51%  │ ✅      ║
+║                                                       ║
+║  Model max: 128,000 tokens                            ║
+║  Unallocated: 45,000 tokens                          ║
+╚═══════════════════════════════════════════════════════╝
+```
 
 **`slim dedup`** — Run deduplication:
 - Find and merge duplicates
 - Report savings
+
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║           Context Slim — Deduplication                ║
+╠═══════════════════════════════════════════════════════╣
+║  Scanning content blocks for duplicates...            ║
+║  Hashing 48 content blocks...                         ║
+║                                                       ║
+║  Exact Duplicates Found: 2                            ║
+║  ──────────────────────────────────────────────        ║
+║  • Project description (3 copies → 1 canonical)      ║
+║    Saved: 2,100 tokens                                ║
+║  • Package.json in tool results (2 copies → 1)       ║
+║    Saved: 900 tokens                                  ║
+║                                                       ║
+║  Near-Duplicates Found: 1 (>80% similarity)          ║
+║  ──────────────────────────────────────────────        ║
+║  • Auth config in memory vs active file (87% match)  ║
+║    Merged into canonical version                      ║
+║    Saved: 1,200 tokens                                ║
+║                                                       ║
+║  Total deduplicated: 3 items                          ║
+║  Total saved: 4,200 tokens                            ║
+║  New usage: 83,200 / 128,000 tokens (65%)            ║
+╚═══════════════════════════════════════════════════════╝
+```
 
 **`slim profile`** — Profile each installed skill's context footprint:
 ```
@@ -219,9 +395,87 @@ Context Slim can run automatically:
 - One command does everything
 - Report savings
 
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║        Context Slim — Full Optimization               ║
+╠═══════════════════════════════════════════════════════╣
+║  Step 1: Analyze...                              ✅   ║
+║    Found 3 duplicates, 5 stale items, 2 over-budget  ║
+║                                                       ║
+║  Step 2: Dedup...                                ✅   ║
+║    Removed 3 duplicates (saved 4,200 tokens)         ║
+║                                                       ║
+║  Step 3: Compress...                             ✅   ║
+║    Conversation: semantic  (saved 21,800 tokens)     ║
+║    Code files: structural  (saved 4,100 tokens)      ║
+║    Skills: priority        (saved 3,400 tokens)      ║
+║    Tool results: semantic  (saved 6,800 tokens)      ║
+║                                                       ║
+║  ═══════════════════════════════════════════════════   ║
+║  Before: 87,400 tokens (68%)                         ║
+║  After:  47,100 tokens (37%)                         ║
+║  Saved:  40,300 tokens (46.1%)                       ║
+║                                                       ║
+║  Status: ████████░░░░░░░░░░░░ 37% — HEALTHY          ║
+║  Optimization logged to .context-slim/history.jsonl  ║
+╚═══════════════════════════════════════════════════════╝
+```
+
 **`slim history`** — Show compression history and cumulative savings
 
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║         Context Slim — Compression History            ║
+╠═══════════════════════════════════════════════════════╣
+║  Date        │ Action     │ Saved    │ Method         ║
+║  ────────────┼────────────┼──────────┼──────────────  ║
+║  Mar 01 14:30│ optimize   │ 40,300   │ auto-select    ║
+║  Mar 01 12:15│ dedup      │  4,200   │ hash-compare   ║
+║  Feb 28 16:45│ compress   │ 28,100   │ semantic       ║
+║  Feb 28 10:20│ auto-90%   │ 12,400   │ priority       ║
+║  Feb 27 14:00│ compress   │ 22,300   │ structural     ║
+║  Feb 26 09:30│ dedup      │  3,800   │ hash-compare   ║
+║                                                       ║
+║  Cumulative Savings (7 days):                         ║
+║  Total tokens saved:   111,100                        ║
+║  Optimization runs:    6                              ║
+║  Auto-triggers:        1 (90% threshold)              ║
+║  Avg savings per run:  18,517 tokens                  ║
+║                                                       ║
+║  Data: .context-slim/history.jsonl                    ║
+╚═══════════════════════════════════════════════════════╝
+```
+
 **`slim reset`** — Reset budgets and settings to defaults
+
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║         Context Slim — Reset to Defaults              ║
+╠═══════════════════════════════════════════════════════╣
+║                                                       ║
+║  ⚠️ This will reset all budgets and settings.         ║
+║  Compression history will be preserved.               ║
+║                                                       ║
+║  Confirm reset? (yes/no): yes                         ║
+║                                                       ║
+║  Budgets reset:                                       ║
+║    system_skills:  3,000  (was 3,000 — unchanged)    ║
+║    conversation:  40,000  (was 30,000 — restored)    ║
+║    memory_files:  15,000  (was 15,000 — unchanged)   ║
+║    active_files:  20,000  (was 20,000 — unchanged)   ║
+║    tool_results:  10,000  (was 10,000 — unchanged)   ║
+║    buffer:         5,000  (was 5,000 — unchanged)    ║
+║                                                       ║
+║  Custom priority overrides: cleared (3 removed)       ║
+║  Skill profiles: preserved                            ║
+║  Hash cache: cleared (will rebuild on next dedup)     ║
+║                                                       ║
+║  ✅ Settings reset to defaults.                        ║
+╚═══════════════════════════════════════════════════════╝
+```
 
 ### Data Storage
 

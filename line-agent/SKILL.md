@@ -336,6 +336,30 @@ Authentication: Bearer token via `LINE_CHANNEL_ACCESS_TOKEN` in Authorization he
 **`line quota`** — Check message quota and current usage
 **`line health`** — API connectivity and token validity check
 
+### Comparison: LINE Agent vs Other LINE Marketing Tools
+
+| Feature                          | LINE Agent (本スキル)           | Liny                            | エルメ (L Message)              | 自社開発Bot                     |
+|----------------------------------|--------------------------------|--------------------------------|--------------------------------|--------------------------------|
+| 初期費用                          | 無料 (OSS)                     | ¥49,800                        | 無料 (フリープラン)             | 開発コスト依存                  |
+| 月額費用                          | LINE API料金のみ               | ¥5,280〜¥76,780/月            | ¥0〜¥33,000/月                 | サーバー費用のみ                |
+| AI自動応答                        | LLM搭載 (敬語自動調整)         | テンプレート応答のみ            | シナリオ応答                    | 自前実装が必要                  |
+| セグメント配信                    | タグ+AI行動分析                | リッチなセグメント              | 詳細セグメント                  | 自前実装が必要                  |
+| Flex Message                     | テンプレート同梱 + カスタム    | ビジュアルエディタ              | テンプレート選択式              | JSON手書き                      |
+| Rich Menu動的切替                 | ユーザー状態に応じて自動       | 条件分岐で切替                  | シナリオで切替                  | API実装が必要                   |
+| EC連携 (EC-CUBE等)                | リアルタイム注文通知・自動タグ | Shopify連携あり                 | 一部EC連携あり                  | 個別開発                        |
+| CRM/顧客管理                     | タグ + 行動履歴 + 会話ログ     | 高機能CRM内蔵                   | 友だち管理あり                  | DB設計が必要                    |
+| 分析ダッシュボード                | CLI + 詳細レポート出力         | Web管理画面                     | Web管理画面                     | 自前BI連携                      |
+| API/CLI操作                       | 全機能CLIコマンド対応          | Web UIのみ                      | Web UIのみ                      | 自由度最大                      |
+| 開封率・CVRトラッキング           | Insight API連携で自動集計      | 標準搭載                        | 標準搭載                        | 自前実装が必要                  |
+| 学習コスト                        | CLI操作の知識が必要            | GUI操作で低い                   | GUI操作で低い                   | 開発スキル必須                  |
+
+**When to use LINE Agent:**
+- コスト最小で高機能なLINE運用をしたい → **LINE Agent**
+- AI自動応答で人件費を削減したい → **LINE Agent**
+- GUIで直感的に操作したい → Liny or エルメ
+- 大規模マーケ組織で多人数運用 → Liny
+- 既存システムと完全統合したい → LINE Agent or 自社開発Bot
+
 ### Error Handling
 
 | Error Code | Meaning | Agent Action |
@@ -343,9 +367,12 @@ Authentication: Bearer token via `LINE_CHANNEL_ACCESS_TOKEN` in Authorization he
 | 400 | Invalid request (bad user ID, invalid message) | Validate user ID format, check message structure |
 | 401 | Invalid channel access token | Prompt user to regenerate token in LINE Developers console |
 | 403 | Insufficient permissions | Check channel permissions (messaging, profile, etc.) |
+| 404 | Resource not found (user unfollowed or invalid rich menu ID) | Verify resource exists, remove stale references from local cache |
+| 408 | Request timeout (large multicast or slow network) | Split multicast into smaller batches (max 500), retry with shorter timeout |
 | 429 | Rate limit (default: 100k/min) | Queue messages, retry with backoff |
 | 500 | LINE platform error | Retry once, log for monitoring |
 | WEBHOOK_VERIFY_FAIL | Signature mismatch | Check `LINE_CHANNEL_SECRET` is correct |
+| QUOTA_EXCEEDED | Monthly message quota exhausted | Alert user, suggest plan upgrade, switch to reply-only mode (free) |
 
 **Message quota awareness:** Free plan = 200 messages/month. Standard = 5,000. Pro = 30,000. The agent checks quota before broadcast/multicast and warns if approaching the limit.
 

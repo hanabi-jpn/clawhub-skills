@@ -267,14 +267,126 @@ Store in `.fx-trader-pro/journal/trades.jsonl`
 - Open positions with current P&L
 - Daily P&L vs daily loss limit
 
+Output:
+```
+╔══════════════════════════════════════════════════╗
+║              FX Trader Pro — Status              ║
+╠══════════════════════════════════════════════════╣
+║  Account:    101-001-12345678-001  (LIVE)        ║
+║  NAV:        $100,826.43                         ║
+║  Unrealized: +$142.30                            ║
+║  Margin Used: $4,200.00 (4.2%)                   ║
+║  Free Margin: $96,626.43                         ║
+╠══════════════════════════════════════════════════╣
+║  Open Positions (2/3)                            ║
+║  ─────────────────────────────────────────────── ║
+║  EUR_USD  BUY  15,000  @ 1.0845  P&L: +$88.50   ║
+║    SL: 1.0812 │ TP: 1.0911 │ R:R 1:2.0          ║
+║  XAG_USD  BUY   5,000  @ 22.340  P&L: +$53.80   ║
+║    SL: 22.150 │ TP: 22.720 │ R:R 1:2.0          ║
+╠══════════════════════════════════════════════════╣
+║  Daily P&L:  +$312.40 / -$3,024.79 limit (10%)  ║
+║  Session:    London-NY Overlap (HIGH volume)     ║
+╚══════════════════════════════════════════════════╝
+```
+
 **`fx analyze <pair> [timeframe]`** — Full technical analysis
+
+Output:
+```
+╔══════════════════════════════════════════════════╗
+║       Technical Analysis: EUR_USD  (M30)        ║
+╠══════════════════════════════════════════════════╣
+║  Price:   1.0857    Spread: 1.2 pips (normal)   ║
+║  ATR(14): 0.0022    Volatility: Medium          ║
+╠══════════════════════════════════════════════════╣
+║  Moving Averages:                                ║
+║    EMA 20:  1.0849  ▲ Price ABOVE (bullish)      ║
+║    EMA 50:  1.0831  ▲ Price ABOVE (bullish)      ║
+║    SMA 200: 1.0798  ▲ Price ABOVE (bullish)      ║
+║    Alignment: EMA20 > EMA50 > SMA200 ✅          ║
+║                                                  ║
+║  RSI(14):  58.3  — Neutral (no divergence)       ║
+║  MACD:     Signal: bullish crossover (2 bars)    ║
+║            Histogram: +0.0004 (rising)           ║
+║  Bollinger: Price at mid-band, bands normal      ║
+║                                                  ║
+║  Support:  1.0820 (swing low), 1.0798 (SMA200)  ║
+║  Resistance: 1.0890 (swing high), 1.0900 (round)║
+║                                                  ║
+║  Trend:  ▲ UPTREND (HH + HL on M30, H4, D)     ║
+║  MTF Confluence: 5/6 timeframes aligned bullish  ║
+║  Bias:  BUY — look for pullback entries          ║
+╚══════════════════════════════════════════════════╝
+```
 
 **`fx scan`** — Scan ALL 28 pairs for opportunities:
 - Quick analysis on H1 for each pair
 - Sort by signal strength
 - Show top 5 opportunities
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║          FX Trader Pro — Market Scan (H1)           ║
+╠══════════════════════════════════════════════════════╣
+║  Scanned 28 pairs in 12.3 seconds                   ║
+║                                                      ║
+║  Top 5 Opportunities:                                ║
+║  ────────────────────────────────────────────────     ║
+║  #1  GBP_JPY   BUY   Score: 84/100  ★★★★☆           ║
+║      H4 uptrend, RSI bounce from 38, MACD cross      ║
+║                                                      ║
+║  #2  EUR_USD   BUY   Score: 78/100  ★★★★☆           ║
+║      All MAs aligned bullish, BB lower band touch     ║
+║                                                      ║
+║  #3  AUD_NZD   SELL  Score: 72/100  ★★★★☆           ║
+║      Death cross on H4, RSI 74 (overbought reversal) ║
+║                                                      ║
+║  #4  USD_CAD   SELL  Score: 65/100  ★★★☆☆           ║
+║      Double top on H1, MACD bearish divergence        ║
+║                                                      ║
+║  #5  XAU_USD   BUY   Score: 61/100  ★★★☆☆           ║
+║      Pullback to EMA50, support confluence at 2,340   ║
+║                                                      ║
+║  23 pairs: No clear signal (score < 60)              ║
+║  Use `fx signal <pair>` for detailed trade setup     ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`fx signal <pair>`** — Generate detailed trade signal
+
+Output:
+```
+╔══════════════════════════════════════════╗
+║         FX TRADE SIGNAL                  ║
+╠══════════════════════════════════════════╣
+║ Pair:        GBP_JPY                     ║
+║ Direction:   BUY (Long)                  ║
+║ Confidence:  84/100                      ║
+║ Timeframe:   M30 (entry) / H4 (bias)    ║
+╠══════════════════════════════════════════╣
+║ Entry:       191.450                     ║
+║ Stop Loss:   190.850 (-60 pips)          ║
+║ Take Profit: 192.650 (+120 pips)         ║
+║ Risk:Reward: 1:2.0                       ║
+╠══════════════════════════════════════════╣
+║ Position Size: 8,400 units               ║
+║ Risk Amount:   $504.00 (2.0% of equity)  ║
+╠══════════════════════════════════════════╣
+║ Supporting Factors:                      ║
+║ ✅ H4 uptrend (EMA 20 > 50 > 200)       ║
+║ ✅ RSI bounced from 38 on M30           ║
+║ ✅ MACD bullish crossover on H1         ║
+║ ✅ Price at ascending trendline support  ║
+║                                          ║
+║ Contradicting Factors:                   ║
+║ ⚠️ Weekly RSI at 68 (approaching OB)    ║
+║                                          ║
+║ Session: London (HIGH vol for JPY cross) ║
+║ Expires: 4 hours from now                ║
+╚══════════════════════════════════════════╝
+```
 
 **`fx trade <pair> <buy|sell> [units]`** — Execute trade:
 - Calculate position size if units not specified
@@ -282,30 +394,227 @@ Store in `.fx-trader-pro/journal/trades.jsonl`
 - Confirm before execution (always)
 - Log to journal
 
+Output:
+```
+╔══════════════════════════════════════════════════╗
+║           Trade Execution — Confirmation         ║
+╠══════════════════════════════════════════════════╣
+║  Pair:      GBP_JPY                              ║
+║  Direction: BUY                                  ║
+║  Units:     8,400 (auto-calculated, 2% risk)     ║
+║  Entry:     191.450 (market)                     ║
+║  Stop Loss: 190.850 (-60 pips)                   ║
+║  Take Profit: 192.650 (+120 pips)                ║
+║  Risk:      $504.00 (2.0% of $25,200 equity)    ║
+║  Account:   LIVE                                 ║
+║                                                  ║
+║  ⚠️ Confirm? (yes/no): yes                       ║
+║                                                  ║
+║  ✅ Trade executed successfully!                  ║
+║  Trade ID:  trade-20260301-003                   ║
+║  Fill Price: 191.453 (slippage: +0.3 pips)       ║
+║  Logged to: .fx-trader-pro/journal/trades.jsonl  ║
+╚══════════════════════════════════════════════════╝
+```
+
 **`fx close <trade-id|all>`** — Close position(s)
 
+Output:
+```
+╔══════════════════════════════════════════════════╗
+║           Close Position                         ║
+╠══════════════════════════════════════════════════╣
+║  Trade ID:  trade-20260301-003                   ║
+║  Pair:      GBP_JPY   BUY  8,400 units          ║
+║  Entry:     191.453                              ║
+║  Close:     191.890   (+43.7 pips)               ║
+║  P&L:       +$367.08                             ║
+║  Duration:  2h 14m                               ║
+║                                                  ║
+║  ✅ Position closed at market price.              ║
+║  Logged to journal.                              ║
+║  Remaining open positions: 1/3                   ║
+╚══════════════════════════════════════════════════╝
+```
+
 **`fx modify <trade-id> --sl <price> --tp <price>`** — Modify SL/TP
+
+Output:
+```
+╔══════════════════════════════════════════════════╗
+║           Modify Trade                           ║
+╠══════════════════════════════════════════════════╣
+║  Trade ID:  trade-20260301-001                   ║
+║  Pair:      EUR_USD  BUY  15,000 units           ║
+║                                                  ║
+║  Stop Loss:    1.0812 → 1.0845 (moved to B/E)   ║
+║  Take Profit:  1.0911 → 1.0940 (extended)        ║
+║                                                  ║
+║  ✅ SL/TP updated successfully on OANDA.          ║
+║  New R:R from current price: 1:3.2               ║
+║  Risk: $0.00 (breakeven stop)                    ║
+╚══════════════════════════════════════════════════╝
+```
 
 **`fx journal`** — Show trading journal summary:
 - Total trades, win rate, profit factor
 - Best/worst trades
 - Average R:R achieved
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║            FX Trader Pro — Trading Journal           ║
+╠══════════════════════════════════════════════════════╣
+║  Period: All time (since 2026-01-15)                 ║
+║                                                      ║
+║  Total Trades:   87                                  ║
+║  Win Rate:       62.1% (54 W / 33 L)                ║
+║  Profit Factor:  1.84                                ║
+║  Net P&L:        +$4,218.30                          ║
+║  Avg R:R Achieved: 1:1.72                            ║
+║                                                      ║
+║  Best Trade:   GBP_JPY  +$892.00  (+142 pips)       ║
+║  Worst Trade:  XAG_USD  -$487.00  (-97 pips)        ║
+║  Avg Win:      +$156.20  │  Avg Loss:  -$84.90      ║
+║  Longest Streak: 7 wins  │  Worst Streak: 4 losses   ║
+║                                                      ║
+║  Most Traded Pairs:                                  ║
+║    EUR_USD: 23 trades │ GBP_JPY: 18 │ XAU_USD: 12   ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`fx journal --month <YYYY-MM>`** — Monthly report
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║        Monthly Report — February 2026                ║
+╠══════════════════════════════════════════════════════╣
+║  Trades:    31         Win Rate:   64.5% (20W/11L)   ║
+║  Net P&L:   +$1,847.20  Profit Factor: 1.92         ║
+║  Best Week:  Week 2 (+$823.00)                       ║
+║  Worst Week: Week 4 (-$212.40)                       ║
+║                                                      ║
+║  Weekly Breakdown:                                   ║
+║  Week 1: █████████░ +$412.30  (8 trades, 63% WR)    ║
+║  Week 2: ████████████ +$823.00 (9 trades, 78% WR)   ║
+║  Week 3: ███████░░░ +$824.30  (7 trades, 57% WR)    ║
+║  Week 4: ██░░░░░░░░ -$212.40  (7 trades, 43% WR)    ║
+║                                                      ║
+║  Top Pair: GBP_JPY (+$634.00, 6 trades, 83% WR)     ║
+║  Best Session: London-NY Overlap (71% WR)            ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`fx pairs`** — List all pairs with current prices and spreads
+
+Output:
+```
+╔═══════════════════════════════════════════════════════╗
+║            Currency Pairs — Live Prices               ║
+╠═══════════════════════════════════════════════════════╣
+║  MAJORS              Bid       Ask      Spread        ║
+║  EUR_USD           1.0856    1.0857    1.2 pips  ✅   ║
+║  GBP_USD           1.2641    1.2643    1.8 pips  ✅   ║
+║  USD_JPY           149.832   149.847   1.5 pips  ✅   ║
+║  USD_CHF           0.8834    0.8836    1.6 pips  ✅   ║
+║  AUD_USD           0.6512    0.6514    1.4 pips  ✅   ║
+║  NZD_USD           0.6108    0.6110    1.8 pips  ✅   ║
+║  USD_CAD           1.3587    1.3589    1.8 pips  ✅   ║
+║                                                       ║
+║  METALS             Bid       Ask      Spread         ║
+║  XAU_USD          2,342.10  2,342.80  70 cents  ✅   ║
+║  XAG_USD            22.340    22.370   3.0 pips  ✅   ║
+║                                                       ║
+║  ✅ = Normal spread │ ⚠️ = Elevated │ 🚫 = Too wide  ║
+║  Session: London-NY Overlap │ 21/28 pairs shown       ║
+║  Use `fx pairs --all` for full list                   ║
+╚═══════════════════════════════════════════════════════╝
+```
 
 **`fx risk`** — Risk dashboard:
 - Current exposure by pair and correlation group
 - Daily loss used vs limit
 - Position count vs limit
 
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║              FX Trader Pro — Risk Dashboard          ║
+╠══════════════════════════════════════════════════════╣
+║  Positions: 2/3 (1 remaining)                        ║
+║  Daily Loss: $312.40 used / $3,024.79 limit (10.3%) ║
+║  Daily Loss Bar: ██░░░░░░░░░░░░░░░░░░  10%          ║
+║                                                      ║
+║  Correlation Groups:                                 ║
+║  ──────────────────────────────────────────────       ║
+║  Group A (EUR/GBP):  1/1 max  ⚠️ EUR_USD open       ║
+║  Group B (USD/CHF):  0/1 max  ✅ Available           ║
+║  Group C (AUD/NZD):  0/1 max  ✅ Available           ║
+║  Group D (Metals):   1/1 max  ⚠️ XAG_USD open       ║
+║                                                      ║
+║  Exposure by Pair:                                   ║
+║  EUR_USD:  $15,000 (14.9% of NAV)  Risk: $330        ║
+║  XAG_USD:   $5,000 ( 5.0% of NAV)  Risk: $190        ║
+║  Total:    $20,000 (19.8% of NAV)  Risk: $520        ║
+║                                                      ║
+║  Margin Status: HEALTHY (4.2% used)                  ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`fx stop-all`** — EMERGENCY: Close ALL positions immediately
+
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║  🚨 EMERGENCY STOP — CLOSING ALL POSITIONS 🚨       ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║  Closing EUR_USD  BUY 15,000 @ market...  ✅ CLOSED  ║
+║    Fill: 1.0859  P&L: +$210.00                       ║
+║                                                      ║
+║  Closing XAG_USD  BUY  5,000 @ market...  ✅ CLOSED  ║
+║    Fill: 22.380  P&L: +$200.00                       ║
+║                                                      ║
+║  ═══════════════════════════════════════════════════  ║
+║  All 2 positions closed in 1.8 seconds               ║
+║  Total realized P&L: +$410.00                        ║
+║  Account NAV: $101,236.43                            ║
+║  Open positions: 0                                   ║
+║  Trading HALTED. Use `fx status` to resume.          ║
+╚══════════════════════════════════════════════════════╝
+```
 
 **`fx backtest <pair> <strategy> --from <date> --to <date>`** — Backtest a strategy:
 - Download historical data
 - Simulate trades
 - Report: total return, max drawdown, win rate, profit factor, Sharpe ratio
+
+Output:
+```
+╔══════════════════════════════════════════════════════╗
+║     Backtest Results: EUR_USD  EMA-Cross             ║
+║     Period: 2025-10-01 → 2026-02-28 (5 months)      ║
+╠══════════════════════════════════════════════════════╣
+║  Total Trades:    142                                ║
+║  Win Rate:        59.2% (84 W / 58 L)               ║
+║  Profit Factor:   1.71                               ║
+║  Total Return:    +$8,420.00 (+33.7%)                ║
+║  Max Drawdown:    -$2,180.00 (-8.7%)                 ║
+║  Sharpe Ratio:    1.42                               ║
+║  Avg Win:         +$182.50 │ Avg Loss: -$112.30      ║
+║  Best Month:      Dec 2025 (+$3,210.00)              ║
+║  Worst Month:     Jan 2026 (-$420.00)                ║
+║                                                      ║
+║  Equity Curve:                                       ║
+║  $25K ─╱──╱╲──╱╱──╱╲─╱╱──╱─ $33.4K                  ║
+║                                                      ║
+║  ✅ Strategy is viable. Positive expectancy.          ║
+║  ⚠️ Jan 2026 drawdown suggests reduce size in       ║
+║     low-volatility ranging markets.                  ║
+╚══════════════════════════════════════════════════════╝
+```
 
 ### Data Storage
 

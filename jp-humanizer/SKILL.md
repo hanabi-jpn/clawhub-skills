@@ -379,6 +379,23 @@ JP Humanizer is a **Japanese language specialist**. While Humanize AI Pro (the m
 
 ---
 
+## Error Handling
+
+| Error Code | Meaning | Agent Action |
+|------------|---------|--------------|
+| E001 | Input text too short (minimum 20 characters required) | Prompt user to provide longer text; single sentences may not benefit from humanization |
+| E002 | Language detection failed (non-Japanese or mixed content above threshold) | Verify input is Japanese text; for mixed JP/EN content, use `--allow-mixed` flag |
+| E003 | Pattern database unavailable (`ai_vocabulary.json` missing or corrupt) | Re-initialize patterns with `jpfix --init`; re-download from skill package if needed |
+| E004 | Confidence score below threshold (AI score delta < 5 points) | Text is already natural (AI score low); skip modification and report current score |
+| E005 | Unsupported text format (binary, encoded, or non-UTF-8 input) | Convert input to UTF-8 plain text (.md, .txt); PDF/DOCX must be extracted first |
+| E006 | Rate limit exceeded (batch processing > 100 files/session) | Split batch into smaller chunks; use `jpfix batch --chunk 50` for large directories |
+| E007 | Output validation failed (humanized text diverges semantically from input) | Rollback to original; retry with `--conservative` mode for minimal changes only |
+| E008 | Context analysis timeout (MeCab/Sudachi processing exceeded 30s) | Reduce input length to < 10,000 characters per call; split long documents into sections |
+
+**Error recovery strategy:** For E001-E005, the agent provides clear guidance and does not produce partial output. For E006-E008, the agent retries once with adjusted parameters before reporting failure. All errors are logged to `~/.jp-humanizer/sessions/` with full diagnostic context.
+
+---
+
 ## Data Storage & Persistence
 
 ```

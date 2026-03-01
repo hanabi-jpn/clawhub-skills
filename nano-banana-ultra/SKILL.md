@@ -21,7 +21,7 @@
 
 `🍌 Multi-Model` `🎨 30+ Templates` `📦 Batch` `🖼 Gallery` `v1.0.0`
 
-[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() [![Models](https://img.shields.io/badge/models-3_engines-orange)]()
 
 > Advanced AI image generation and editing with multi-model support, prompt engineering templates, batch workflows, and intelligent gallery management.
 
@@ -233,21 +233,339 @@ When generating images:
 ### Commands
 
 **`generate <prompt>`** — Generate single image with default settings
+
+```
+> generate "a serene mountain lake at sunrise with mist"
+
+🎨 Generating image...
+  Model: Gemini (default)
+  Prompt: "a serene mountain lake at sunrise with mist"
+  Resolution: 1K (1024x1024)
+
+✅ Image generated successfully
+  File: generated-images/2026-03-01/143022-serene-mountain-lake-sunrise.png
+  Metadata: generated-images/2026-03-01/143022-serene-mountain-lake-sunrise.meta.json
+  Quality Score: 8.2/10 (composition: 9, color: 8, adherence: 8, overall: 8)
+  Time: 4.3s
+```
+
 **`generate <prompt> --template <name>`** — Use prompt template
+
+```
+> generate "red wireless headphones" --template product-photo
+
+🎨 Generating image...
+  Model: Gemini (default)
+  Template: product-photo
+  Enhanced prompt: "red wireless headphones, professional product photography,
+    white background, soft studio lighting, high detail, commercial quality,
+    centered composition"
+  Resolution: 1K (1024x1024)
+
+✅ Image generated successfully
+  File: generated-images/2026-03-01/150815-red-wireless-headphones.png
+  Quality Score: 9.1/10 (composition: 9, color: 9, adherence: 10, overall: 9)
+  Time: 5.1s
+```
+
 **`generate <prompt> --model <gemini|dalle|stability>`** — Choose model
+
+```
+> generate "cyberpunk cityscape at night, neon lights" --model dalle
+
+🎨 Generating image...
+  Model: DALL-E 3 (selected)
+  Prompt: "cyberpunk cityscape at night, neon lights"
+  Resolution: 1K (1024x1024)
+  Cost: $0.04
+
+✅ Image generated successfully
+  File: generated-images/2026-03-01/161200-cyberpunk-cityscape-neon.png
+  Quality Score: 8.7/10 (composition: 9, color: 9, adherence: 8, overall: 9)
+  Time: 11.2s
+```
+
 **`generate <prompt> --variations <n>`** — Generate n variations
+
+```
+> generate "minimalist company logo, letter X" --variations 4
+
+🎨 Generating 4 variations...
+  Model: Gemini (default)
+  Resolution: 1K (1024x1024)
+
+  [1/4] ✅ 163045-minimalist-logo-x-v1.png  Score: 7.8/10  (3.9s)
+  [2/4] ✅ 163045-minimalist-logo-x-v2.png  Score: 8.4/10  (4.1s)
+  [3/4] ✅ 163045-minimalist-logo-x-v3.png  Score: 6.9/10  (3.7s)
+  [4/4] ✅ 163045-minimalist-logo-x-v4.png  Score: 8.1/10  (4.3s)
+
+📊 Summary: 4/4 generated | Best: v2 (8.4) | Average: 7.8
+  All saved to generated-images/2026-03-01/
+```
+
 **`generate <prompt> --resolution <1k|2k|4k>`** — Set resolution
+
+```
+> generate "tropical beach panorama" --resolution 4k
+
+🎨 Generating image...
+  Model: Gemini (default)
+  Resolution: 4K (4096x4096) — native 1K + AI upscale
+  Prompt: "tropical beach panorama"
+
+  Step 1: Generating base image (1024x1024)... ✅ (4.2s)
+  Step 2: Upscaling 1K → 2K... ✅ (6.8s)
+  Step 3: Upscaling 2K → 4K... ✅ (7.1s)
+
+✅ Image generated successfully
+  File: generated-images/2026-03-01/170200-tropical-beach-panorama.png
+  Size: 12.4 MB
+  Quality Score: 7.9/10
+  Total time: 18.1s
+```
+
 **`generate batch <csv-or-json>`** — Batch generation from file
+
+```
+> generate batch product-shots.csv
+
+📦 Loading batch file: product-shots.csv
+  Entries: 10 items
+
+[1/10]  "Red sneakers on white background" (product-photo, 2k, ×3)
+        ✅ 3 variations generated (14.2s)
+[2/10]  "Company logo with mountain" (logo-design, 1k, ×5)
+        ✅ 5 variations generated (21.8s)
+[3/10]  "Sunset beach scene" (landscape, 4k, ×1)
+        ✅ 1 image generated (17.9s)
+...
+[10/10] "Team photo placeholder" (portrait, 2k, ×1)
+        ✅ 1 image generated (8.4s)
+
+📊 Batch Summary:
+  Total images: 22 generated | 0 failed
+  Time: 3m 47s
+  State saved: .banana-batch-state.json (resume-safe)
+  All images saved to generated-images/2026-03-01/
+```
+
 **`edit <image> <instruction>`** — Edit existing image
+
+```
+> edit generated-images/2026-03-01/150815-red-wireless-headphones.png
+  "Remove the background and replace with gradient blue"
+
+🖌 Editing image...
+  Model: Gemini
+  Operation: Inpainting (background replacement)
+  Instruction: "Remove the background and replace with gradient blue"
+
+✅ Edit applied successfully
+  File: generated-images/2026-03-01/150815-red-wireless-headphones-edited.png
+  Quality Score: 8.8/10
+  Time: 6.2s
+```
+
 **`edit <image> --upscale <resolution>`** — Upscale image
+
+```
+> edit logo-draft.png --upscale 4k
+
+🔍 Upscaling image...
+  Source: logo-draft.png (512x512)
+  Target: 4K (4096x4096) — 8x magnification
+
+  Step 1: 512 → 1024... ✅
+  Step 2: 1024 → 2048... ✅
+  Step 3: 2048 → 4096... ✅
+
+✅ Upscale complete
+  File: logo-draft-4k.png (4096x4096)
+  Size: 8.2 MB
+  Time: 19.4s
+  Note: Progressive 3-step upscale used for optimal quality
+```
+
 **`edit <image> --style "<style>"`** — Apply style transfer
+
+```
+> edit photo.png --style "watercolor painting"
+
+🎨 Applying style transfer...
+  Source: photo.png (1024x1024)
+  Style: watercolor painting
+  Preserving: composition, subject, proportions
+
+✅ Style transfer applied
+  File: photo-watercolor.png
+  Quality Score: 8.0/10
+  Time: 7.8s
+```
+
 **`gallery`** — Show image gallery
+
+```
+> gallery
+
+# Image Gallery — 2026-03-01
+
+## Products (8 images)
+| Preview | Prompt | Model | Score |
+|---------|--------|-------|-------|
+| 📷 red-wireless-headphones.png | Red wireless headphones | Gemini | 9.1 |
+| 📷 red-sneakers-v1.png | Red sneakers on white | Gemini | 8.5 |
+| 📷 red-sneakers-v2.png | Red sneakers on white | Gemini | 8.8 |
+...
+
+## Landscapes (3 images)
+| Preview | Prompt | Model | Score |
+|---------|--------|-------|-------|
+| 📷 serene-mountain-lake.png | Mountain lake at sunrise | Gemini | 8.2 |
+| 📷 sunset-beach.png | Sunset beach scene | Gemini | 7.9 |
+| 📷 tropical-beach-panorama.png | Tropical beach | Gemini | 7.9 |
+
+**Total: 22 images | Average Score: 8.1 | Disk: 89 MB**
+```
+
 **`gallery search <query>`** — Search images
+
+```
+> gallery search sunset
+
+🔍 Search results for "sunset" (3 matches):
+
+1. 📷 serene-mountain-lake-sunrise.png
+   Prompt: "a serene mountain lake at sunrise with mist"
+   Tags: landscape, sunrise, mountain | Score: 8.2 | Mar 01
+
+2. 📷 sunset-beach.png
+   Prompt: "Sunset beach scene"
+   Tags: landscape, sunset, beach | Score: 7.9 | Mar 01
+
+3. 📷 golden-hour-portrait.png
+   Prompt: "portrait in golden hour light"
+   Tags: portrait, golden-hour | Score: 8.5 | Feb 28
+```
+
 **`gallery tag <image> <tags...>`** — Tag images
+
+```
+> gallery tag serene-mountain-lake-sunrise.png nature wallpaper favorite
+
+🏷 Tags updated for serene-mountain-lake-sunrise.png:
+  Before: landscape, sunrise, mountain
+  After: landscape, sunrise, mountain, nature, wallpaper, favorite
+  Added: 3 new tags
+  Metadata updated in .meta.json
+```
+
 **`gallery export <md|html>`** — Export gallery
+
+```
+> gallery export html
+
+📤 Exporting gallery as HTML...
+
+  Processing: 22 images
+  Generating thumbnails: 22/22 ✅
+  Building HTML gallery with lightbox viewer...
+
+✅ Gallery exported
+  File: generated-images/gallery-export.html
+  Size: 2.1 MB (HTML + embedded thumbnails)
+  Images: 22 entries with metadata and scores
+  Open in browser to view interactive gallery
+```
+
 **`templates`** — List all prompt templates
+
+```
+> templates
+
+📋 Available Prompt Templates (20 built-in):
+
+  Category: Photography
+    product-photo    — Studio product shots, white background
+    portrait         — Professional portraits, shallow DOF
+    landscape        — Scenic landscapes, golden hour
+    food             — Appetizing food photography
+    architecture     — Architectural photography
+    fashion          — Editorial fashion photography
+
+  Category: Design
+    logo-design      — Minimal vector logos
+    social-media     — Eye-catching social graphics
+    infographic      — Data visualization, flat design
+    icon-set         — Consistent icon sets
+    banner           — Wide hero banners
+    mockup           — Product mockups
+
+  Category: Artistic
+    illustration     — Digital illustrations
+    anime            — Japanese animation style
+    watercolor       — Watercolor painting style
+    pixel-art        — Retro pixel art
+    vintage          — Nostalgic film photography
+    minimalist       — Clean minimal compositions
+
+  Category: 3D
+    3d-render        — Realistic 3D renders
+    isometric        — Isometric 3D illustrations
+
+  Custom templates: 0 (add to .nano-banana/custom-templates.json)
+
+  Tip: Combine templates with --template "product-photo,minimalist"
+```
+
 **`templates show <name>`** — Show template details with examples
+
+```
+> templates show product-photo
+
+📋 Template: product-photo
+
+  Modifiers added to prompt:
+    "professional product photography, white background, soft studio
+    lighting, high detail, commercial quality, centered composition"
+
+  Best for: E-commerce listings, product catalogs, marketing materials
+  Recommended resolution: 2K
+  Recommended model: DALL-E 3 (best photorealism)
+
+  Example prompts:
+    generate "red sneakers" --template product-photo
+    generate "glass perfume bottle" --template product-photo
+    generate "wireless earbuds in charging case" --template product-photo
+
+  Combines well with: minimalist, vintage
+```
+
 **`compare <prompt>`** — Generate on all available models
+
+```
+> compare "a golden retriever wearing sunglasses on the beach"
+
+🔄 Generating on all available models...
+
+  [1/3] Gemini...    ✅ 4.1s  Score: 8.3/10
+  [2/3] DALL-E 3...  ✅ 12.4s Score: 8.9/10
+  [3/3] Stability... ✅ 7.2s  Score: 7.6/10
+
+📊 Model Comparison:
+  ┌──────────────┬────────┬───────┬────────┬─────────┬─────────┐
+  │ Model        │ Time   │ Score │ Compos.│ Color   │ Adhere. │
+  ├──────────────┼────────┼───────┼────────┼─────────┼─────────┤
+  │ Gemini       │  4.1s  │  8.3  │  8     │  9      │  8      │
+  │ DALL-E 3     │ 12.4s  │  8.9  │  9     │  9      │  9      │
+  │ Stability AI │  7.2s  │  7.6  │  7     │  8      │  8      │
+  └──────────────┴────────┴───────┴────────┴─────────┴─────────┘
+
+  🏆 Winner: DALL-E 3 (8.9/10) — Best photorealism
+  ⚡ Fastest: Gemini (4.1s)
+  💰 Cheapest: Gemini ($0.00 free tier)
+
+  All 3 images saved to generated-images/2026-03-01/compare-golden-retriever/
+```
 
 ## Why Nano Banana Ultra vs Nano Banana Pro?
 
@@ -263,6 +581,23 @@ When generating images:
 | Gallery | No | **Full gallery with search/tags** |
 | Metadata | No | **JSON sidecar per image** |
 | Image read-back | Cannot | **Analyze generated images** |
+
+## Comparison with Alternatives
+
+| Feature | DALL-E Direct (API) | Midjourney | Stable Diffusion (local) | **Nano Banana Ultra** |
+|---------|--------------------|-----------|--------------------------|-----------------------|
+| Models | DALL-E only | Midjourney only | SD only | **Gemini + DALL-E + Stability (auto-fallback)** |
+| Auto-fallback on error | No | No | No | **Yes (quota/error recovery across models)** |
+| Prompt templates | No | Partial (style suffixes) | Community prompts | **30+ built-in + custom templates** |
+| Batch generation | Manual scripting | `/describe` only | ComfyUI workflows | **CSV/JSON batch + resume on interrupt** |
+| Image editing | DALL-E edit API | Vary/upscale only | img2img | **Inpainting + style transfer + upscale** |
+| Quality scoring | No | No | No | **AI-powered 4-axis scoring (composition/color/adherence/overall)** |
+| Gallery management | No | Web gallery | No | **Local gallery with search, tags, export** |
+| Model comparison | No | No | Manual | **Side-by-side multi-model comparison** |
+| File organization | Manual | Discord downloads | Manual | **Auto-organized by date + kebab-case naming** |
+| Metadata tracking | No | Limited | No | **JSON sidecar per image** |
+| Cost | $0.04-$0.12/image | $10-$60/mo | Free (hardware cost) | **Free tier available (Gemini) + pay-per-use** |
+| Offline support | No | No | Yes (full) | **Gallery/organize offline, generation needs API** |
 
 ## FAQ
 

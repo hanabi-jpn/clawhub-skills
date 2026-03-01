@@ -487,6 +487,23 @@ Japanese SEO has unique characteristics that general-purpose English SEO tools f
 
 ---
 
+## Error Handling
+
+| Error Code | Meaning | Agent Action |
+|------------|---------|--------------|
+| E001 | Keyword analysis failed (no search volume data returned) | Verify keyword spelling; try broader keyword; check if search API quota is available |
+| E002 | Co-occurrence data unavailable (competitor pages blocked or empty) | Retry with cached data if available; fall back to manual co-occurrence input; check network connectivity |
+| E003 | Article generation timeout (exceeded 5-minute generation limit) | Reduce target word count with `--length`; split into sections with `seo write --section`; retry |
+| E004 | Duplicate content detected (>30% similarity with existing indexed content) | Show diff with matched content; suggest alternative angles; use `seo rewrite` for differentiation |
+| E005 | Word count out of range (generated text deviates >20% from target) | Auto-trim or expand content to fit target range; report actual vs target count with adjustment suggestions |
+| E006 | SEO score below threshold (generated article scores < 60/100) | Auto-run improvement pass; add missing co-occurrence terms; enhance E-E-A-T elements; regenerate weak sections |
+| E007 | Image optimization failed (suggested image slots could not be resolved) | Fall back to text-only placeholders with `[IMAGE: description]` markers; provide alt-text suggestions |
+| E008 | Schema markup validation error (JSON-LD failed Google validation) | Run schema through validator; fix missing required fields; regenerate with corrected structure |
+
+**Error recovery strategy:** For E001-E002 (data acquisition errors), the agent retries up to 3 times with exponential backoff, then falls back to cached data. For E003-E006 (generation errors), the agent adjusts parameters and regenerates. For E007-E008 (post-processing errors), the agent provides manual correction guidance. All errors are logged to `~/.jp-seo-writer/scores/` for debugging.
+
+---
+
 ## Data Storage & Persistence
 
 ```

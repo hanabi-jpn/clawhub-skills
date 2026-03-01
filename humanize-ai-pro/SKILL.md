@@ -20,7 +20,7 @@
 
 `✍ 12 Languages` `🇯🇵 Japanese Deep` `📊 AI Scoring` `🔀 5 Modes` `v1.0.0`
 
-[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() [![Languages](https://img.shields.io/badge/languages-12+-purple)]()
 
 > Multi-language AI text humanizer with 5 writing modes, statistical analysis, and meaning-preserving transformation. Supports English, Japanese, Chinese, Korean, and 10+ languages.
 
@@ -178,9 +178,67 @@ When transforming text, apply the selected mode:
 5. Verify: re-score transformed text (must be lower than original)
 6. Show before/after AI score
 
+```
+> humanize "It is important to note that artificial intelligence has significantly
+  transformed the landscape of modern technology. Furthermore, the comprehensive
+  impact of these advancements cannot be overstated. Moreover, leveraging these
+  tools effectively fosters innovation across various domains."
+
+🔍 Language: English | Mode: casual (default)
+
+📊 Before — AI Score: 89%
+  Patterns: "important to note", "landscape", "Furthermore", "comprehensive",
+  "Moreover", "leveraging", "fosters" (7 ChatGPT-style patterns)
+
+✍ Transformed:
+  "AI has changed how we build and use technology — that much is obvious. What's
+  less obvious is how deep it goes. These tools aren't just nice to have anymore.
+  Teams that actually use them well are shipping faster and finding solutions that
+  weren't possible two years ago."
+
+📊 After — AI Score: 14%
+  ✅ Score reduced: 89% → 14% (−75 points)
+  Meaning preserved: ✓ All factual claims intact
+```
+
 **`humanize <text> --mode <academic|business|casual|creative|social>`** — Choose writing mode
 
+```
+> humanize "The results demonstrate that the proposed methodology yields
+  superior outcomes." --mode academic
+
+🔍 Language: English | Mode: academic
+
+📊 Before — AI Score: 72%
+
+✍ Transformed:
+  "Results suggest the proposed approach outperforms existing methods, though
+  the effect size varies across experimental conditions (see Table 3)."
+
+📊 After — AI Score: 18%
+  ✅ Score reduced: 72% → 18% (−54 points)
+```
+
 **`humanize <text> --lang <code>`** — Force language (en, ja, zh, ko, es, fr, de, pt)
+
+```
+> humanize "AIの活用は非常に重要です。包括的なアプローチを踏まえて、
+  多角的に検討することが求められます。" --lang ja
+
+🔍 Language: Japanese (forced) | Mode: casual (default)
+
+📊 Before — AI Score: 83%
+  パターン: 「非常に重要です」「包括的な」「踏まえて」「多角的に」「求められます」
+  文末の均一性: 「〜です」「〜ます」の繰り返し (σ=0.08)
+
+✍ 変換後:
+  「AIをどう使うかって、実はすごく大事なんですよね。いろんな角度から
+  考えてみると、やれることがまだまだあるなと。」
+
+📊 After — AI Score: 11%
+  ✅ スコア低減: 83% → 11% (−72ポイント)
+  文末バリエーション: 「〜んですよね」「〜なと」— 自然な口語体
+```
 
 **`humanize score <text>`** — Score only (no transformation):
 ```
@@ -203,11 +261,135 @@ When transforming text, apply the selected mode:
 
 **`humanize analyze <text>`** — Detailed statistical analysis with all metrics
 
+```
+> humanize analyze "Furthermore, it is essential to consider the multifaceted
+  nature of this comprehensive challenge. The landscape continues to evolve
+  rapidly, and stakeholders must leverage innovative solutions to foster
+  sustainable growth across all sectors."
+
+╔════════════════════════════════════════════════╗
+║      Humanize AI Pro — Full Analysis          ║
+╠════════════════════════════════════════════════╣
+║                                                ║
+║ Language: English                              ║
+║ Word Count: 32                                 ║
+║ Sentence Count: 2                              ║
+║                                                ║
+║ Statistical Metrics:                           ║
+║   Burstiness:     0.18  (low — AI-like)       ║
+║   Type-Token:     0.81  (high — AI-like)      ║
+║   Perplexity:     low   (AI-like)             ║
+║   Transitions:    0.91  (highly formulaic)    ║
+║                                                ║
+║ Sentence Length Distribution:                  ║
+║   Sentence 1: 14 words                        ║
+║   Sentence 2: 18 words                        ║
+║   Std Dev: 2.83 | Mean: 16.0 | σ/μ = 0.18    ║
+║   Human typical range: 0.4-0.8                ║
+║                                                ║
+║ Model Signature: ChatGPT (87% confidence)     ║
+║   Matched tells: "Furthermore", "essential",  ║
+║   "multifaceted", "comprehensive",            ║
+║   "landscape", "leverage", "foster"           ║
+║                                                ║
+║ Overall AI Probability: 91%                   ║
+║   ████████████████████░░  LIKELY AI-GENERATED  ║
+╚════════════════════════════════════════════════╝
+```
+
 **`humanize batch <directory>`** — Process all text files in directory
+
+```
+> humanize batch ./blog-drafts/ --mode business
+
+📂 Scanning ./blog-drafts/... 4 files found
+
+[1/4] intro-post.md
+  AI Score: 78% → 16% ✅  (saved to ./blog-drafts/intro-post.humanized.md)
+
+[2/4] product-announcement.md
+  AI Score: 82% → 19% ✅  (saved to ./blog-drafts/product-announcement.humanized.md)
+
+[3/4] case-study.md
+  AI Score: 45% → 12% ✅  (saved to ./blog-drafts/case-study.humanized.md)
+
+[4/4] team-bio.txt
+  AI Score: 23% → 18% ✅  (saved to ./blog-drafts/team-bio.humanized.txt)
+
+📊 Batch Summary:
+  Files processed: 4/4
+  Average score reduction: 65% → 16% (−49 points)
+  Mode: business | Language: auto-detected (all English)
+  Total processing time: 8.2s
+```
 
 **`humanize diff <text>`** — Show before/after with changes highlighted
 
+```
+> humanize diff "It is important to note that our comprehensive analysis
+  reveals several key findings. Furthermore, these results demonstrate
+  the significant impact of our methodology."
+
+╔══════════════════════════════════════════════════════╗
+║  Humanize Diff — Changes Highlighted                ║
+╠══════════════════════════════════════════════════════╣
+║                                                      ║
+║  BEFORE (AI Score: 81%):                             ║
+║  "[-It is important to note that-] our               ║
+║  [-comprehensive-] analysis reveals several key      ║
+║  findings. [-Furthermore,-] these results            ║
+║  [-demonstrate the significant impact of-] our       ║
+║  methodology."                                       ║
+║                                                      ║
+║  AFTER (AI Score: 13%):                              ║
+║  "[+Here's what we found:+] our analysis turned up   ║
+║  [+a few things worth+] [+calling out.+] [+The+]     ║
+║  results [+show our approach actually made a real+]   ║
+║  [+difference+][+.+]"                                ║
+║                                                      ║
+║  Changes: 5 substitutions, 1 sentence restructured   ║
+║  Patterns removed: 4 (important to note,             ║
+║    comprehensive, Furthermore, demonstrate the       ║
+║    significant impact of)                            ║
+║  Meaning preserved: ✓                               ║
+╚══════════════════════════════════════════════════════╝
+```
+
 **`humanize patterns`** — List all detected AI patterns in the text
+
+```
+> humanize patterns "Certainly! Here's a comprehensive overview. It's important
+  to note that this landscape is constantly evolving. Furthermore, leveraging
+  these tools fosters innovation. In conclusion, the multifaceted nature of
+  this challenge requires a nuanced approach."
+
+🔍 AI Pattern Detection Report
+
+Model: ChatGPT (93% confidence)
+
+Detected Patterns (11):
+  ┌───────────────────────────────────────────────────┐
+  │ Pattern                    │ Type      │ Count    │
+  ├───────────────────────────────────────────────────┤
+  │ "Certainly!"               │ Opener    │ 1        │
+  │ "Here's a comprehensive"   │ Opener    │ 1        │
+  │ "important to note"        │ Hedging   │ 1        │
+  │ "landscape"                │ Buzzword  │ 1        │
+  │ "Furthermore"              │ Transition│ 1        │
+  │ "leveraging"               │ Buzzword  │ 1        │
+  │ "fosters"                  │ Buzzword  │ 1        │
+  │ "In conclusion"            │ Closer    │ 1        │
+  │ "multifaceted"             │ Buzzword  │ 1        │
+  │ "nuanced"                  │ Buzzword  │ 1        │
+  │ Uniform sentence length    │ Structure │ σ=0.09   │
+  └───────────────────────────────────────────────────┘
+
+  Category Breakdown:
+    Buzzwords: 5 | Transitions: 1 | Openers: 2 | Closers: 1 | Structure: 1
+    Hedging: 1
+
+  Recommendation: High AI signal. Use `humanize` to transform.
+```
 
 ### Japanese-Specific Features
 
@@ -243,6 +425,23 @@ When processing Japanese text:
 | Meaning preservation | Aggressive replace | **Verified transformation** |
 | Batch processing | No | **Yes** |
 | Before/after diff | No | **Yes** |
+
+## Comparison with Alternatives
+
+| Feature | Undetectable AI | Quillbot | WriteHuman | **Humanize AI Pro** |
+|---------|----------------|----------|------------|---------------------|
+| Languages | English only | English + 30 | English only | **12+ languages with deep support** |
+| Japanese support | None | Basic paraphrase | None | **300+ patterns, keigo/katakana/kanji balance** |
+| Model-specific detection | No | No | No | **Yes (ChatGPT/Claude/Gemini tells)** |
+| Writing modes | 1 (generic) | 3 (fluency/formal/creative) | 1 (generic) | **5 modes (academic/business/casual/creative/social)** |
+| Statistical analysis | AI score only | No | AI score only | **5 metrics (burstiness/TTR/perplexity/transition/patterns)** |
+| Batch processing | No | No | No | **Yes (directory-level)** |
+| Diff view | No | Side-by-side | No | **Yes (highlighted changes)** |
+| Meaning verification | No guarantee | No guarantee | No guarantee | **Re-score verification + factual check** |
+| Privacy | Cloud-processed | Cloud-processed | Cloud-processed | **Local LLM (no external service)** |
+| Cost | $9.99/mo | $9.95/mo | $12/mo | **Free (uses your existing LLM)** |
+| Pattern database | Proprietary | N/A (paraphrase) | Proprietary | **1200+ patterns (open, embedded)** |
+| Before/after comparison | Score only | No | Score only | **Full diff + score + pattern removal count** |
 
 ## FAQ
 

@@ -20,7 +20,7 @@
 
 `🛡 Safe` `🔄 Sandboxed` `⏪ Rollback` `📊 Dashboard` `v1.0.0`
 
-[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() [![Safety](https://img.shields.io/badge/safety-5_layer-brightgreen)]()
 
 > Safe, sandboxed self-evolution engine for OpenClaw agents with automatic rollback, evolution dashboard, and governed improvement protocols.
 
@@ -130,11 +130,54 @@ When the user says any of the following, execute the corresponding action:
 6. Apply if passed, skip if failed
 7. Update evolution log and dashboard
 
+```
+> evolve
+
+🔍 Analyzing agent state...
+  - Error rate: 12% (3 errors in last 25 operations)
+  - Recurring pattern: "file not found" errors in project scaffold
+  - Strategy selected: repair
+
+📸 Checkpoint created: chk-20260301-143022
+
+🧪 Sandbox testing...
+  - Proposed fix: Add existence check before file read operations
+  - Running validation... ✓ 12/12 checks passed
+
+✅ Evolution applied successfully
+  Health Score: 78 → 84 (+6)
+  Evolution #48 logged to evolution-log.jsonl
+```
+
 **`evolve --continuous`** — Background evolution loop:
 1. Run `evolve` every 30 minutes
 2. Use `conservative` tier unless user specified otherwise
 3. Stop after 5 cycles or when no improvements found
 4. Generate summary report
+
+```
+> evolve --continuous
+
+⚡ Continuous evolution started (conservative tier, max 5 cycles)
+
+[Cycle 1/5 — 14:30] Strategy: repair
+  Fixed: file path validation pattern
+  Health: 78 → 84 (+6) ✅
+
+[Cycle 2/5 — 15:00] Strategy: optimize
+  Improved: prompt caching for repeated queries
+  Health: 84 → 87 (+3) ✅
+
+[Cycle 3/5 — 15:30] Strategy: optimize
+  No improvements found. Stopping early.
+
+📊 Continuous Evolution Summary
+  Cycles run: 3 / 5
+  Evolutions applied: 2
+  Evolutions skipped: 1
+  Health Score: 78 → 87 (+9)
+  Duration: 1h 0m
+```
 
 **`evolve --review`** — Human-in-the-loop mode:
 1. Analyze and propose changes
@@ -142,9 +185,75 @@ When the user says any of the following, execute the corresponding action:
 3. Wait for approval/rejection
 4. Apply only approved changes
 
+```
+> evolve --review
+
+🔍 Analyzing agent state...
+  Found 3 potential improvements:
+
+[1/3] Repair: Add retry logic for API timeout errors
+  File: .evolver-pro/memory/patterns.json
+  Impact: Reduces timeout failures by ~60%
+  Risk: Low
+  → Approve? (y/n): y
+  ✅ Applied
+
+[2/3] Optimize: Cache repeated file reads in current session
+  File: .evolver-pro/memory/patterns.json
+  Impact: ~15% fewer tokens per session
+  Risk: Low
+  → Approve? (y/n): y
+  ✅ Applied
+
+[3/3] Innovate: Add auto-format detection for unknown file types
+  File: .evolver-pro/memory/patterns.json
+  Impact: Handles 5 new file types
+  Risk: Medium
+  → Approve? (y/n): n
+  ⏭ Skipped
+
+Summary: 2 applied, 1 skipped | Health: 84 → 89
+```
+
 **`evolve --strategy <repair|optimize|innovate|harden>`** — Force specific strategy
 
+```
+> evolve --strategy harden
+
+🛡 Forcing strategy: harden
+
+📸 Checkpoint created: chk-20260301-160045
+
+🔒 Security hardening scan:
+  [1] Reviewing custom instructions for injection vectors... clean
+  [2] Scanning memory files for leaked credentials... clean
+  [3] Checking file access patterns... 2 issues found
+      - Pattern reads outside expected directory scope
+      - Unbounded wildcard in file search
+  [4] Strengthening input validation rules... 2 rules added
+
+✅ Harden evolution applied
+  Health Score: 87 → 89 (+2)
+  Security improvements: 2 access rules tightened, 2 validations added
+```
+
 **`evolve --tier <conservative|balanced|aggressive>`** — Override safety tier
+
+```
+> evolve --tier balanced
+
+⚙ Safety tier set to: balanced (80%+ validation threshold)
+
+🔍 Analyzing... Strategy selected: optimize
+📸 Checkpoint created: chk-20260301-161500
+
+🧪 Sandbox testing...
+  - Validation: 9/11 checks passed (82%) — meets balanced threshold
+
+✅ Evolution applied (balanced tier)
+  Health Score: 89 → 91 (+2)
+  Note: 2 non-critical validations were skipped under balanced tier
+```
 
 **`evolve status`** — Display:
 ```
@@ -166,11 +275,51 @@ When the user says any of the following, execute the corresponding action:
 - Changes made (brief diff summary)
 - Health score before/after
 
+```
+> evolve history
+
+Evolution History (last 20 events)
+──────────────────────────────────────────────────────────
+#48  2026-03-01 14:30  repair     APPLIED    78→84 (+6)
+     Fixed file path validation pattern
+#47  2026-02-28 22:15  optimize   APPLIED    75→78 (+3)
+     Reduced token usage in prompt templates
+#46  2026-02-28 20:00  innovate   SKIPPED    75→75 (0)
+     Proposed auto-translate — failed validation (2/12)
+#45  2026-02-27 16:45  harden     APPLIED    72→75 (+3)
+     Tightened file access scope rules
+#44  2026-02-27 10:20  repair     ROLLED-BACK 74→68→74
+     Fix caused regression in task completion rate
+...
+──────────────────────────────────────────────────────────
+Showing 5 of 48 events. Total: 39 applied, 7 skipped, 2 rolled-back
+```
+
 **`evolve rollback [checkpoint-id]`** — Restore to a previous checkpoint:
 1. If no ID given, rollback to last checkpoint
 2. Show diff between current state and checkpoint
 3. Confirm with user before applying
 4. Log rollback event
+
+```
+> evolve rollback chk-20260228-2215
+
+⏪ Rollback target: chk-20260228-2215 (2026-02-28 22:15)
+
+Diff (current → checkpoint):
+  - patterns.json: 3 entries removed (added after checkpoint)
+  - config.json: tier changed back to "conservative"
+  - evolution-log.jsonl: 3 entries will be marked as rolled-back
+
+⚠ This will undo evolutions #46, #47, #48.
+  Health score will revert from 84 to 75.
+  → Confirm rollback? (y/n): y
+
+✅ Rolled back to chk-20260228-2215
+  Health Score: 84 → 75
+  3 evolutions undone
+  Rollback event logged (#49)
+```
 
 **`evolve dashboard`** — Generate comprehensive markdown report:
 - Evolution timeline
@@ -180,7 +329,68 @@ When the user says any of the following, execute the corresponding action:
 - Current blocklist (patterns that caused regressions)
 - Recommendations for next evolution
 
+```
+> evolve dashboard
+
+╔══════════════════════════════════════════════════╗
+║         Capability Evolver Pro Dashboard         ║
+╠══════════════════════════════════════════════════╣
+║                                                  ║
+║ Health Score Trend (last 30 days):                ║
+║  100│                                            ║
+║   90│                          ╭──●              ║
+║   80│               ╭───●────╯                   ║
+║   70│        ╭─●───╯                             ║
+║   60│  ●────╯                                    ║
+║   50│                                            ║
+║     └──────────────────────────                  ║
+║      Feb 01  Feb 08  Feb 15  Feb 22  Mar 01      ║
+║                                                  ║
+║ Strategy Distribution:                           ║
+║   repair:   18 (38%) ████████████░░░░░░░░░       ║
+║   optimize: 15 (31%) █████████░░░░░░░░░░░       ║
+║   innovate:  9 (19%) ██████░░░░░░░░░░░░░░       ║
+║   harden:    6 (12%) ████░░░░░░░░░░░░░░░░       ║
+║                                                  ║
+║ Top 5 Most Impactful Evolutions:                 ║
+║   1. #32 repair: +12 health (error handler fix)  ║
+║   2. #41 optimize: +8 health (prompt caching)    ║
+║   3. #48 repair: +6 health (path validation)     ║
+║   4. #38 harden: +5 health (access rules)        ║
+║   5. #45 harden: +3 health (scope tightening)    ║
+║                                                  ║
+║ Blocklist (3 patterns):                          ║
+║   - Auto-translate modification (regression)     ║
+║   - Recursive file scan expansion (timeout)      ║
+║   - Dynamic prompt injection (security)          ║
+║                                                  ║
+║ Recommendations:                                 ║
+║   → Run "optimize" — 3 bottlenecks detected      ║
+║   → Consider "innovate" for new file format       ║
+╚══════════════════════════════════════════════════╝
+```
+
 **`evolve reset`** — Reset all evolution data (requires confirmation)
+
+```
+> evolve reset
+
+⚠ WARNING: This will permanently delete ALL evolution data:
+  - 23 checkpoints (1.2 MB)
+  - 48 evolution log entries
+  - 15 discovered patterns
+  - 3 blocklist entries
+  - Health score history
+
+This action cannot be undone.
+→ Type "RESET" to confirm: RESET
+
+🗑 All evolution data deleted.
+  .evolver-pro/ directory cleared.
+  Default config.json recreated.
+  Health score reset to 50 (baseline).
+  Ready for fresh evolution cycle.
+```
 
 ### Data Storage
 
@@ -220,6 +430,23 @@ Capability Evolver Pro works alongside other skills without interference:
 - It ONLY modifies its own data files in `.evolver-pro/`
 - It reads (but never writes) other skills' outputs for analysis
 - It can suggest improvements to other skills but requires user approval to modify them
+
+## Comparison with Alternatives
+
+| Feature | Manual Config Tuning | Basic Self-Tune | AutoGPT Evolve | **Capability Evolver Pro** |
+|---------|---------------------|-----------------|----------------|---------------------------|
+| Sandbox testing | No | No | Partial | **Full sandbox + validation** |
+| Automatic rollback | No | No | No | **Yes (health-score triggered)** |
+| Safety tiers | N/A | N/A | None | **3 tiers (conservative/balanced/aggressive)** |
+| Health scoring | No | No | No | **Composite 0-100 score** |
+| Evolution strategies | Manual | Single (tune) | Generic | **4 specialized (repair/optimize/innovate/harden)** |
+| Checkpoints | Manual backup | No | No | **Automatic per-evolution snapshots** |
+| Rate limiting | N/A | No | No | **5/hour cap with queueing** |
+| Blocklist (regression prevention) | No | No | No | **Automatic pattern blocklist** |
+| Human-in-the-loop mode | Always manual | No | No | **Optional review mode** |
+| Cross-session memory | No | Session only | Session only | **Persistent patterns + logs** |
+| Dashboard & analytics | No | No | Basic logs | **Full ASCII dashboard + history** |
+| Cost per cycle | High (manual time) | ~500 tokens | ~2000-5000 tokens | **~500-2000 tokens** |
 
 ## FAQ
 
