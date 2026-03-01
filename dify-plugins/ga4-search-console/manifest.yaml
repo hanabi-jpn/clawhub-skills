@@ -1,0 +1,62 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: ga4-search-console
+label:
+  en_US: "GA4 & Search Console Analyst"
+  ja_JP: "GA4 & Search Console アナリスト"
+description:
+  en_US: "Query GA4 analytics and Google Search Console data in natural language. Analyze traffic, conversions, SEO rankings, funnels, and real-time data. Features cross-platform analysis correlating organic search with on-site behavior, automated SEO audits with 100-point scoring, and threshold-based alerts."
+  ja_JP: "GA4アナリティクスとGoogle Search Consoleのデータを自然言語でクエリ。トラフィック・コンバージョン・SEOランキング・ファネル・リアルタイムデータを分析。オーガニック検索とサイト内行動の相関分析、100点満点のSEO自動監査、閾値アラートに対応。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 256
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: ga4-search-console
+credentials_for_provider:
+  ga4_property_id:
+    type: text-input
+    required: true
+    label:
+      en_US: "GA4 Property ID"
+      ja_JP: "GA4 プロパティID"
+  gsc_site_url:
+    type: text-input
+    required: true
+    label:
+      en_US: "Search Console Site URL"
+      ja_JP: "Search Console サイトURL"
+  google_client_id:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Google OAuth Client ID"
+      ja_JP: "Google OAuth クライアントID"
+  google_client_secret:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Google OAuth Client Secret"
+      ja_JP: "Google OAuth クライアントシークレット"
+  google_refresh_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Google OAuth Refresh Token"
+      ja_JP: "Google OAuth リフレッシュトークン"

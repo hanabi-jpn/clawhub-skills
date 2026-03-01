@@ -1,0 +1,44 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: kintone-agent
+label:
+  en_US: "kintone Agent"
+  ja_JP: "kintone エージェント"
+description:
+  en_US: "Build, query, and automate Cybozu kintone apps — Japan's leading no-code business platform. Full CRUD on records, natural language queries translated to kintone QL, bulk operations (100 records/batch), app schema management, workflow transitions, CSV/JSON import-export, and plugin scaffolding."
+  ja_JP: "サイボウズkintoneアプリの構築・クエリ・自動化 — 日本最大のノーコード業務プラットフォーム。レコードの完全CRUD、自然言語→kintone QL変換、一括操作（100件/バッチ）、アプリスキーマ管理、ワークフロー遷移、CSV/JSONインポート・エクスポート、プラグイン開発に対応。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 256
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: kintone-agent
+credentials_for_provider:
+  kintone_domain:
+    type: text-input
+    required: true
+    label:
+      en_US: "kintone Domain (e.g., mycompany.cybozu.com)"
+      ja_JP: "kintoneドメイン（例: mycompany.cybozu.com）"
+  kintone_api_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: "API Token (comma-separated for multi-app)"
+      ja_JP: "APIトークン（複数アプリの場合カンマ区切り）"

@@ -1,0 +1,50 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: smarthr-agent
+label:
+  en_US: "SmartHR Agent"
+  ja_JP: "SmartHR エージェント"
+description:
+  en_US: "Automate HR and labor management on Japan's leading HR cloud (70K+ companies). Employee onboarding workflows, document generation (employment certificates, withholding tax slips), payroll data sync, compliance reporting, electronic signatures, department hierarchy management, and My Number secure handling."
+  ja_JP: "日本最大のクラウドHRプラットフォーム（7万社以上）のHR・労務管理を自動化。入社手続きワークフロー、書類生成（在籍証明書・源泉徴収票）、給与データ同期、コンプライアンスレポート、電子署名、部門階層管理、マイナンバー安全取扱いに対応。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 128
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: smarthr-agent
+credentials_for_provider:
+  smarthr_access_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: "SmartHR Access Token"
+      ja_JP: "SmartHR アクセストークン"
+  smarthr_tenant_id:
+    type: text-input
+    required: true
+    label:
+      en_US: "Tenant ID (UUID)"
+      ja_JP: "テナントID（UUID）"
+  smarthr_subdomain:
+    type: text-input
+    required: true
+    label:
+      en_US: "Company Subdomain"
+      ja_JP: "企業サブドメイン"

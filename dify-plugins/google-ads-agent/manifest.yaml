@@ -1,0 +1,62 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: google-ads-agent
+label:
+  en_US: "Google Ads Agent"
+  ja_JP: "Google 広告エージェント"
+description:
+  en_US: "AI-powered Google Ads campaign management. Create, optimize, audit, and report on PPC campaigns with natural language commands. Features GAQL query builder, bid optimization with projected impact, quality score diagnostics, A/B test analysis, and MCC multi-account support."
+  ja_JP: "AI搭載のGoogle広告キャンペーン管理。PPC広告の作成・最適化・監査・レポートを自然言語コマンドで実行。GAQLクエリビルダー、影響予測付き入札最適化、品質スコア診断、A/Bテスト分析、MCC複数アカウント対応。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 256
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: google-ads-agent
+credentials_for_provider:
+  google_ads_developer_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Google Ads Developer Token"
+      ja_JP: "Google Ads 開発者トークン"
+  google_ads_client_id:
+    type: secret-input
+    required: true
+    label:
+      en_US: "OAuth Client ID"
+      ja_JP: "OAuth クライアントID"
+  google_ads_client_secret:
+    type: secret-input
+    required: true
+    label:
+      en_US: "OAuth Client Secret"
+      ja_JP: "OAuth クライアントシークレット"
+  google_ads_refresh_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: "OAuth Refresh Token"
+      ja_JP: "OAuth リフレッシュトークン"
+  google_ads_customer_id:
+    type: text-input
+    required: true
+    label:
+      en_US: "Customer ID (no dashes)"
+      ja_JP: "顧客ID（ハイフンなし）"

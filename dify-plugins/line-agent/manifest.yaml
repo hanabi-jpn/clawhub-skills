@@ -1,0 +1,44 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: line-agent
+label:
+  en_US: "LINE Agent"
+  ja_JP: "LINE エージェント"
+description:
+  en_US: "LINE Official Account automation for Japan's #1 messaging platform (96M+ monthly active users). AI auto-response with keigo adjustment, Flex Message templates for e-commerce, customer segmentation and CRM, rich menu dynamic control, broadcast/narrowcast messaging, and analytics dashboard with follower demographics."
+  ja_JP: "日本最大のメッセージプラットフォーム（月間アクティブユーザー9600万人以上）のLINE公式アカウント自動化。敬語調整付きAI自動応答、EC用Flex Messageテンプレート、顧客セグメンテーション・CRM、リッチメニュー動的制御、ブロードキャスト/ナローキャスト配信、フォロワーデモグラフィクス付き分析ダッシュボード。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 128
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: line-agent
+credentials_for_provider:
+  line_channel_access_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: "LINE Channel Access Token"
+      ja_JP: "LINE チャネルアクセストークン"
+  line_channel_secret:
+    type: secret-input
+    required: true
+    label:
+      en_US: "LINE Channel Secret"
+      ja_JP: "LINE チャネルシークレット"

@@ -1,0 +1,278 @@
+{
+  "name": "ChatWork Notification Hub — Multi-Source Alert Router",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatwork-webhook",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily 9AM Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false
+          },
+          "conditions": [
+            {
+              "id": "condition-deploy",
+              "leftValue": "={{ $json.event_type }}",
+              "rightValue": "deployment",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "combinator": "and"
+      },
+      "id": "route-deploy",
+      "name": "Is Deployment?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false
+          },
+          "conditions": [
+            {
+              "id": "condition-error",
+              "leftValue": "={{ $json.event_type }}",
+              "rightValue": "error",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ]
+        },
+        "combinator": "and"
+      },
+      "id": "route-error",
+      "name": "Is Error?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [480, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_DEPLOY_ROOM_ID }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "=[info][title]Deployment Complete[/title]Service: {{ $json.service_name }}\nVersion: {{ $json.version }}\nEnvironment: {{ $json.environment }}\nTimestamp: {{ $now.format('yyyy-MM-dd HH:mm:ss') }} JST\nDeployed by: {{ $json.deployer }}[/info]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-deploy-msg",
+      "name": "Send Deploy Notification",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_ERROR_ROOM_ID }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "=[To:{{ $env.CHATWORK_ONCALL_ACCOUNT_ID }}]\n[info][title]ERROR ALERT[/title]Service: {{ $json.service_name }}\nError: {{ $json.error_message }}\nSeverity: {{ $json.severity }}\nTimestamp: {{ $now.format('yyyy-MM-dd HH:mm:ss') }} JST\n\nStack Trace:\n[code]{{ $json.stack_trace }}[/code][/info]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-error-msg",
+      "name": "Send Error Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_TEAM_ROOM_ID }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "=[info][title]おはようございます！本日のタスク確認[/title]日付: {{ $now.format('yyyy年MM月dd日(E)') }}\n\n本日の予定を確認して、タスクの更新をお願いします。\n\n今日も一日よろしくお願いいたします！[/info]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-daily-msg",
+      "name": "Send Daily Greeting",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 520]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_ERROR_ROOM_ID }}/tasks",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "Investigate and fix: {{ $json.error_message }} ({{ $json.service_name }})"
+            },
+            {
+              "name": "to_ids",
+              "value": "={{ $env.CHATWORK_ONCALL_ACCOUNT_ID }}"
+            },
+            {
+              "name": "limit_type",
+              "value": "date"
+            },
+            {
+              "name": "limit",
+              "value": "={{ $now.plus(1, 'day').toSeconds() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create-error-task",
+      "name": "Create Error Fix Task",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 400]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          { "node": "Is Deployment?", "type": "main", "index": 0 },
+          { "node": "Is Error?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Daily 9AM Trigger": {
+      "main": [
+        [
+          { "node": "Send Daily Greeting", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Is Deployment?": {
+      "main": [
+        [
+          { "node": "Send Deploy Notification", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Is Error?": {
+      "main": [
+        [
+          { "node": "Send Error Alert", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Send Error Alert": {
+      "main": [
+        [
+          { "node": "Create Error Fix Task", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "chatwork" },
+    { "name": "notifications" },
+    { "name": "japan" },
+    { "name": "clawhub" }
+  ],
+  "triggerCount": 2,
+  "updatedAt": "2026-03-01T00:00:00.000Z",
+  "versionId": "1"
+}

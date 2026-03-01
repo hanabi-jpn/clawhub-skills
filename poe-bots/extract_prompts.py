@@ -12,8 +12,9 @@ import os
 import re
 import sys
 
-# All 20 skill directories
+# All 40 skill directories
 SKILL_DIRS = [
+    # ── Wave 1 (Original 20) ──
     # P1 — Premium
     "capability-evolver-pro",
     "self-learning-agent",
@@ -37,6 +38,33 @@ SKILL_DIRS = [
     "jp-humanizer",
     "lark-workflow",
     "jp-seo-writer",
+
+    # ── Wave 2 (New 20) ──
+    # P1 — Google Suite
+    "google-ads-agent",
+    "google-workspace-agent",
+    "ga4-search-console",
+    "google-maps-biz",
+    # P2 — Payment & Social
+    "stripe-japan-agent",
+    "social-media-publisher",
+    # P2 — Japan SaaS
+    "chatwork-agent",
+    "kintone-agent",
+    # P3 — Japan HR/Biz SaaS
+    "smarthr-agent",
+    "backlog-agent",
+    "sansan-agent",
+    "moneyforward-agent",
+    "kingof-time-agent",
+    "line-works-agent",
+    "jooto-agent",
+    "base-stores-agent",
+    "yayoi-agent",
+    # P3 — Security Suite
+    "mac-sentinel",
+    "repo-guardian",
+    "credential-vault",
 ]
 
 # Metadata for each skill (display_name, description, tier)
@@ -139,6 +167,108 @@ SKILL_META = {
     "jp-seo-writer": {
         "display_name": "JP SEO Writer",
         "description": "Japanese SEO article generator with keyword research, co-occurrence analysis, content structure planning, and E-E-A-T compliance.",
+        "tier": "P3",
+    },
+
+    # ── Wave 2 (New 20) ──
+    "google-ads-agent": {
+        "display_name": "Google Ads Agent",
+        "description": "AI-powered Google Ads campaign management. Create, optimize, audit, and report on PPC campaigns with bid optimization and keyword research.",
+        "tier": "P1",
+    },
+    "google-workspace-agent": {
+        "display_name": "Google Workspace Agent",
+        "description": "Unified Gmail, Calendar, Drive, Sheets, and Docs management. Automate your entire Google Workspace from a single agent.",
+        "tier": "P1",
+    },
+    "ga4-search-console": {
+        "display_name": "GA4 & Search Console",
+        "description": "Query GA4 analytics and Google Search Console in natural language. Traffic analysis, SEO insights, conversion tracking, and performance reports.",
+        "tier": "P1",
+    },
+    "google-maps-biz": {
+        "display_name": "Google Maps Biz",
+        "description": "Location intelligence for business. Geocoding, places search, routing optimization, and Google Business Profile management.",
+        "tier": "P1",
+    },
+    "stripe-japan-agent": {
+        "display_name": "Stripe Japan Agent",
+        "description": "Payment management for Japan via Stripe. PayPay, konbini payments, subscriptions, invoicing, and revenue analytics.",
+        "tier": "P2",
+    },
+    "social-media-publisher": {
+        "display_name": "Social Media Publisher",
+        "description": "Cross-platform social media posting and analytics. X/Twitter, Instagram, TikTok, and LINE scheduling, content creation, and engagement tracking.",
+        "tier": "P2",
+    },
+    "chatwork-agent": {
+        "display_name": "Chatwork Agent",
+        "description": "Automate Japan's #1 business chat. Messages, tasks, rooms, and bot integration via ChatWork API v2.",
+        "tier": "P2",
+    },
+    "kintone-agent": {
+        "display_name": "Kintone Agent",
+        "description": "Build, query, and automate Cybozu kintone apps. Japan's leading no-code business platform with 30,000+ companies.",
+        "tier": "P2",
+    },
+    "smarthr-agent": {
+        "display_name": "SmartHR Agent",
+        "description": "HR and labor management automation. Employee onboarding, documents, payroll, and compliance on Japan's leading HR cloud.",
+        "tier": "P3",
+    },
+    "backlog-agent": {
+        "display_name": "Backlog Agent",
+        "description": "Project management on Nulab Backlog. Issues, wikis, milestones, Git integration, and sprint management for Japan's top PM tool.",
+        "tier": "P3",
+    },
+    "sansan-agent": {
+        "display_name": "Sansan Agent",
+        "description": "Business card and contact intelligence. Search, manage, and sync digitized cards for Japanese B2B networking with Sansan.",
+        "tier": "P3",
+    },
+    "moneyforward-agent": {
+        "display_name": "MoneyForward Agent",
+        "description": "Cloud accounting automation via MoneyForward. Invoices, expenses, journal entries, and bank reconciliation for Japanese businesses.",
+        "tier": "P3",
+    },
+    "kingof-time-agent": {
+        "display_name": "King of Time Agent",
+        "description": "Attendance and time tracking automation. Daily/monthly reports, overtime alerts, and payroll sync via Japan's leading attendance system.",
+        "tier": "P3",
+    },
+    "line-works-agent": {
+        "display_name": "LINE WORKS Agent",
+        "description": "Enterprise LINE communication. Bots, messages, groups, and calendar on Japan's business-grade LINE platform.",
+        "tier": "P3",
+    },
+    "jooto-agent": {
+        "display_name": "Jooto Agent",
+        "description": "Task and project management on Jooto. Kanban boards, task automation, and team workflows via PR TIMES' project management tool.",
+        "tier": "P3",
+    },
+    "base-stores-agent": {
+        "display_name": "BASE & STORES Agent",
+        "description": "Manage Japanese EC shops on BASE and STORES. Products, orders, inventory, and analytics for instant-commerce platforms.",
+        "tier": "P3",
+    },
+    "yayoi-agent": {
+        "display_name": "Yayoi Agent",
+        "description": "Accounting automation for Yayoi. Smart transaction import, Misoca invoicing, bank reconciliation, and tax filing support.",
+        "tier": "P3",
+    },
+    "mac-sentinel": {
+        "display_name": "Mac Sentinel",
+        "description": "macOS security hardening for Claude Code. Pre-execution validation, malicious config detection, credential hygiene, and endpoint protection.",
+        "tier": "P3",
+    },
+    "repo-guardian": {
+        "display_name": "Repo Guardian",
+        "description": "Pre-clone security scanner. Detect malicious hooks, poisoned MCP configs, credential-harvesting patterns before processing repos.",
+        "tier": "P3",
+    },
+    "credential-vault": {
+        "display_name": "Credential Vault",
+        "description": "Secure API key management. Encrypted storage, auto-rotation, leak detection, and safe injection for Claude Code credentials.",
         "tier": "P3",
     },
 }

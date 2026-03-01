@@ -1,0 +1,44 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: stripe-japan-agent
+label:
+  en_US: "Stripe Japan Agent"
+  ja_JP: "Stripe Japan エージェント"
+description:
+  en_US: "Payment management optimized for Japan — PayPay QR, konbini (convenience store) payments, subscriptions, Tekikaku Invoice-compliant invoicing, and financial reporting. Handles JPY zero-decimal currency, dual tax rates (8%/10%), dispute automation, and Stripe Connect marketplace payouts."
+  ja_JP: "日本に最適化された決済管理 — PayPay QR決済・コンビニ払い・サブスクリプション・適格請求書対応のインボイス発行・財務レポート。JPYゼロ小数通貨、消費税8%/10%二重税率、紛争自動対応、Stripe Connectマーケットプレイス払い出しに対応。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 128
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: stripe-japan-agent
+credentials_for_provider:
+  stripe_secret_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Stripe Secret Key (sk_test_ or sk_live_)"
+      ja_JP: "Stripeシークレットキー（sk_test_ または sk_live_）"
+  stripe_webhook_secret:
+    type: secret-input
+    required: false
+    label:
+      en_US: "Stripe Webhook Secret"
+      ja_JP: "Stripe Webhookシークレット"

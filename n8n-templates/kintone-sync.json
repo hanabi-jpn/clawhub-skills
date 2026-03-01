@@ -1,0 +1,294 @@
+{
+  "name": "kintone Bi-Directional Sync — Google Sheets to kintone Records",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/15 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "sync-trigger",
+      "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "kintone-webhook",
+        "options": {}
+      },
+      "id": "kintone-webhook",
+      "name": "kintone Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 520]
+    },
+    {
+      "parameters": {
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/{{ $env.SYNC_SHEET_ID }}/values/SyncData!A2:Z1000",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "id": "fetch-sheets",
+      "name": "Fetch Google Sheets Data",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 200]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://{{ $env.KINTONE_DOMAIN }}/k/v1/records.json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Cybozu-API-Token",
+              "value": "={{ $env.KINTONE_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "app",
+              "value": "={{ $env.KINTONE_APP_ID }}"
+            },
+            {
+              "name": "query",
+              "value": "order by 更新日時 desc limit 500"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-kintone",
+      "name": "Fetch kintone Records",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const sheetsData = $('Fetch Google Sheets Data').first().json;\nconst kintoneData = $('Fetch kintone Records').first().json;\n\nconst sheetRows = (sheetsData.values || []).map(row => ({\n  id: row[0],           // Column A: Record ID\n  company: row[1],      // Column B: Company name\n  contact: row[2],      // Column C: Contact person\n  status: row[3],       // Column D: Status\n  amount: row[4],       // Column E: Amount\n  updated: row[5]       // Column F: Last updated\n}));\n\nconst kintoneRecords = (kintoneData.records || []).map(rec => ({\n  id: rec['$id'].value,\n  company: rec['会社名']?.value || '',\n  contact: rec['担当者']?.value?.[0]?.name || '',\n  status: rec['ステータス']?.value || '',\n  amount: rec['売上見込']?.value || '0',\n  updated: rec['更新日時']?.value || ''\n}));\n\n// Find records to create in kintone (in sheets but not kintone)\nconst kintoneIds = new Set(kintoneRecords.map(r => r.id));\nconst toCreate = sheetRows.filter(r => r.id && !kintoneIds.has(r.id) && r.id.startsWith('NEW-'));\n\n// Find records to update in kintone (different data)\nconst toUpdate = sheetRows.filter(row => {\n  const ktRecord = kintoneRecords.find(kr => kr.id === row.id);\n  if (!ktRecord) return false;\n  return ktRecord.status !== row.status || ktRecord.amount !== row.amount;\n});\n\n// Find records to sync back to sheets (new in kintone)\nconst sheetIds = new Set(sheetRows.map(r => r.id));\nconst toSyncBack = kintoneRecords.filter(r => !sheetIds.has(r.id));\n\nreturn [\n  { json: { action: 'create', records: toCreate, count: toCreate.length } },\n  { json: { action: 'update', records: toUpdate, count: toUpdate.length } },\n  { json: { action: 'sync_back', records: toSyncBack, count: toSyncBack.length } }\n];"
+      },
+      "id": "diff-engine",
+      "name": "Calculate Differences",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.count }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "gt" }
+            }
+          ]
+        }
+      },
+      "id": "has-changes",
+      "name": "Has Changes?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst results = [];\n\nfor (const item of items) {\n  const data = item.json;\n  \n  if (data.action === 'create' && data.records.length > 0) {\n    // Prepare kintone create payload\n    const kintoneRecords = data.records.map(r => ({\n      '会社名': { value: r.company },\n      'ステータス': { value: r.status },\n      '売上見込': { value: r.amount }\n    }));\n    results.push({\n      json: {\n        action: 'create',\n        endpoint: `https://${process.env.KINTONE_DOMAIN}/k/v1/records.json`,\n        payload: {\n          app: process.env.KINTONE_APP_ID,\n          records: kintoneRecords\n        },\n        count: data.records.length\n      }\n    });\n  }\n  \n  if (data.action === 'update' && data.records.length > 0) {\n    const kintoneUpdates = data.records.map(r => ({\n      id: r.id,\n      record: {\n        'ステータス': { value: r.status },\n        '売上見込': { value: r.amount }\n      }\n    }));\n    results.push({\n      json: {\n        action: 'update',\n        endpoint: `https://${process.env.KINTONE_DOMAIN}/k/v1/records.json`,\n        payload: {\n          app: process.env.KINTONE_APP_ID,\n          records: kintoneUpdates\n        },\n        count: data.records.length\n      }\n    });\n  }\n}\n\nreturn results.length > 0 ? results : [{ json: { action: 'none', count: 0 } }];"
+      },
+      "id": "prepare-sync",
+      "name": "Prepare Sync Payloads",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1200, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.endpoint }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Cybozu-API-Token",
+              "value": "={{ $env.KINTONE_API_TOKEN }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {}
+      },
+      "id": "execute-sync",
+      "name": "Execute kintone Sync",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1440, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_OPS_ROOM_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "=[info][title]kintone Sync Complete[/title]Action: {{ $json.action }}\nRecords processed: {{ $json.count }}\nTime: {{ $now.format('yyyy-MM-dd HH:mm:ss') }} JST\nStatus: Success[/info]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-sync",
+      "name": "Notify Sync Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1680, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Handle kintone webhook events (record create/update/delete)\nconst event = $input.first().json;\nconst record = event.record || {};\n\n// Map kintone record to sheets row format\nconst row = [\n  record['$id']?.value || '',\n  record['会社名']?.value || '',\n  record['担当者']?.value?.[0]?.name || '',\n  record['ステータス']?.value || '',\n  record['売上見込']?.value || '0',\n  new Date().toISOString()\n];\n\nreturn [{ json: { row, record_id: row[0], event_type: event.type } }];"
+      },
+      "id": "process-webhook",
+      "name": "Process kintone Event",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 520]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/{{ $env.SYNC_SHEET_ID }}/values/SyncData!A:F:append",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "valueInputOption",
+              "value": "USER_ENTERED"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"values\": [{{ JSON.stringify($json.row) }}] }",
+        "options": {}
+      },
+      "id": "update-sheets",
+      "name": "Update Google Sheets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [720, 520]
+    }
+  ],
+  "connections": {
+    "Every 15 Minutes": {
+      "main": [
+        [
+          { "node": "Fetch Google Sheets Data", "type": "main", "index": 0 },
+          { "node": "Fetch kintone Records", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch Google Sheets Data": {
+      "main": [
+        [
+          { "node": "Calculate Differences", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch kintone Records": {
+      "main": [
+        [
+          { "node": "Calculate Differences", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Calculate Differences": {
+      "main": [
+        [
+          { "node": "Has Changes?", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Has Changes?": {
+      "main": [
+        [
+          { "node": "Prepare Sync Payloads", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Prepare Sync Payloads": {
+      "main": [
+        [
+          { "node": "Execute kintone Sync", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Execute kintone Sync": {
+      "main": [
+        [
+          { "node": "Notify Sync Status", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "kintone Webhook": {
+      "main": [
+        [
+          { "node": "Process kintone Event", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Process kintone Event": {
+      "main": [
+        [
+          { "node": "Update Google Sheets", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "kintone" },
+    { "name": "google-sheets" },
+    { "name": "sync" },
+    { "name": "japan" },
+    { "name": "clawhub" }
+  ],
+  "triggerCount": 2,
+  "updatedAt": "2026-03-01T00:00:00.000Z",
+  "versionId": "1"
+}

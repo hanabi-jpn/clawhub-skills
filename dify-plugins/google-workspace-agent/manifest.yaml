@@ -1,0 +1,50 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: google-workspace-agent
+label:
+  en_US: "Google Workspace Agent"
+  ja_JP: "Google Workspace エージェント"
+description:
+  en_US: "Unified Gmail, Calendar, Drive, Sheets, and Docs management. Read mail, schedule meetings, query spreadsheets, edit documents, and automate cross-service workflows with natural language commands. Supports OAuth 2.0, real-time search across all services, and pipe-based workflow automation."
+  ja_JP: "Gmail・カレンダー・Drive・スプレッドシート・ドキュメントの統合管理。メール読取、会議スケジュール、スプレッドシートクエリ、ドキュメント編集、サービス横断の自動化ワークフローを自然言語コマンドで実行。OAuth 2.0認証、リアルタイム横断検索、パイプ連携に対応。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 256
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: google-workspace-agent
+credentials_for_provider:
+  google_client_id:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Google OAuth Client ID"
+      ja_JP: "Google OAuth クライアントID"
+  google_client_secret:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Google OAuth Client Secret"
+      ja_JP: "Google OAuth クライアントシークレット"
+  google_refresh_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: "Google OAuth Refresh Token"
+      ja_JP: "Google OAuth リフレッシュトークン"

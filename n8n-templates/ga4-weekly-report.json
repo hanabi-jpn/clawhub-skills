@@ -1,0 +1,167 @@
+{
+  "name": "GA4 Weekly Report — Automated SEO & Traffic Analysis to ChatWork",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "weekly-trigger",
+      "name": "Every Monday 9AM JST",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://analyticsdata.googleapis.com/v1beta/properties/{{ $env.GA4_PROPERTY_ID }}:runReport",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"dateRanges\": [\n    {\"startDate\": \"7daysAgo\", \"endDate\": \"yesterday\"},\n    {\"startDate\": \"14daysAgo\", \"endDate\": \"8daysAgo\"}\n  ],\n  \"metrics\": [\n    {\"name\": \"activeUsers\"},\n    {\"name\": \"sessions\"},\n    {\"name\": \"screenPageViews\"},\n    {\"name\": \"averageSessionDuration\"},\n    {\"name\": \"bounceRate\"},\n    {\"name\": \"conversions\"},\n    {\"name\": \"totalRevenue\"}\n  ]\n}",
+        "options": {}
+      },
+      "id": "ga4-overview",
+      "name": "GA4 Overview Metrics",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 200]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://analyticsdata.googleapis.com/v1beta/properties/{{ $env.GA4_PROPERTY_ID }}:runReport",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"dateRanges\": [{\"startDate\": \"7daysAgo\", \"endDate\": \"yesterday\"}],\n  \"dimensions\": [{\"name\": \"sessionDefaultChannelGroup\"}],\n  \"metrics\": [\n    {\"name\": \"sessions\"},\n    {\"name\": \"conversions\"},\n    {\"name\": \"totalRevenue\"}\n  ],\n  \"orderBys\": [{\"metric\": {\"metricName\": \"sessions\"}, \"desc\": true}],\n  \"limit\": 8\n}",
+        "options": {}
+      },
+      "id": "ga4-channels",
+      "name": "GA4 Channel Breakdown",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/webmasters/v3/sites/{{ $env.GSC_SITE_URL }}/searchAnalytics/query",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"startDate\": \"{{ $now.minus(7, 'days').format('yyyy-MM-dd') }}\",\n  \"endDate\": \"{{ $now.minus(1, 'days').format('yyyy-MM-dd') }}\",\n  \"dimensions\": [\"query\"],\n  \"rowLimit\": 10,\n  \"type\": \"web\"\n}",
+        "options": {}
+      },
+      "id": "gsc-keywords",
+      "name": "Search Console Top Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 600]
+    },
+    {
+      "parameters": {
+        "jsCode": "const overview = $('GA4 Overview Metrics').first().json;\nconst channels = $('GA4 Channel Breakdown').first().json;\nconst keywords = $('Search Console Top Keywords').first().json;\n\n// Parse overview metrics\nconst rows = overview.rows || [];\nconst thisWeek = rows[0]?.metricValues?.map(m => m.value) || [];\nconst lastWeek = rows[1]?.metricValues?.map(m => m.value) || [];\n\nconst metrics = [\n  'Active Users', 'Sessions', 'Pageviews', \n  'Avg Duration (s)', 'Bounce Rate', 'Conversions', 'Revenue'\n];\n\n// Calculate changes\nconst formatChange = (curr, prev) => {\n  const c = parseFloat(curr) || 0;\n  const p = parseFloat(prev) || 0;\n  if (p === 0) return '+N/A';\n  const change = ((c - p) / p * 100).toFixed(1);\n  return change >= 0 ? `+${change}%` : `${change}%`;\n};\n\n// Build overview section\nlet overviewText = metrics.map((name, i) => {\n  const curr = thisWeek[i] || '0';\n  const prev = lastWeek[i] || '0';\n  const change = formatChange(curr, prev);\n  let displayVal = curr;\n  if (name === 'Revenue') displayVal = `¥${parseInt(curr).toLocaleString()}`;\n  if (name === 'Bounce Rate') displayVal = `${(parseFloat(curr) * 100).toFixed(1)}%`;\n  if (name === 'Avg Duration (s)') displayVal = `${Math.round(parseFloat(curr))}s`;\n  return `  ${name}: ${displayVal} (${change} WoW)`;\n}).join('\\n');\n\n// Build channel section\nconst channelRows = channels.rows || [];\nlet channelText = channelRows.map(row => {\n  const channel = row.dimensionValues[0].value;\n  const sessions = parseInt(row.metricValues[0].value).toLocaleString();\n  const conversions = row.metricValues[1].value;\n  const revenue = `¥${parseInt(row.metricValues[2].value).toLocaleString()}`;\n  return `  ${channel}: ${sessions} sessions, ${conversions} conv, ${revenue}`;\n}).join('\\n');\n\n// Build keyword section\nconst keywordRows = keywords.rows || [];\nlet keywordText = keywordRows.slice(0, 10).map((row, i) => {\n  const query = row.keys[0];\n  const clicks = row.clicks;\n  const impressions = row.impressions;\n  const position = row.position.toFixed(1);\n  return `  ${i + 1}. \"${query}\" — ${clicks} clicks, ${impressions} imp, pos ${position}`;\n}).join('\\n');\n\nconst report = `[info][title]Weekly Analytics Report (${$now.minus(7, 'days').format('MM/dd')} - ${$now.minus(1, 'days').format('MM/dd')})[/title]` +\n`\\n■ Overview\\n${overviewText}` +\n`\\n\\n■ Traffic by Channel\\n${channelText}` +\n`\\n\\n■ Top 10 Search Keywords\\n${keywordText}` +\n`\\n\\nReport generated: ${$now.format('yyyy-MM-dd HH:mm')} JST[/info]`;\n\nreturn [{ json: { report } }];"
+      },
+      "id": "build-report",
+      "name": "Build Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_MARKETING_ROOM_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "={{ $json.report }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "send-to-chatwork",
+      "name": "Send Report to ChatWork",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1020, 400]
+    }
+  ],
+  "connections": {
+    "Every Monday 9AM JST": {
+      "main": [
+        [
+          { "node": "GA4 Overview Metrics", "type": "main", "index": 0 },
+          { "node": "GA4 Channel Breakdown", "type": "main", "index": 0 },
+          { "node": "Search Console Top Keywords", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "GA4 Overview Metrics": {
+      "main": [
+        [
+          { "node": "Build Report", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "GA4 Channel Breakdown": {
+      "main": [
+        [
+          { "node": "Build Report", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Search Console Top Keywords": {
+      "main": [
+        [
+          { "node": "Build Report", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Build Report": {
+      "main": [
+        [
+          { "node": "Send Report to ChatWork", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "ga4" },
+    { "name": "seo" },
+    { "name": "analytics" },
+    { "name": "reporting" },
+    { "name": "clawhub" }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-01T00:00:00.000Z",
+  "versionId": "1"
+}

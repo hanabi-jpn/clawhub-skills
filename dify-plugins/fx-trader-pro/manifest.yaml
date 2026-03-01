@@ -1,0 +1,60 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: fx-trader-pro
+label:
+  en_US: "FX Trader Pro"
+  ja_JP: "FX Trader Pro"
+description:
+  en_US: "Professional forex trading agent for OANDA with 28 currency pairs including gold and silver. Multi-timeframe technical analysis (EMA, RSI, MACD, Bollinger Bands), automated position sizing with risk management, correlation-based portfolio protection, trading journal, and backtesting. Practice mode by default with kill switch safety."
+  ja_JP: "OANDA対応のプロフェッショナルFXトレーディングエージェント。金・銀を含む28通貨ペア対応。マルチタイムフレームテクニカル分析（EMA、RSI、MACD、ボリンジャーバンド）、リスク管理付き自動ポジションサイジング、相関ベースのポートフォリオ保護、トレードジャーナル、バックテスト機能。デフォルトで練習モード、キルスイッチ搭載。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 256
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: fx-trader-pro
+credentials_for_provider:
+  oanda_api_key:
+    type: secret-input
+    required: true
+    label:
+      en_US: "OANDA API Key (v20)"
+      ja_JP: "OANDA APIキー（v20）"
+  oanda_account_id:
+    type: text-input
+    required: true
+    label:
+      en_US: "OANDA Account ID"
+      ja_JP: "OANDAアカウントID"
+  oanda_environment:
+    type: select
+    required: false
+    default: practice
+    label:
+      en_US: "Environment"
+      ja_JP: "環境"
+    options:
+      - value: practice
+        label:
+          en_US: "Practice (Demo)"
+          ja_JP: "練習（デモ）"
+      - value: live
+        label:
+          en_US: "Live (Real Money)"
+          ja_JP: "ライブ（実取引）"

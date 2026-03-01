@@ -1,5 +1,5 @@
 """
-Poe Bot Server for all 20 hanabi-jpn skills.
+Poe Bot Server for all 40 hanabi-jpn skills.
 
 Serves each skill as a separate Poe bot, routing messages to the correct
 bot based on bot name. Each bot prepends its extracted system prompt and
@@ -115,7 +115,7 @@ class HanabiBotBase(fp.PoeBot):
 
 
 def create_bot_instances() -> dict[str, HanabiBotBase]:
-    """Create all 20 bot instances from configs."""
+    """Create all 40 bot instances from configs."""
     all_bots = get_all_bots()
     instances = {}
 

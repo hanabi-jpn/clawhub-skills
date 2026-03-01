@@ -2,14 +2,14 @@
 """
 GPT Store Configuration Generator for hanabi-jpn Skills
 ========================================================
-Reads all 20 SKILL.md files from the clawhub-skills directory
+Reads all 40 SKILL.md files from the clawhub-skills directory
 and generates GPT Store-compatible JSON configuration files.
 
 Usage:
     python3 generate-configs.py
 
 Output:
-    configs/<skill-slug>.json  (20 files)
+    configs/<skill-slug>.json  (40 files)
 """
 
 import json
@@ -423,7 +423,434 @@ SKILL_CONFIGS = {
             "dall_e": False,
             "code_interpreter": True
         }
-    }
+    },
+
+    # ═══════════════════════════════════════════════════════════
+    # Wave 2 — 20 New Skills
+    # ═══════════════════════════════════════════════════════════
+
+    # ── Google Suite ──
+    "google-ads-agent": {
+        "display_name": "Google Ads Agent",
+        "category": "Productivity",
+        "description": (
+            "AI-powered Google Ads campaign management agent. Create, optimize, and audit "
+            "PPC campaigns with automated bid optimization, keyword research, ad copy generation, "
+            "and performance reporting across Search, Display, Shopping, and YouTube campaigns."
+        ),
+        "conversation_starters": [
+            "Audit my Google Ads account for wasted spend",
+            "Create a search campaign for my product launch in Japan",
+            "Optimize my bidding strategy based on conversion data",
+            "Generate ad copy variations for A/B testing"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "google-workspace-agent": {
+        "display_name": "Google Workspace Agent",
+        "category": "Productivity",
+        "description": (
+            "Unified Google Workspace management agent for Gmail, Calendar, Drive, Sheets, "
+            "and Docs. Automate email workflows, schedule meetings, organize files, "
+            "build spreadsheet reports, and generate documents from a single conversational interface."
+        ),
+        "conversation_starters": [
+            "Search my Gmail for unread messages from this week",
+            "Create a Google Sheets report from this sales data",
+            "Schedule a team meeting on Google Calendar for next Tuesday",
+            "Organize my Google Drive files by project"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "ga4-search-console": {
+        "display_name": "GA4 & Search Console",
+        "category": "Research",
+        "description": (
+            "Natural language analytics for Google Analytics 4 and Search Console. "
+            "Ask questions about your traffic, SEO performance, conversions, and user behavior "
+            "in plain English or Japanese. Generates reports, identifies trends, and provides "
+            "actionable SEO recommendations."
+        ),
+        "conversation_starters": [
+            "Show my top 10 landing pages by organic traffic this month",
+            "What keywords am I ranking for that have high impressions but low clicks?",
+            "Analyze my GA4 conversion funnel and find drop-off points",
+            "Compare this month's SEO performance vs last month"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "google-maps-biz": {
+        "display_name": "Google Maps Biz",
+        "category": "Productivity",
+        "description": (
+            "Location intelligence and Google Business Profile management agent. "
+            "Geocoding, places search, competitor analysis, route optimization, "
+            "store locator generation, and review management for physical businesses."
+        ),
+        "conversation_starters": [
+            "Find all competitors within 5km of my store location",
+            "Optimize my Google Business Profile for local SEO",
+            "Calculate the best delivery route for these 10 addresses",
+            "Generate a store locator page for my website"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+
+    # ── Payment & Social ──
+    "stripe-japan-agent": {
+        "display_name": "Stripe Japan Agent",
+        "category": "Productivity",
+        "description": (
+            "Stripe payment management optimized for the Japanese market. "
+            "Supports PayPay, konbini payments, bank transfers, subscriptions, "
+            "invoicing, and revenue analytics. Handles Japan-specific payment methods "
+            "and tax compliance including the qualified invoice system."
+        ),
+        "conversation_starters": [
+            "Show my Stripe payment dashboard for this month",
+            "Set up konbini payment integration for my checkout",
+            "Create a subscription plan with tiered pricing",
+            "Analyze my payment success rates by method"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "social-media-publisher": {
+        "display_name": "Social Media Publisher",
+        "category": "Lifestyle",
+        "description": (
+            "Cross-platform social media management agent for X/Twitter, Instagram, "
+            "TikTok, and LINE. Content creation, scheduling, analytics, hashtag research, "
+            "and engagement tracking. Supports Japanese and English content with "
+            "platform-specific optimization."
+        ),
+        "conversation_starters": [
+            "Draft a week of social media posts for my product launch",
+            "Analyze my engagement metrics across all platforms",
+            "Find trending hashtags for my niche in Japan",
+            "Create an Instagram carousel post about our new feature"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": True,
+            "code_interpreter": True
+        }
+    },
+
+    # ── Japan SaaS ──
+    "chatwork-agent": {
+        "display_name": "Chatwork Agent",
+        "category": "Productivity",
+        "description": (
+            "Automation agent for Chatwork, Japan's #1 business messaging platform. "
+            "Send messages, create tasks, manage rooms, and build bot integrations "
+            "via the ChatWork API v2. Perfect for Japanese team communication workflows."
+        ),
+        "conversation_starters": [
+            "Send a progress update to my project room",
+            "Create tasks for all team members from this meeting notes",
+            "Set up a webhook bot for automated notifications",
+            "Show unread messages across all my Chatwork rooms"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "kintone-agent": {
+        "display_name": "Kintone Agent",
+        "category": "Productivity",
+        "description": (
+            "Build, query, and automate Cybozu kintone apps — Japan's leading no-code "
+            "business platform used by 30,000+ companies. Create custom apps, "
+            "run queries, build workflows, and integrate with other systems "
+            "through the kintone REST API."
+        ),
+        "conversation_starters": [
+            "Query my kintone CRM app for leads from this month",
+            "Create a new kintone app for expense tracking",
+            "Automate a workflow between kintone and Google Sheets",
+            "Show all records with status 'pending review'"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+
+    # ── Japan HR/Biz SaaS ──
+    "smarthr-agent": {
+        "display_name": "SmartHR Agent",
+        "category": "Productivity",
+        "description": (
+            "HR and labor management automation for SmartHR, Japan's leading cloud HR platform. "
+            "Employee onboarding, document generation, payroll integration, "
+            "labor compliance checks, and electronic signature management "
+            "for Japanese businesses."
+        ),
+        "conversation_starters": [
+            "Start the onboarding process for a new employee",
+            "Generate a labor compliance report for this quarter",
+            "List all employees with expiring contracts this month",
+            "Create an electronic document for signature"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "backlog-agent": {
+        "display_name": "Backlog Agent",
+        "category": "Productivity",
+        "description": (
+            "Project management automation for Nulab Backlog, Japan's top PM tool. "
+            "Create and manage issues, wikis, milestones, Git repositories, "
+            "and sprint boards. Track project progress and generate reports "
+            "through the Backlog API."
+        ),
+        "conversation_starters": [
+            "Show all my open issues sorted by priority",
+            "Create a new sprint with these user stories",
+            "Generate a burndown chart for the current milestone",
+            "Update the wiki with today's meeting notes"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "sansan-agent": {
+        "display_name": "Sansan Agent",
+        "category": "Productivity",
+        "description": (
+            "Business card and contact intelligence agent for Sansan, Japan's leading "
+            "B2B contact management platform. Search digitized business cards, "
+            "manage contacts, track networking relationships, and sync with CRM systems."
+        ),
+        "conversation_starters": [
+            "Search my business cards for contacts at Toyota",
+            "Show recently scanned cards from this week's events",
+            "Export contacts tagged with 'potential client'",
+            "Find all contacts in the manufacturing industry"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "moneyforward-agent": {
+        "display_name": "MoneyForward Agent",
+        "category": "Productivity",
+        "description": (
+            "Cloud accounting automation via MoneyForward, Japan's leading fintech platform. "
+            "Automate invoice creation, expense categorization, journal entries, "
+            "bank reconciliation, and financial reporting for Japanese businesses."
+        ),
+        "conversation_starters": [
+            "Show this month's profit and loss summary",
+            "Auto-categorize my latest bank transactions",
+            "Create an invoice for a new client",
+            "Generate a quarterly financial report"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "kingof-time-agent": {
+        "display_name": "King of Time Agent",
+        "category": "Productivity",
+        "description": (
+            "Attendance and time tracking automation for King of Time, "
+            "Japan's leading cloud attendance management system. Daily/monthly reports, "
+            "overtime monitoring, shift management, payroll data sync, "
+            "and labor law compliance checks."
+        ),
+        "conversation_starters": [
+            "Show today's attendance summary for my team",
+            "Who has overtime exceeding 45 hours this month?",
+            "Generate the monthly attendance report for payroll",
+            "Check shift coverage for next week"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "line-works-agent": {
+        "display_name": "LINE WORKS Agent",
+        "category": "Productivity",
+        "description": (
+            "Enterprise communication automation for LINE WORKS (formerly LINE for Business). "
+            "Bot messaging, group management, calendar integration, and workflow automation "
+            "on Japan's business-grade LINE platform used by 430,000+ organizations."
+        ),
+        "conversation_starters": [
+            "Send a notification to my LINE WORKS team group",
+            "Set up a bot for automated daily standup reports",
+            "Show my LINE WORKS calendar for this week",
+            "Create a survey and distribute to all team members"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "jooto-agent": {
+        "display_name": "Jooto Agent",
+        "category": "Productivity",
+        "description": (
+            "Task and project management automation for Jooto by PR TIMES. "
+            "Kanban board management, task creation, workflow automation, "
+            "and team collaboration for Japanese project teams. "
+            "Simple visual project tracking with API integration."
+        ),
+        "conversation_starters": [
+            "Show my Jooto board with current task status",
+            "Create a new project board with standard Kanban columns",
+            "Move all tasks tagged 'done' to the completed column",
+            "Generate a weekly progress report from my board"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "base-stores-agent": {
+        "display_name": "BASE & STORES Agent",
+        "category": "Productivity",
+        "description": (
+            "Japanese instant-commerce shop management for BASE and STORES platforms. "
+            "Product listing, order processing, inventory management, sales analytics, "
+            "and multi-shop operations for Japan's popular EC creation platforms "
+            "with 2M+ total shops."
+        ),
+        "conversation_starters": [
+            "Show my BASE shop's sales performance this month",
+            "List low-stock products across all my shops",
+            "Update product prices in bulk from this spreadsheet",
+            "Compare my shop performance: BASE vs STORES"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "yayoi-agent": {
+        "display_name": "Yayoi Agent",
+        "category": "Productivity",
+        "description": (
+            "Accounting automation for Yayoi, Japan's most widely used accounting software. "
+            "Smart transaction import, Misoca invoice creation, bank reconciliation, "
+            "tax filing preparation, and financial reporting. "
+            "Supports Yayoi Online and desktop versions."
+        ),
+        "conversation_starters": [
+            "Import bank transactions and auto-categorize them",
+            "Create a Misoca invoice for a new client",
+            "Generate my quarterly tax filing summary",
+            "Reconcile my bank statement with Yayoi records"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+
+    # ── Security Suite ──
+    "mac-sentinel": {
+        "display_name": "Mac Sentinel",
+        "category": "Programming",
+        "description": (
+            "macOS security hardening agent for Claude Code environments. "
+            "Pre-execution command validation, malicious config detection, "
+            "credential hygiene audits, CVE vulnerability scanning, "
+            "and endpoint protection. Protects your Mac development setup."
+        ),
+        "conversation_starters": [
+            "Run a full security audit of my Mac",
+            "Check for known CVE vulnerabilities on my system",
+            "Harden my macOS security settings for development",
+            "Scan my Claude Code configs for security issues"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "repo-guardian": {
+        "display_name": "Repo Guardian",
+        "category": "Programming",
+        "description": (
+            "Pre-clone repository security scanner for developers. "
+            "Detects malicious git hooks, poisoned MCP configurations, "
+            "credential-harvesting patterns, prompt injection attacks, "
+            "and dependency confusion risks BEFORE you clone or process a repo."
+        ),
+        "conversation_starters": [
+            "Scan this GitHub repo before I clone it",
+            "Check this repository for malicious git hooks",
+            "Audit the MCP configs and Claude settings in this project",
+            "Detect potential prompt injection in this repo's README"
+        ],
+        "capabilities": {
+            "web_browsing": True,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
+    "credential-vault": {
+        "display_name": "Credential Vault",
+        "category": "Programming",
+        "description": (
+            "Secure API key and credential management for Claude Code. "
+            "Encrypted storage using macOS Keychain, automatic rotation policies, "
+            "leak detection scanning, safe environment injection, "
+            "and audit logging. Never expose secrets in your codebase again."
+        ),
+        "conversation_starters": [
+            "Store my new API key securely in the vault",
+            "Check my project for leaked credentials and secrets",
+            "Rotate all API keys older than 90 days",
+            "Show my credential audit log and expiration status"
+        ],
+        "capabilities": {
+            "web_browsing": False,
+            "dall_e": False,
+            "code_interpreter": True
+        }
+    },
 }
 
 
@@ -577,7 +1004,8 @@ def generate_config(skill_slug: str) -> dict:
 
 
 def main():
-    """Generate all 20 GPT Store config files."""
+    """Generate all 40 GPT Store config files."""
+    total = len(SKILL_CONFIGS)
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
     print("=" * 60)
@@ -585,14 +1013,14 @@ def main():
     print("=" * 60)
     print(f"\n  Skills directory: {SKILLS_DIR}")
     print(f"  Output directory: {OUTPUT_DIR}")
-    print(f"  Skills to process: {len(SKILL_CONFIGS)}")
+    print(f"  Skills to process: {total}")
     print()
 
     generated = 0
     failed = 0
 
     for skill_slug in sorted(SKILL_CONFIGS.keys()):
-        print(f"  [{generated + failed + 1:2d}/20] Processing {skill_slug}...", end=" ")
+        print(f"  [{generated + failed + 1:2d}/{total}] Processing {skill_slug}...", end=" ")
 
         config = generate_config(skill_slug)
         if config is None:
@@ -617,10 +1045,10 @@ def main():
     print(f"  Output:    {OUTPUT_DIR}/")
     print()
 
-    if generated == 20:
-        print("  All 20 configs generated successfully!")
+    if generated == total:
+        print(f"  All {total} configs generated successfully!")
     else:
-        print(f"  WARNING: Expected 20, got {generated}. Check errors above.")
+        print(f"  WARNING: Expected {total}, got {generated}. Check errors above.")
 
     print()
 

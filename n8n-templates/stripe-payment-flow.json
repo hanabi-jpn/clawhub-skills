@@ -1,0 +1,275 @@
+{
+  "name": "Stripe Japan Payment Flow — PayPay, Konbini & Card Processing",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "stripe-webhook",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "stripe-webhook",
+      "name": "Stripe Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst payload = $input.first().json.body;\nconst sig = $input.first().json.headers['stripe-signature'];\nconst secret = $env.STRIPE_WEBHOOK_SECRET;\n\n// Parse Stripe signature\nconst elements = sig.split(',');\nconst timestamp = elements.find(e => e.startsWith('t=')).split('=')[1];\nconst signature = elements.find(e => e.startsWith('v1=')).split('=')[1];\n\n// Verify signature\nconst signedPayload = `${timestamp}.${JSON.stringify(payload)}`;\nconst expectedSig = crypto.createHmac('sha256', secret).update(signedPayload).digest('hex');\n\nif (expectedSig !== signature) {\n  throw new Error('Invalid webhook signature');\n}\n\n// Parse event\nconst event = typeof payload === 'string' ? JSON.parse(payload) : payload;\nreturn [{ json: event }];"
+      },
+      "id": "verify-signature",
+      "name": "Verify Webhook Signature",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "payment_intent.succeeded",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Payment Succeeded"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "payment_intent.payment_failed",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Payment Failed"
+            },
+            {
+              "conditions": {
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.type }}",
+                    "rightValue": "charge.dispute.created",
+                    "operator": { "type": "string", "operation": "equals" }
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Dispute Created"
+            }
+          ]
+        }
+      },
+      "id": "event-router",
+      "name": "Route by Event Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $input.first().json;\nconst pi = event.data.object;\nconst amount = pi.amount;\nconst currency = pi.currency.toUpperCase();\nconst paymentMethod = pi.payment_method_types ? pi.payment_method_types[0] : 'card';\nconst customerEmail = pi.receipt_email || 'N/A';\n\n// Format JPY amount\nconst formattedAmount = currency === 'JPY' \n  ? `¥${amount.toLocaleString()}` \n  : `${(amount / 100).toFixed(2)} ${currency}`;\n\n// Determine payment method display name\nconst methodNames = {\n  'card': 'Credit Card',\n  'paypay': 'PayPay',\n  'konbini': 'Konbini',\n  'customer_balance': 'Bank Transfer'\n};\nconst methodDisplay = methodNames[paymentMethod] || paymentMethod;\n\nreturn [{\n  json: {\n    payment_intent_id: pi.id,\n    amount: amount,\n    formatted_amount: formattedAmount,\n    currency: currency,\n    payment_method: methodDisplay,\n    customer_email: customerEmail,\n    customer_id: pi.customer,\n    description: pi.description || 'N/A',\n    created: new Date(pi.created * 1000).toISOString(),\n    receipt_url: pi.charges?.data?.[0]?.receipt_url || 'N/A'\n  }\n}];"
+      },
+      "id": "format-success",
+      "name": "Format Success Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 180]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_SALES_ROOM_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "=[info][title]💰 Payment Received[/title]Amount: {{ $json.formatted_amount }}\nMethod: {{ $json.payment_method }}\nCustomer: {{ $json.customer_email }}\nDescription: {{ $json.description }}\nReceipt: {{ $json.receipt_url }}\nTime: {{ $json.created }}[/info]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-success-chatwork",
+      "name": "Notify ChatWork (Success)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 100]
+    },
+    {
+      "parameters": {
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/{{ $env.GOOGLE_SHEET_ID }}/values/Payments!A:H:append",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"values\": [[\"{{ $json.created }}\", \"{{ $json.payment_intent_id }}\", {{ $json.amount }}, \"{{ $json.currency }}\", \"{{ $json.payment_method }}\", \"{{ $json.customer_email }}\", \"{{ $json.description }}\", \"{{ $json.receipt_url }}\"]] }",
+        "options": {},
+        "method": "POST",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "valueInputOption",
+              "value": "USER_ENTERED"
+            }
+          ]
+        }
+      },
+      "id": "log-to-sheets",
+      "name": "Log to Google Sheets",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 260]
+    },
+    {
+      "parameters": {
+        "jsCode": "const event = $input.first().json;\nconst pi = event.data.object;\nconst error = pi.last_payment_error;\n\nreturn [{\n  json: {\n    payment_intent_id: pi.id,\n    amount: `¥${pi.amount.toLocaleString()}`,\n    error_code: error?.code || 'unknown',\n    error_message: error?.message || 'Payment failed',\n    payment_method: pi.payment_method_types?.[0] || 'unknown',\n    customer_id: pi.customer || 'N/A'\n  }\n}];"
+      },
+      "id": "format-failure",
+      "name": "Format Failure Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 340]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_SALES_ROOM_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "=[info][title]⚠️ Payment Failed[/title]Amount: {{ $json.amount }}\nError: {{ $json.error_code }} - {{ $json.error_message }}\nMethod: {{ $json.payment_method }}\nCustomer: {{ $json.customer_id }}\n\nSuggestion: If card declined, consider offering PayPay or konbini payment.[/info]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-failure-chatwork",
+      "name": "Notify ChatWork (Failure)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 340]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_SALES_ROOM_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "=[To:{{ $env.CHATWORK_ONCALL_ACCOUNT_ID }}]\n[info][title]🚨 DISPUTE ALERT[/title]A customer has filed a dispute.\nDispute ID: {{ $json.data.object.id }}\nAmount: ¥{{ $json.data.object.amount }}\nReason: {{ $json.data.object.reason }}\nDeadline: Respond within 7 days\n\nAction: Go to Stripe Dashboard immediately.[/info]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-dispute",
+      "name": "Notify Dispute Alert",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 480]
+    }
+  ],
+  "connections": {
+    "Stripe Webhook": {
+      "main": [
+        [
+          { "node": "Verify Webhook Signature", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Verify Webhook Signature": {
+      "main": [
+        [
+          { "node": "Route by Event Type", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Route by Event Type": {
+      "main": [
+        [
+          { "node": "Format Success Data", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Format Failure Data", "type": "main", "index": 0 }
+        ],
+        [
+          { "node": "Notify Dispute Alert", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format Success Data": {
+      "main": [
+        [
+          { "node": "Notify ChatWork (Success)", "type": "main", "index": 0 },
+          { "node": "Log to Google Sheets", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Format Failure Data": {
+      "main": [
+        [
+          { "node": "Notify ChatWork (Failure)", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "stripe" },
+    { "name": "payments" },
+    { "name": "japan" },
+    { "name": "clawhub" }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-01T00:00:00.000Z",
+  "versionId": "1"
+}

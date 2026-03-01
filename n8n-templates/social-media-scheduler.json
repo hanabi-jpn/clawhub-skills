@@ -1,0 +1,256 @@
+{
+  "name": "Social Media Cross-Post Scheduler — X, Instagram, LINE",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 10,12,18 * * 1-5"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Post Schedule (10, 12, 18 JST)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://sheets.googleapis.com/v4/spreadsheets/{{ $env.CONTENT_SHEET_ID }}/values/ContentCalendar!A2:G100",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "id": "fetch-content",
+      "name": "Fetch Content Calendar",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [480, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.first().json.values || [];\nconst now = new Date();\nconst today = now.toISOString().split('T')[0];\nconst currentHour = now.getUTCHours() + 9; // Convert to JST\n\n// Filter for today's posts at current time slot\nconst postsToPublish = rows\n  .filter(row => {\n    const scheduledDate = row[0]; // Column A: Date (YYYY-MM-DD)\n    const scheduledHour = parseInt(row[1]); // Column B: Hour (JST)\n    const status = row[6]; // Column G: Status\n    return scheduledDate === today && scheduledHour === currentHour && status !== 'published';\n  })\n  .map(row => ({\n    date: row[0],\n    hour: row[1],\n    text_x: row[2],      // Column C: X/Twitter text\n    text_insta: row[3],   // Column D: Instagram caption\n    text_line: row[4],    // Column E: LINE message\n    image_url: row[5],    // Column F: Image URL\n    status: row[6]        // Column G: Status\n  }));\n\nreturn postsToPublish.map(post => ({ json: post }));"
+      },
+      "id": "filter-scheduled",
+      "name": "Filter Scheduled Posts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [720, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.twitter.com/2/tweets",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth1Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"text\": \"{{ $json.text_x }}\"}",
+        "options": {}
+      },
+      "id": "post-to-x",
+      "name": "Post to X/Twitter",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 160]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/{{ $env.INSTAGRAM_BUSINESS_ACCOUNT_ID }}/media",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "image_url",
+              "value": "={{ $json.image_url }}"
+            },
+            {
+              "name": "caption",
+              "value": "={{ $json.text_insta }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.INSTAGRAM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "create-insta-media",
+      "name": "Create Instagram Media",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://graph.facebook.com/v19.0/{{ $env.INSTAGRAM_BUSINESS_ACCOUNT_ID }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "creation_id",
+              "value": "={{ $json.id }}"
+            },
+            {
+              "name": "access_token",
+              "value": "={{ $env.INSTAGRAM_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "publish-insta",
+      "name": "Publish Instagram Post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1200, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.line.me/v2/bot/message/broadcast",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "Bearer {{ $env.LINE_CHANNEL_ACCESS_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"messages\":[{\"type\":\"text\",\"text\":\"{{ $json.text_line }}\"}]}",
+        "options": {}
+      },
+      "id": "post-to-line",
+      "name": "Broadcast to LINE",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [960, 440]
+    },
+    {
+      "parameters": {
+        "jsCode": "const results = {\n  x: $('Post to X/Twitter').first()?.json || { error: 'skipped' },\n  instagram: $('Publish Instagram Post').first()?.json || { error: 'skipped' },\n  line: $('Broadcast to LINE').first()?.json || { error: 'skipped' }\n};\n\nconst summary = [\n  `X/Twitter: ${results.x.data?.id ? 'Posted (ID: ' + results.x.data.id + ')' : 'Failed'}`,\n  `Instagram: ${results.instagram.id ? 'Posted (ID: ' + results.instagram.id + ')' : 'Failed'}`,\n  `LINE: ${results.line.sentMessages ? 'Broadcast sent' : 'Failed'}`\n].join('\\n');\n\nreturn [{ json: { summary, results, timestamp: new Date().toISOString() } }];"
+      },
+      "id": "aggregate-results",
+      "name": "Aggregate Results",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.chatwork.com/v2/rooms/{{ $env.CHATWORK_MARKETING_ROOM_ID }}/messages",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-ChatWorkToken",
+              "value": "={{ $env.CHATWORK_API_TOKEN }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "body",
+              "value": "=[info][title]SNS Cross-Post Complete[/title]{{ $json.summary }}\nTime: {{ $json.timestamp }}[/info]"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "notify-chatwork",
+      "name": "Notify Marketing Team",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1680, 300]
+    }
+  ],
+  "connections": {
+    "Post Schedule (10, 12, 18 JST)": {
+      "main": [
+        [
+          { "node": "Fetch Content Calendar", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Fetch Content Calendar": {
+      "main": [
+        [
+          { "node": "Filter Scheduled Posts", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Filter Scheduled Posts": {
+      "main": [
+        [
+          { "node": "Post to X/Twitter", "type": "main", "index": 0 },
+          { "node": "Create Instagram Media", "type": "main", "index": 0 },
+          { "node": "Broadcast to LINE", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Create Instagram Media": {
+      "main": [
+        [
+          { "node": "Publish Instagram Post", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Post to X/Twitter": {
+      "main": [
+        [
+          { "node": "Aggregate Results", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Publish Instagram Post": {
+      "main": [
+        [
+          { "node": "Aggregate Results", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Broadcast to LINE": {
+      "main": [
+        [
+          { "node": "Aggregate Results", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Aggregate Results": {
+      "main": [
+        [
+          { "node": "Notify Marketing Team", "type": "main", "index": 0 }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [
+    { "name": "social-media" },
+    { "name": "scheduling" },
+    { "name": "cross-platform" },
+    { "name": "clawhub" }
+  ],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-01T00:00:00.000Z",
+  "versionId": "1"
+}

@@ -1,0 +1,44 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: chatwork-agent
+label:
+  en_US: "ChatWork Agent"
+  ja_JP: "ChatWork エージェント"
+description:
+  en_US: "Automate Japan's #1 business chat platform (410K+ companies). Send messages, manage tasks, handle rooms, build bots via ChatWork API v2. Features rate-limit-safe operations, webhook signature validation, bulk messaging, file management, and full Japanese text support."
+  ja_JP: "日本最大のビジネスチャットプラットフォーム（41万社以上）を自動化。ChatWork API v2でメッセージ送信・タスク管理・ルーム操作・Bot構築。レートリミット対応、Webhook署名検証、一括メッセージング、ファイル管理、日本語テキスト完全サポート。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 128
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: chatwork-agent
+credentials_for_provider:
+  chatwork_api_token:
+    type: secret-input
+    required: true
+    label:
+      en_US: "ChatWork API Token"
+      ja_JP: "ChatWork APIトークン"
+  chatwork_default_room_id:
+    type: text-input
+    required: false
+    label:
+      en_US: "Default Room ID"
+      ja_JP: "デフォルトルームID"

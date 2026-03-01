@@ -1,5 +1,5 @@
 """
-Bot configurations for all 20 hanabi-jpn Poe bots.
+Bot configurations for all 40 hanabi-jpn Poe bots.
 
 Each bot has:
   - bot_name: Poe bot slug (used in URL)
@@ -264,6 +264,260 @@ BOT_DEFINITIONS = {
             "Write an SEO article about 'AI business automation'",
             "Analyze keywords for my niche",
             "Create an article outline with co-occurrence analysis",
+        ],
+    },
+
+    # ═══════════════════════════════════════════════════════════
+    # NEW WAVE — 20 additional skills (Wave 2)
+    # ═══════════════════════════════════════════════════════════
+
+    # ═══════ P1 — Premium (GPT-4o) — Google Suite ═══════
+    "google-ads-agent": {
+        "bot_name": "GoogleAdsAgent",
+        "display_name": "Google Ads Agent",
+        "description": "AI-powered Google Ads campaign management. Create, optimize, audit, and report on PPC campaigns with bid optimization and keyword research.",
+        "model": "GPT-4o",
+        "tier": "P1",
+        "suggested_replies": [
+            "Audit my Google Ads account for optimization opportunities",
+            "Create a search campaign for my product launch",
+            "Analyze my campaign performance and suggest bid adjustments",
+        ],
+    },
+    "google-workspace-agent": {
+        "bot_name": "GoogleWorkspaceAgent",
+        "display_name": "Google Workspace Agent",
+        "description": "Unified Gmail, Calendar, Drive, Sheets, and Docs management. Automate your entire Google Workspace from a single agent.",
+        "model": "GPT-4o",
+        "tier": "P1",
+        "suggested_replies": [
+            "Search my Gmail for unread messages from today",
+            "Create a Google Sheets report from this data",
+            "Schedule a meeting on my Google Calendar",
+        ],
+    },
+    "ga4-search-console": {
+        "bot_name": "GA4SearchConsole",
+        "display_name": "GA4 & Search Console",
+        "description": "Query GA4 analytics and Google Search Console in natural language. Traffic analysis, SEO insights, conversion tracking, and performance reports.",
+        "model": "GPT-4o",
+        "tier": "P1",
+        "suggested_replies": [
+            "Show my top pages by traffic this month",
+            "What keywords am I ranking for in Search Console?",
+            "Analyze my conversion funnel in GA4",
+        ],
+    },
+    "google-maps-biz": {
+        "bot_name": "GoogleMapsBiz",
+        "display_name": "Google Maps Biz",
+        "description": "Location intelligence for business. Geocoding, places search, routing optimization, and Google Business Profile management.",
+        "model": "GPT-4o",
+        "tier": "P1",
+        "suggested_replies": [
+            "Find all competitors within 5km of my store",
+            "Optimize my Google Business Profile listing",
+            "Calculate the best delivery route for these 10 addresses",
+        ],
+    },
+
+    # ═══════ P2 — Standard (GPT-4o) — Payment & Social ═══════
+    "stripe-japan-agent": {
+        "bot_name": "StripeJapanAgent",
+        "display_name": "Stripe Japan Agent",
+        "description": "Payment management for Japan via Stripe. PayPay, konbini payments, subscriptions, invoicing, and revenue analytics.",
+        "model": "GPT-4o",
+        "tier": "P2",
+        "suggested_replies": [
+            "Show my Stripe payment dashboard for this month",
+            "Set up konbini payment for my checkout flow",
+            "Create a subscription plan with tiered pricing",
+        ],
+    },
+    "social-media-publisher": {
+        "bot_name": "SocialMediaPublisher",
+        "display_name": "Social Media Publisher",
+        "description": "Cross-platform social media posting and analytics. X/Twitter, Instagram, TikTok, and LINE scheduling, content creation, and engagement tracking.",
+        "model": "GPT-4o",
+        "tier": "P2",
+        "suggested_replies": [
+            "Draft a week of social media posts for my product launch",
+            "Analyze my engagement metrics across all platforms",
+            "Schedule a cross-platform campaign for next Monday",
+        ],
+    },
+
+    # ═══════ P2 — Standard (GPT-4o) — Japan SaaS ═══════
+    "chatwork-agent": {
+        "bot_name": "ChatworkAgent",
+        "display_name": "Chatwork Agent",
+        "description": "Automate Japan's #1 business chat. Messages, tasks, rooms, and bot integration via ChatWork API v2.",
+        "model": "GPT-4o",
+        "tier": "P2",
+        "suggested_replies": [
+            "Send a message to my project room",
+            "Create tasks for all team members from this list",
+            "Show unread messages across my Chatwork rooms",
+        ],
+    },
+    "kintone-agent": {
+        "bot_name": "KintoneAgent",
+        "display_name": "Kintone Agent",
+        "description": "Build, query, and automate Cybozu kintone apps. Japan's leading no-code business platform with 30,000+ companies.",
+        "model": "GPT-4o",
+        "tier": "P2",
+        "suggested_replies": [
+            "Query my kintone CRM app for this month's leads",
+            "Create a new kintone app for project tracking",
+            "Automate a workflow between two kintone apps",
+        ],
+    },
+
+    # ═══════ P3 — Lite (GPT-4o-Mini) — Japan HR/Biz SaaS ═══════
+    "smarthr-agent": {
+        "bot_name": "SmartHRAgent",
+        "display_name": "SmartHR Agent",
+        "description": "HR and labor management automation. Employee onboarding, documents, payroll, and compliance on Japan's leading HR cloud.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Start the onboarding process for a new employee",
+            "Generate a labor compliance report",
+            "List all employees with expiring contracts this month",
+        ],
+    },
+    "backlog-agent": {
+        "bot_name": "BacklogAgent",
+        "display_name": "Backlog Agent",
+        "description": "Project management on Nulab Backlog. Issues, wikis, milestones, Git integration, and sprint management for Japan's top PM tool.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Show my open issues sorted by priority",
+            "Create a new sprint with these user stories",
+            "Generate a burndown chart for the current sprint",
+        ],
+    },
+    "sansan-agent": {
+        "bot_name": "SansanAgent",
+        "display_name": "Sansan Agent",
+        "description": "Business card and contact intelligence. Search, manage, and sync digitized cards for Japanese B2B networking with Sansan.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Search my business cards for contacts at Toyota",
+            "Show recently scanned business cards this week",
+            "Export contacts from a specific event or meeting",
+        ],
+    },
+    "moneyforward-agent": {
+        "bot_name": "MoneyForwardAgent",
+        "display_name": "MoneyForward Agent",
+        "description": "Cloud accounting automation via MoneyForward. Invoices, expenses, journal entries, and bank reconciliation for Japanese businesses.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Show this month's profit and loss summary",
+            "Auto-categorize my bank transactions",
+            "Create an invoice for a new client",
+        ],
+    },
+    "kingof-time-agent": {
+        "bot_name": "KingOfTimeAgent",
+        "display_name": "King of Time Agent",
+        "description": "Attendance and time tracking automation. Daily/monthly reports, overtime alerts, and payroll sync via Japan's leading attendance system.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Show today's attendance summary for my team",
+            "Who has overtime exceeding 45 hours this month?",
+            "Generate the monthly attendance report for payroll",
+        ],
+    },
+    "line-works-agent": {
+        "bot_name": "LINEWorksAgent",
+        "display_name": "LINE WORKS Agent",
+        "description": "Enterprise LINE communication. Bots, messages, groups, and calendar on Japan's business-grade LINE platform.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Send a notification to my LINE WORKS group",
+            "Set up a bot for automated daily reports",
+            "Show my LINE WORKS calendar for this week",
+        ],
+    },
+    "jooto-agent": {
+        "bot_name": "JootoAgent",
+        "display_name": "Jooto Agent",
+        "description": "Task and project management on Jooto. Kanban boards, task automation, and team workflows via PR TIMES' project management tool.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Show my Jooto board with task status summary",
+            "Create a new project board with standard columns",
+            "Move all completed tasks to the Done column",
+        ],
+    },
+    "base-stores-agent": {
+        "bot_name": "BaseStoresAgent",
+        "display_name": "BASE & STORES Agent",
+        "description": "Manage Japanese EC shops on BASE and STORES. Products, orders, inventory, and analytics for instant-commerce platforms.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Show my BASE shop's sales for this month",
+            "List low-stock products across my stores",
+            "Update product pricing in bulk from this CSV",
+        ],
+    },
+    "yayoi-agent": {
+        "bot_name": "YayoiAgent",
+        "display_name": "Yayoi Agent",
+        "description": "Accounting automation for Yayoi. Smart transaction import, Misoca invoicing, bank reconciliation, and tax filing support.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Import bank transactions and auto-categorize them",
+            "Create a Misoca invoice for a client",
+            "Generate my quarterly tax filing summary",
+        ],
+    },
+
+    # ═══════ P3 — Security Suite (GPT-4o-Mini) ═══════
+    "mac-sentinel": {
+        "bot_name": "MacSentinel",
+        "display_name": "Mac Sentinel",
+        "description": "macOS security hardening for Claude Code. Pre-execution validation, malicious config detection, credential hygiene, and endpoint protection.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Run a full security audit of my Mac",
+            "Check my system for known CVE vulnerabilities",
+            "Harden my macOS security settings",
+        ],
+    },
+    "repo-guardian": {
+        "bot_name": "RepoGuardian",
+        "display_name": "Repo Guardian",
+        "description": "Pre-clone security scanner. Detect malicious hooks, poisoned MCP configs, credential-harvesting patterns before processing repos.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Scan this GitHub repo before I clone it",
+            "Check this repository for malicious git hooks",
+            "Audit the MCP configs in this project",
+        ],
+    },
+    "credential-vault": {
+        "bot_name": "CredentialVault",
+        "display_name": "Credential Vault",
+        "description": "Secure API key management. Encrypted storage, auto-rotation, leak detection, and safe injection for Claude Code credentials.",
+        "model": "GPT-4o-Mini",
+        "tier": "P3",
+        "suggested_replies": [
+            "Store my new API key securely",
+            "Check for leaked credentials in my project",
+            "Rotate all API keys older than 90 days",
         ],
     },
 }

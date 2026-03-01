@@ -1,0 +1,62 @@
+version: 0.0.1
+type: extension
+author: hanabi-jpn
+name: social-media-publisher
+label:
+  en_US: "Social Media Publisher"
+  ja_JP: "ソーシャルメディアパブリッシャー"
+description:
+  en_US: "Cross-platform social media posting and analytics for X/Twitter, Instagram, TikTok, and LINE. Adaptive cross-posting optimized per platform, AI-powered hashtag optimization for JP and EN, scheduling with optimal timing analysis, unified analytics with normalized engagement metrics, trending topic monitoring, and A/B testing support."
+  ja_JP: "X/Twitter・Instagram・TikTok・LINEのクロスプラットフォームSNS投稿・分析。プラットフォーム別最適化クロスポスト、日英AI ハッシュタグ最適化、最適タイミング分析付きスケジューリング、エンゲージメント指標統一分析、トレンドトピック監視、A/Bテスト対応。"
+icon: icon.svg
+category: agent-strategy
+resource:
+  memory: 256
+  permission:
+    tool:
+      enabled: true
+    endpoint:
+      enabled: true
+meta:
+  version: 1.0.0
+  arch:
+    - amd64
+    - arm64
+  runner:
+    language: python
+    version: "3.12"
+    entrypoint: main
+extra:
+  python:
+    source: social-media-publisher
+credentials_for_provider:
+  x_api_key:
+    type: secret-input
+    required: false
+    label:
+      en_US: "X/Twitter API Key"
+      ja_JP: "X/Twitter APIキー"
+  x_api_secret:
+    type: secret-input
+    required: false
+    label:
+      en_US: "X/Twitter API Secret"
+      ja_JP: "X/Twitter APIシークレット"
+  instagram_access_token:
+    type: secret-input
+    required: false
+    label:
+      en_US: "Instagram Access Token"
+      ja_JP: "Instagram アクセストークン"
+  tiktok_access_token:
+    type: secret-input
+    required: false
+    label:
+      en_US: "TikTok Access Token"
+      ja_JP: "TikTok アクセストークン"
+  line_channel_token:
+    type: secret-input
+    required: false
+    label:
+      en_US: "LINE Channel Token"
+      ja_JP: "LINE チャネルトークン"

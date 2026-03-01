@@ -11,6 +11,8 @@
     "build:shared": "cd shared && npx tsc",
     "clean": "rm -rf packages/*/dist",
     "publish-all": "./scripts/publish-all.sh",
+    "quick-publish": "./scripts/quick-publish.sh",
+    "register-mcp": "./scripts/register-mcp.sh",
     "generate-all": "./scripts/generate-all.sh"
   },
   "repository": {
