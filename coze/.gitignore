@@ -1,0 +1,16 @@
+# Credentials - NEVER commit these
+.env
+config.json
+.coze_cookies.json
+.browser_state
+
+# Results (may contain bot IDs)
+create_results.json
+create_results_browser.json
+
+# Error screenshots
+error_*.png
+
+# Python
+__pycache__/
+*.pyc
