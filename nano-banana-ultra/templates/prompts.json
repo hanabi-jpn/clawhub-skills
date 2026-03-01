@@ -1,0 +1,548 @@
+{
+  "$schema": "https://clawhub.dev/skills/nano-banana-ultra/prompts-schema.json",
+  "version": "1.0.0",
+  "last_updated": "2026-03-01",
+  "total_templates": 35,
+  "templates": {
+    "product-photo": {
+      "name": "Product Photography",
+      "description": "Professional product shots suitable for e-commerce and catalogs",
+      "category": "commercial",
+      "modifiers": "professional product photography, white background, soft studio lighting, high detail, commercial quality, centered composition, subtle shadow, crisp focus on product, 8K resolution",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Red sneakers on white background",
+        "Wireless headphones floating at angle",
+        "Skincare bottle with water droplets",
+        "Watch on marble surface with soft lighting"
+      ],
+      "negative_prompt": "blurry, low quality, distorted, watermark, text overlay, cluttered background"
+    },
+    "product-lifestyle": {
+      "name": "Product Lifestyle Shot",
+      "description": "Products shown in natural use contexts",
+      "category": "commercial",
+      "modifiers": "lifestyle product photography, natural environment, in-use context, warm ambient lighting, depth of field, authentic setting, candid feel, editorial quality",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "4:3",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Coffee mug on a wooden desk with morning light",
+        "Backpack on a hiking trail at sunset",
+        "Laptop in a cozy cafe setting"
+      ],
+      "negative_prompt": "studio lighting, white background, artificial, posed, stock photo feel"
+    },
+    "logo-design": {
+      "name": "Logo Design",
+      "description": "Clean, minimal logo concepts for branding",
+      "category": "branding",
+      "modifiers": "minimal logo design, vector style, clean lines, scalable, professional branding, negative space, centered on white background, flat design, single or two color palette, geometric precision",
+      "recommended_resolution": "1k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Mountain and sunrise logo for outdoor brand",
+        "Abstract letter M logo for tech company",
+        "Leaf and coffee cup logo for organic cafe",
+        "Geometric fox logo for creative agency"
+      ],
+      "negative_prompt": "3D, gradient, photorealistic, detailed illustration, complex, busy, many colors"
+    },
+    "social-media": {
+      "name": "Social Media Graphics",
+      "description": "Eye-catching visuals for Instagram, Twitter, LinkedIn",
+      "category": "marketing",
+      "modifiers": "eye-catching social media graphic, vibrant colors, bold composition, suitable for Instagram/Twitter, modern design, engaging visual, clean layout with text space",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "gemini",
+      "example_prompts": [
+        "Motivational quote background with abstract gradients",
+        "Product announcement visual with bold typography space",
+        "Seasonal sale graphic with festive elements",
+        "Event promotion visual with dynamic shapes"
+      ],
+      "negative_prompt": "text, words, letters, low resolution, pixelated"
+    },
+    "social-media-story": {
+      "name": "Social Media Story",
+      "description": "Vertical format for Instagram/TikTok stories",
+      "category": "marketing",
+      "modifiers": "vertical story format, 9:16 aspect ratio, mobile-optimized, bold visuals, text overlay space at center, gradient background, modern aesthetic",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "9:16",
+      "best_model": "gemini",
+      "example_prompts": [
+        "Behind-the-scenes style background for story",
+        "Countdown announcement background",
+        "Poll/question background with split design"
+      ],
+      "negative_prompt": "landscape orientation, small details, complex scenes"
+    },
+    "illustration": {
+      "name": "Digital Illustration",
+      "description": "Professional digital artwork for various purposes",
+      "category": "creative",
+      "modifiers": "digital illustration, detailed artwork, professional quality, clean lines, vivid colors, well-defined shapes, balanced composition, artstation quality",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "stability",
+      "example_prompts": [
+        "Futuristic cityscape at night with neon lights",
+        "Fantasy forest with glowing mushrooms",
+        "Children's book style village scene"
+      ],
+      "negative_prompt": "photorealistic, photograph, blurry, low quality, amateur"
+    },
+    "portrait": {
+      "name": "Portrait Photography",
+      "description": "Professional portrait and headshot style images",
+      "category": "photography",
+      "modifiers": "professional portrait photography, shallow depth of field, natural lighting, high detail, 85mm lens look, soft bokeh background, flattering light, sharp focus on eyes",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "3:4",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Professional headshot with neutral background",
+        "Environmental portrait of an artist in studio",
+        "Natural light portrait near a window"
+      ],
+      "negative_prompt": "distorted face, extra fingers, deformed, ugly, blurry"
+    },
+    "landscape": {
+      "name": "Landscape Photography",
+      "description": "Breathtaking natural and urban landscape scenes",
+      "category": "photography",
+      "modifiers": "breathtaking landscape photography, golden hour lighting, wide angle, high dynamic range, vivid natural colors, dramatic sky, sharp throughout, National Geographic quality",
+      "recommended_resolution": "4k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Mountain range reflected in crystal clear lake at sunrise",
+        "Rolling lavender fields in Provence at golden hour",
+        "Desert sand dunes under Milky Way sky"
+      ],
+      "negative_prompt": "indoor, close-up, portrait, artificial lighting, cluttered"
+    },
+    "infographic": {
+      "name": "Infographic Design",
+      "description": "Data visualization and informational graphics",
+      "category": "business",
+      "modifiers": "clean infographic design, data visualization, flat design, organized layout, professional color palette, clear hierarchy, icons and symbols, grid-aligned, modern typography space",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "2:3",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Process flow infographic with 5 steps",
+        "Comparison infographic template two columns",
+        "Statistics dashboard layout with chart placeholders"
+      ],
+      "negative_prompt": "photorealistic, 3D, cluttered, hand-drawn, text, numbers"
+    },
+    "icon-set": {
+      "name": "Icon Set Design",
+      "description": "Consistent icon sets for apps and websites",
+      "category": "ui-design",
+      "modifiers": "consistent icon design, flat style, uniform stroke width, cohesive color palette, 64x64 grid aligned, pixel perfect, minimal detail, recognizable silhouettes",
+      "recommended_resolution": "1k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Set of 9 business icons in blue line style",
+        "Food and drink icon set in flat pastel colors",
+        "Travel and transportation icon grid"
+      ],
+      "negative_prompt": "3D, gradient, realistic, detailed, shadowed, inconsistent style"
+    },
+    "mockup": {
+      "name": "Product Mockup",
+      "description": "Realistic product mockups for presentations",
+      "category": "commercial",
+      "modifiers": "professional product mockup, realistic perspective, clean environment, branded presentation, subtle shadows, photorealistic rendering, premium feel",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "dalle",
+      "example_prompts": [
+        "iPhone showing app interface on wooden desk",
+        "T-shirt mockup on invisible mannequin",
+        "Business card mockup on concrete surface",
+        "Packaging box mockup with brand space"
+      ],
+      "negative_prompt": "flat, 2D, illustration, cartoon, low quality"
+    },
+    "banner": {
+      "name": "Banner / Hero Image",
+      "description": "Wide banners for websites, emails, and ads",
+      "category": "marketing",
+      "modifiers": "wide banner design, hero image, bold composition, text space on left or right third, 16:9 aspect ratio, impactful visual, professional quality, clean negative space for typography",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "gemini",
+      "example_prompts": [
+        "Tech conference banner with abstract circuit patterns",
+        "E-commerce sale banner with dynamic shapes",
+        "SaaS landing page hero with gradient abstract"
+      ],
+      "negative_prompt": "text, words, letters, portrait orientation, cluttered"
+    },
+    "anime": {
+      "name": "Anime / Manga Style",
+      "description": "Japanese animation and manga aesthetic artwork",
+      "category": "creative",
+      "modifiers": "anime illustration style, Japanese animation aesthetic, detailed character design, vibrant colors, clean line art, expressive eyes, dynamic pose, studio quality, light novel cover quality",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "3:4",
+      "best_model": "stability",
+      "example_prompts": [
+        "Anime girl with blue hair in school uniform",
+        "Cyberpunk samurai character concept",
+        "Fantasy adventurer party group shot",
+        "Slice of life cafe scene illustration"
+      ],
+      "negative_prompt": "western style, realistic, 3D render, blurry, bad anatomy, extra limbs"
+    },
+    "watercolor": {
+      "name": "Watercolor Style",
+      "description": "Soft watercolor painting aesthetic",
+      "category": "creative",
+      "modifiers": "watercolor painting style, soft edges, natural color blending, artistic brushstrokes, paper texture visible, paint bleeding effects, delicate washes, traditional media feel",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "4:3",
+      "best_model": "stability",
+      "example_prompts": [
+        "Watercolor flowers bouquet on white paper",
+        "Watercolor landscape of a French village",
+        "Watercolor portrait with loose brushwork"
+      ],
+      "negative_prompt": "digital art, sharp edges, photorealistic, vector, flat colors"
+    },
+    "oil-painting": {
+      "name": "Oil Painting Style",
+      "description": "Classical oil painting technique aesthetic",
+      "category": "creative",
+      "modifiers": "oil painting style, thick brushstrokes, rich colors, canvas texture, impasto technique, classical composition, museum quality, warm palette, dramatic lighting",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "4:3",
+      "best_model": "stability",
+      "example_prompts": [
+        "Still life with fruits and wine in classical style",
+        "Impressionist garden scene with dappled light",
+        "Portrait in Rembrandt lighting style"
+      ],
+      "negative_prompt": "digital, flat, minimalist, cartoon, photographic"
+    },
+    "3d-render": {
+      "name": "3D Render",
+      "description": "Photorealistic 3D rendered scenes and objects",
+      "category": "creative",
+      "modifiers": "3D rendered scene, realistic materials, professional lighting, octane render quality, ray tracing, ambient occlusion, subsurface scattering, physically based rendering",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "dalle",
+      "example_prompts": [
+        "3D render of a cozy room interior with warm lighting",
+        "Abstract 3D shapes floating on gradient background",
+        "3D product visualization of futuristic gadget"
+      ],
+      "negative_prompt": "2D, flat, illustration, cartoon, low poly, wireframe"
+    },
+    "pixel-art": {
+      "name": "Pixel Art",
+      "description": "Retro gaming pixel art aesthetic",
+      "category": "creative",
+      "modifiers": "pixel art style, retro gaming aesthetic, limited color palette (16-32 colors), clean pixel placement, crisp edges, no anti-aliasing, 8-bit or 16-bit era feel",
+      "recommended_resolution": "1k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "stability",
+      "example_prompts": [
+        "Pixel art fantasy castle on a hill",
+        "16-bit RPG character sprite sheet",
+        "Pixel art sunset cityscape scene"
+      ],
+      "negative_prompt": "high resolution, photorealistic, smooth gradients, anti-aliased, modern"
+    },
+    "vintage": {
+      "name": "Vintage / Retro",
+      "description": "Nostalgic film photography and retro aesthetics",
+      "category": "creative",
+      "modifiers": "vintage photograph style, film grain, muted colors, nostalgic atmosphere, 1970s aesthetic, slight vignette, warm color shift, analog feel, Kodak Portra 400 look",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "3:2",
+      "best_model": "stability",
+      "example_prompts": [
+        "Vintage cafe interior with film grain",
+        "1970s road trip van on desert highway",
+        "Polaroid style beach scene at sunset"
+      ],
+      "negative_prompt": "modern, digital, sharp, clean, HDR, oversaturated"
+    },
+    "minimalist": {
+      "name": "Minimalist Design",
+      "description": "Clean, minimal compositions with negative space",
+      "category": "design",
+      "modifiers": "minimalist design, clean composition, generous negative space, limited color palette (2-3 colors), modern aesthetic, geometric simplicity, refined details, elegant restraint",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Single flower in a minimal vase on white",
+        "Geometric abstract shapes in earth tones",
+        "Minimal architecture with strong shadows"
+      ],
+      "negative_prompt": "busy, cluttered, detailed, complex, many colors, ornate"
+    },
+    "isometric": {
+      "name": "Isometric Illustration",
+      "description": "Isometric 3D illustrations for tech and business",
+      "category": "design",
+      "modifiers": "isometric 3D illustration, clean geometric shapes, flat shading, technical precision, 30-degree angle, consistent scale, vibrant yet professional color palette, no perspective distortion",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Isometric office workspace with desk and computer",
+        "Isometric city block with buildings and streets",
+        "Isometric data center server room"
+      ],
+      "negative_prompt": "perspective, realistic, photographic, hand-drawn, sketchy"
+    },
+    "food": {
+      "name": "Food Photography",
+      "description": "Professional food styling and photography",
+      "category": "commercial",
+      "modifiers": "professional food photography, appetizing presentation, shallow depth of field, warm lighting, overhead or 45-degree angle, styled with props, mouth-watering detail, restaurant menu quality",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Artisan pizza on wooden board overhead shot",
+        "Colorful poke bowl with chopsticks",
+        "Stack of fluffy pancakes with berries and syrup",
+        "Japanese ramen bowl with steam rising"
+      ],
+      "negative_prompt": "unappetizing, cold lighting, messy, dirty dishes, low quality"
+    },
+    "architecture": {
+      "name": "Architectural Photography",
+      "description": "Clean architectural and interior photography",
+      "category": "photography",
+      "modifiers": "architectural photography, clean lines, dramatic perspective, professional quality, wide angle, straight verticals, natural lighting, interior or exterior, modern design magazine quality",
+      "recommended_resolution": "4k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Modern glass building reflecting sunset",
+        "Minimalist white interior with natural light",
+        "Spiral staircase from above with geometric pattern"
+      ],
+      "negative_prompt": "distorted, tilted, blurry, HDR overdone, people"
+    },
+    "fashion": {
+      "name": "Fashion Photography",
+      "description": "High fashion editorial and lookbook style",
+      "category": "commercial",
+      "modifiers": "high fashion photography, editorial style, dramatic lighting, professional model pose, studio or location, Vogue quality, bold styling, strong composition, designer aesthetic",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "3:4",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Fashion editorial with geometric shadows",
+        "Street style photography in urban setting",
+        "Luxury accessories flat lay on marble"
+      ],
+      "negative_prompt": "amateur, snapshot, casual, unflattering angles, poor lighting"
+    },
+    "flat-lay": {
+      "name": "Flat Lay",
+      "description": "Overhead flat lay compositions for social media and e-commerce",
+      "category": "commercial",
+      "modifiers": "professional flat lay photography, overhead bird's eye view, organized composition, complementary props, soft even lighting, clean background, styled arrangement, Instagram-worthy",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Travel essentials flat lay with passport and camera",
+        "Desk accessories flat lay on white marble",
+        "Skincare routine flat lay with plants"
+      ],
+      "negative_prompt": "angled, perspective, 3D, messy, cluttered, dark"
+    },
+    "texture": {
+      "name": "Texture / Pattern",
+      "description": "Seamless textures and patterns for design use",
+      "category": "design",
+      "modifiers": "seamless tileable texture, high resolution, consistent lighting, no visible seams, photographic quality, even distribution, suitable for 3D material or background use",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "stability",
+      "example_prompts": [
+        "Seamless white marble texture with gold veins",
+        "Weathered wood planks texture seamless",
+        "Abstract geometric pattern in navy and gold"
+      ],
+      "negative_prompt": "objects, scenes, people, uneven, non-tileable, perspective"
+    },
+    "sticker": {
+      "name": "Sticker / Emoji Design",
+      "description": "Cute sticker and emoji designs for apps and messaging",
+      "category": "creative",
+      "modifiers": "cute sticker design, die-cut style, white border outline, kawaii aesthetic, simple clean lines, bright cheerful colors, transparent background, expressive, chibi proportions",
+      "recommended_resolution": "1k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "gemini",
+      "example_prompts": [
+        "Cute cat sticker with heart eyes",
+        "Happy coffee cup sticker character",
+        "Set of emoji-style weather stickers"
+      ],
+      "negative_prompt": "realistic, photographic, complex background, detailed, dark"
+    },
+    "cyberpunk": {
+      "name": "Cyberpunk / Sci-Fi",
+      "description": "Futuristic cyberpunk and science fiction aesthetics",
+      "category": "creative",
+      "modifiers": "cyberpunk aesthetic, neon lights, futuristic technology, dark moody atmosphere, rain-slicked streets, holographic elements, blade runner inspired, high contrast, electric blue and magenta color palette",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "stability",
+      "example_prompts": [
+        "Cyberpunk city street at night with neon signs",
+        "Futuristic hacker workspace with holographic screens",
+        "Sci-fi spaceship interior corridor"
+      ],
+      "negative_prompt": "daytime, natural, rural, historical, simple, minimalist"
+    },
+    "fantasy": {
+      "name": "Fantasy Art",
+      "description": "Epic fantasy illustrations and concept art",
+      "category": "creative",
+      "modifiers": "epic fantasy art, detailed environment, dramatic lighting, magical atmosphere, concept art quality, rich color palette, painterly technique, world-building detail, D&D/LOTR inspired quality",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "stability",
+      "example_prompts": [
+        "Ancient dragon perched on a crystal mountain",
+        "Enchanted forest with glowing fairy lights",
+        "Wizard tower at twilight with aurora borealis"
+      ],
+      "negative_prompt": "modern, urban, photorealistic, minimalist, cartoon, childish"
+    },
+    "children-book": {
+      "name": "Children's Book Illustration",
+      "description": "Warm, friendly illustrations suitable for children's books",
+      "category": "creative",
+      "modifiers": "children's book illustration, warm friendly style, soft colors, gentle lighting, storybook aesthetic, whimsical characters, rounded shapes, cozy atmosphere, suitable for ages 3-8",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "4:3",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Bunny family having tea in a mushroom house",
+        "Little bear exploring a magical garden",
+        "Child riding a friendly dragon through clouds"
+      ],
+      "negative_prompt": "scary, dark, violent, realistic, photographic, mature themes"
+    },
+    "technical-diagram": {
+      "name": "Technical Diagram",
+      "description": "Clean technical diagrams and system architecture visuals",
+      "category": "business",
+      "modifiers": "clean technical diagram, system architecture visualization, organized layout, clear connections and arrows, professional color coding, labeled components, white background, engineering precision",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Cloud architecture diagram with AWS-style icons",
+        "Network topology diagram with labeled nodes",
+        "Software development pipeline flowchart"
+      ],
+      "negative_prompt": "artistic, painterly, photographic, abstract, decorative"
+    },
+    "presentation-slide": {
+      "name": "Presentation Slide Background",
+      "description": "Professional backgrounds for keynote and PowerPoint slides",
+      "category": "business",
+      "modifiers": "professional presentation slide background, clean design, subtle gradient or pattern, corporate quality, large text area, non-distracting, modern aesthetic, 16:9 widescreen format",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "gemini",
+      "example_prompts": [
+        "Abstract blue gradient slide background with geometric shapes",
+        "Dark theme slide background with subtle circuit pattern",
+        "Clean white slide background with minimal accent lines"
+      ],
+      "negative_prompt": "busy, detailed, text, cluttered, portrait orientation, photos"
+    },
+    "meme": {
+      "name": "Meme Template",
+      "description": "Internet meme style images for humor and engagement",
+      "category": "creative",
+      "modifiers": "meme template style, bold visual, exaggerated expression or situation, clear composition, space for top and bottom text, relatable scenario, internet humor aesthetic",
+      "recommended_resolution": "1k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "gemini",
+      "example_prompts": [
+        "Surprised cat looking at laptop screen",
+        "Person making difficult choice between two buttons",
+        "Dog sitting at desk pretending to work"
+      ],
+      "negative_prompt": "text, words, letters, captions, watermark, high art"
+    },
+    "album-cover": {
+      "name": "Album Cover Art",
+      "description": "Music album and single cover art designs",
+      "category": "creative",
+      "modifiers": "music album cover art, artistic composition, bold visual impact, suitable for square format, genre-appropriate mood, memorable design, record label quality, strong color palette",
+      "recommended_resolution": "2k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "stability",
+      "example_prompts": [
+        "Lo-fi hip hop album cover with rainy window scene",
+        "Electronic music album with abstract neon geometry",
+        "Jazz album cover with smoky club atmosphere"
+      ],
+      "negative_prompt": "text, words, band name, song title, plain, boring"
+    },
+    "avatar": {
+      "name": "Profile Avatar",
+      "description": "Profile pictures and avatar designs for social media",
+      "category": "branding",
+      "modifiers": "profile avatar design, centered face or icon, circular crop friendly, clear at small sizes, distinctive and memorable, clean background, works at 128x128 and up",
+      "recommended_resolution": "1k",
+      "recommended_aspect_ratio": "1:1",
+      "best_model": "gemini",
+      "example_prompts": [
+        "Stylized fox avatar with geometric shapes",
+        "Professional illustrated portrait for LinkedIn",
+        "Cute animal avatar in pastel colors"
+      ],
+      "negative_prompt": "full body, landscape, wide shot, complex background, tiny details"
+    },
+    "real-estate": {
+      "name": "Real Estate Photography",
+      "description": "Professional real estate and property photography",
+      "category": "commercial",
+      "modifiers": "professional real estate photography, wide angle interior, HDR balanced exposure, bright and airy, straight verticals, welcoming atmosphere, magazine quality, natural daylight enhanced",
+      "recommended_resolution": "4k",
+      "recommended_aspect_ratio": "16:9",
+      "best_model": "dalle",
+      "example_prompts": [
+        "Modern living room with floor-to-ceiling windows",
+        "Luxury kitchen with marble island and pendant lights",
+        "Backyard patio with pool at golden hour"
+      ],
+      "negative_prompt": "dark, cluttered, messy, people, personal items, dated"
+    }
+  },
+  "template_combinations": {
+    "description": "Pre-defined template combinations for common use cases",
+    "ecommerce_bundle": ["product-photo", "product-lifestyle", "flat-lay"],
+    "branding_bundle": ["logo-design", "banner", "social-media", "avatar"],
+    "content_creator_bundle": ["social-media", "social-media-story", "meme", "sticker"],
+    "art_bundle": ["watercolor", "oil-painting", "illustration", "anime"],
+    "business_bundle": ["infographic", "technical-diagram", "presentation-slide", "banner"]
+  },
+  "global_negative_prompt": "nsfw, nude, violence, gore, offensive, copyright characters, branded logos, watermark, signature, low quality, blurry, distorted, deformed"
+}

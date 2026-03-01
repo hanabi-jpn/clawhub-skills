@@ -1,11 +1,32 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │   🍌 N A N O  B A N A N A 🍌            │
+    │         U  L  T  R  A                    │
+    │                                          │
+    │          ╭──────────╮                    │
+    │         ╱  🎨  🖼   ╲                   │
+    │        │  ┌──────┐   │                   │
+    │        │  │ ✨✨ │   │  "Imagine it.     │
+    │        │  │ ✨✨ │   │   Generate it.    │
+    │        │  └──────┘   │   Perfect it."   │
+    │         ╲  Gemini ╱                      │
+    │          ╲ DALL-E╱                       │
+    │           ╲ SD  ╱                        │
+    │            ╰───╯                         │
+    ╰──────────────────────────────────────────╯
+```
+
 # Nano Banana Ultra
+
+`🍌 Multi-Model` `🎨 30+ Templates` `📦 Batch` `🖼 Gallery` `v1.0.0`
+
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
 > Advanced AI image generation and editing with multi-model support, prompt engineering templates, batch workflows, and intelligent gallery management.
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** image-generation, ai-art, gemini, dalle, design, creative
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `image-generation` `ai-art` `gemini` `dalle` `design` `creative`
 
 ---
 

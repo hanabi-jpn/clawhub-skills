@@ -1,11 +1,31 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │   📊 A G E N T  D A S H B O A R D 📊   │
+    │                                          │
+    │   ┌──────────────────────────────┐       │
+    │   │ Health: ████████░░  82/100   │       │
+    │   │ Tasks:  47 ✓  3 ✗  2 ●      │       │
+    │   │ Cost:   $4.23 today          │       │
+    │   │ ─────────────────────────    │       │
+    │   │  📈 ╱╲  ╱╲  ╱╲              │       │
+    │   │    ╱  ╲╱  ╲╱  ╲ trend       │       │
+    │   └──────────────────────────────┘       │
+    │                                          │
+    │    "See everything. Miss nothing."       │
+    ╰──────────────────────────────────────────╯
+```
+
 # Agent Dashboard
+
+`📊 Real-Time` `💰 Cost Tracking` `🔔 Alerts` `🌐 Web Export` `v1.0.0`
+
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
 > Real-time monitoring and analytics for OpenClaw agents. Track performance, costs, task completion, and skill health with terminal and web dashboards.
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** monitoring, analytics, dashboard, performance, cost-tracking
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `monitoring` `analytics` `dashboard` `performance` `cost-tracking`
 
 ---
 

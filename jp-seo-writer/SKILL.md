@@ -1,5 +1,35 @@
 # JP SEO Writer
 
+```
+    ╔══════════════════════════════════════════════════╗
+    ║                                                  ║
+    ║            JP SEO WRITER v1.0                    ║
+    ║                                                  ║
+    ║         ┌─────────────────────┐                  ║
+    ║         │  🔍 キーワード       │                  ║
+    ║         │    ↓                │                  ║
+    ║         │  📊 共起語分析      │                  ║
+    ║         │    ↓                │                  ║
+    ║         │  📋 構成案作成      │                  ║
+    ║         │    ↓                │                  ║
+    ║         │  ✍️  記事生成        │                  ║
+    ║         │    ↓                │                  ║
+    ║         │  🏆 E-E-A-T最適化   │                  ║
+    ║         │    ↓                │                  ║
+    ║         │  📈 検索1位へ!       │                  ║
+    ║         └─────────────────────┘                  ║
+    ║                                                  ║
+    ║   ─── キーワードから1位記事を自動生成 ───        ║
+    ║                                                  ║
+    ╚══════════════════════════════════════════════════╝
+```
+
+![Version](https://img.shields.io/badge/version-1.0.0-4285F4?style=for-the-badge)
+![SEO](https://img.shields.io/badge/Google-日本語SEO最適化-4285F4?style=for-the-badge&logo=google&logoColor=white)
+![Japan](https://img.shields.io/badge/🇯🇵-Japan_First-ff0000?style=for-the-badge)
+![E-E-A-T](https://img.shields.io/badge/🏆-E--E--A--T対応-green?style=for-the-badge)
+![共起語](https://img.shields.io/badge/📊-共起語分析搭載-orange?style=for-the-badge)
+
 > 日本語SEO記事自動生成エージェント。共起語分析、構成案作成、E-E-A-T対応の高品質記事を生成。
 
 **Author:** hanabi-jpn

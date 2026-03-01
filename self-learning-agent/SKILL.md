@@ -1,11 +1,32 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │   🧠 S E L F - L E A R N I N G 🧠       │
+    │          A  G  E  N  T                   │
+    │                                          │
+    │            ┌─────────┐                   │
+    │            │  📚  📚 │   "I remember     │
+    │            │    💡   │    everything."   │
+    │            │  ╰───╯  │                   │
+    │            └────┬────┘                   │
+    │         ┌───────┼───────┐                │
+    │         ▼       ▼       ▼                │
+    │       [PJ-A] [PJ-B]  [PJ-C]             │
+    │         └───────┼───────┘                │
+    │              🌐 GLOBAL                   │
+    ╰──────────────────────────────────────────╯
+```
+
 # Self-Learning Agent
+
+`🧠 Cross-Project` `⚡ Auto-Capture` `📊 Analytics` `🗜 Compressed` `v1.0.0`
+
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
 > Cross-project learning engine with automatic failure capture, intelligent knowledge promotion, and context-aware memory compression.
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** ai, learning, memory, cross-project, self-improvement
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `ai` `learning` `memory` `cross-project` `self-improvement`
 
 ---
 

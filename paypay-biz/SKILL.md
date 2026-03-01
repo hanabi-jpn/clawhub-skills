@@ -1,5 +1,34 @@
 # PayPay Biz
 
+```
+    ╔══════════════════════════════════════════════════╗
+    ║                                                  ║
+    ║         ┌─────────────────────┐                  ║
+    ║         │   ╔═══════════╗     │                  ║
+    ║         │   ║  PayPay   ║     │                  ║
+    ║         │   ║  ┌─────┐  ║     │                  ║
+    ║         │   ║  │ $$$ │  ║     │                  ║
+    ║         │   ║  │ QR  │  ║     │                  ║
+    ║         │   ║  └─────┘  ║     │                  ║
+    ║         │   ╚═══════════╝     │                  ║
+    ║         │                     │                  ║
+    ║         │  💰 決済管理        │                  ║
+    ║         │  🔄 返金処理        │                  ║
+    ║         │  📊 売上分析        │                  ║
+    ║         │  📱 QR生成          │                  ║
+    ║         └─────────────────────┘                  ║
+    ║                                                  ║
+    ║      P A Y P A Y   B I Z   v1.0                 ║
+    ║      ─── 6500万ユーザーの決済基盤 ───            ║
+    ║                                                  ║
+    ╚══════════════════════════════════════════════════╝
+```
+
+![Version](https://img.shields.io/badge/version-1.0.0-FF0033?style=for-the-badge)
+![PayPay](https://img.shields.io/badge/PayPay-Business_API-FF0033?style=for-the-badge)
+![Japan](https://img.shields.io/badge/🇯🇵-Japan_First-ff0000?style=for-the-badge)
+![Users](https://img.shields.io/badge/65M+-ユーザー対応-FF0033?style=for-the-badge)
+
 > PayPay決済連携・売上分析エージェント。決済状況確認、返金処理、売上分析をAIで管理。
 
 **Author:** hanabi-jpn

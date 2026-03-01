@@ -1,11 +1,32 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │   🛡  S K I L L  G U A R D I A N  🛡    │
+    │                                          │
+    │            ┌─────────┐                   │
+    │            │  ◈   ◈  │                   │
+    │            │   ━━━   │  "No malware      │
+    │            │  ╰═══╯  │   shall pass."    │
+    │            └────┬────┘                   │
+    │         ╱───────┼───────╲                │
+    │        🔍      🔒      ⚠                │
+    │      SCAN    BLOCK    ALERT              │
+    │                                          │
+    │   [L1]─[L2]─[L3]─[L4]─[L5]             │
+    │    Static Deps Behav Repute Semantic     │
+    ╰──────────────────────────────────────────╯
+```
+
 # Skill Guardian
+
+`🛡 5-Layer Scan` `🔍 ClawHavoc DB` `⚠ Auto-Block` `📋 Audit` `v1.0.0`
+
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
 > AI-powered security scanner for OpenClaw skills. Detects malicious code, supply chain attacks, data exfiltration, and C2 backdoors. Protect your agent before installing any skill.
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** security, scanner, malware, protection, audit, clawhavoc
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `security` `scanner` `malware` `protection` `audit` `clawhavoc`
 
 ---
 

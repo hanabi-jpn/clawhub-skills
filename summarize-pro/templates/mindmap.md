@@ -1,0 +1,173 @@
+# Mind Map: {{title}}
+
+**Source:** {{source}}
+**Date:** {{date}}
+**Depth:** {{depth_level}}
+**Language:** {{language}}
+
+---
+
+## Visual Structure
+
+```
+{{central_topic}}
+│
+├── {{branch_1_label}}
+│   ├── {{branch_1_detail_a}}
+│   │   ├── {{branch_1_detail_a_sub_1}}
+│   │   └── {{branch_1_detail_a_sub_2}}
+│   ├── {{branch_1_detail_b}}
+│   │   └── {{branch_1_detail_b_sub_1}}
+│   └── {{branch_1_detail_c}}
+│
+├── {{branch_2_label}}
+│   ├── {{branch_2_detail_a}}
+│   │   ├── {{branch_2_detail_a_sub_1}}
+│   │   └── {{branch_2_detail_a_sub_2}}
+│   ├── {{branch_2_detail_b}}
+│   └── {{branch_2_detail_c}}
+│       └── {{branch_2_detail_c_sub_1}}
+│
+├── {{branch_3_label}}
+│   ├── {{branch_3_detail_a}}
+│   ├── {{branch_3_detail_b}}
+│   │   ├── {{branch_3_detail_b_sub_1}}
+│   │   ├── {{branch_3_detail_b_sub_2}}
+│   │   └── {{branch_3_detail_b_sub_3}}
+│   └── {{branch_3_detail_c}}
+│
+├── {{branch_4_label}}
+│   ├── {{branch_4_detail_a}}
+│   │   └── {{branch_4_detail_a_sub_1}}
+│   ├── {{branch_4_detail_b}}
+│   └── {{branch_4_detail_c}}
+│
+└── {{branch_5_label}}
+    ├── {{branch_5_detail_a}}
+    ├── {{branch_5_detail_b}}
+    └── {{branch_5_detail_c}}
+        ├── {{branch_5_detail_c_sub_1}}
+        └── {{branch_5_detail_c_sub_2}}
+```
+
+---
+
+## Branch Details
+
+### {{branch_1_label}}
+
+{{branch_1_summary}}
+
+| Node | Description | Importance |
+|------|-------------|------------|
+| {{branch_1_detail_a}} | {{branch_1_detail_a_desc}} | {{branch_1_detail_a_importance}} |
+| {{branch_1_detail_b}} | {{branch_1_detail_b_desc}} | {{branch_1_detail_b_importance}} |
+| {{branch_1_detail_c}} | {{branch_1_detail_c_desc}} | {{branch_1_detail_c_importance}} |
+
+### {{branch_2_label}}
+
+{{branch_2_summary}}
+
+| Node | Description | Importance |
+|------|-------------|------------|
+| {{branch_2_detail_a}} | {{branch_2_detail_a_desc}} | {{branch_2_detail_a_importance}} |
+| {{branch_2_detail_b}} | {{branch_2_detail_b_desc}} | {{branch_2_detail_b_importance}} |
+| {{branch_2_detail_c}} | {{branch_2_detail_c_desc}} | {{branch_2_detail_c_importance}} |
+
+### {{branch_3_label}}
+
+{{branch_3_summary}}
+
+| Node | Description | Importance |
+|------|-------------|------------|
+| {{branch_3_detail_a}} | {{branch_3_detail_a_desc}} | {{branch_3_detail_a_importance}} |
+| {{branch_3_detail_b}} | {{branch_3_detail_b_desc}} | {{branch_3_detail_b_importance}} |
+| {{branch_3_detail_c}} | {{branch_3_detail_c_desc}} | {{branch_3_detail_c_importance}} |
+
+### {{branch_4_label}}
+
+{{branch_4_summary}}
+
+| Node | Description | Importance |
+|------|-------------|------------|
+| {{branch_4_detail_a}} | {{branch_4_detail_a_desc}} | {{branch_4_detail_a_importance}} |
+| {{branch_4_detail_b}} | {{branch_4_detail_b_desc}} | {{branch_4_detail_b_importance}} |
+| {{branch_4_detail_c}} | {{branch_4_detail_c_desc}} | {{branch_4_detail_c_importance}} |
+
+### {{branch_5_label}}
+
+{{branch_5_summary}}
+
+| Node | Description | Importance |
+|------|-------------|------------|
+| {{branch_5_detail_a}} | {{branch_5_detail_a_desc}} | {{branch_5_detail_a_importance}} |
+| {{branch_5_detail_b}} | {{branch_5_detail_b_desc}} | {{branch_5_detail_b_importance}} |
+| {{branch_5_detail_c}} | {{branch_5_detail_c_desc}} | {{branch_5_detail_c_importance}} |
+
+---
+
+## Cross-Branch Connections
+
+{{#connections}}
+- **{{connection_from}}** <-> **{{connection_to}}**: {{connection_description}}
+{{/connections}}
+
+---
+
+## Key Entities Extracted
+
+| Entity | Type | Branch | Frequency |
+|--------|------|--------|-----------|
+{{#entities}}
+| {{entity_name}} | {{entity_type}} | {{entity_branch}} | {{entity_frequency}} |
+{{/entities}}
+
+---
+
+## Statistics
+
+| Metric | Value |
+|--------|-------|
+| Total Branches | {{total_branches}} |
+| Total Nodes | {{total_nodes}} |
+| Max Depth | {{max_depth}} levels |
+| Key Entities | {{entity_count}} |
+| Cross-Connections | {{connection_count}} |
+| Source Word Count | {{source_word_count}} |
+| Compression Ratio | {{compression_ratio}} |
+
+---
+
+## Mermaid Export
+
+```mermaid
+mindmap
+  root(({{central_topic}}))
+    {{branch_1_label}}
+      {{branch_1_detail_a}}
+        {{branch_1_detail_a_sub_1}}
+        {{branch_1_detail_a_sub_2}}
+      {{branch_1_detail_b}}
+      {{branch_1_detail_c}}
+    {{branch_2_label}}
+      {{branch_2_detail_a}}
+      {{branch_2_detail_b}}
+      {{branch_2_detail_c}}
+    {{branch_3_label}}
+      {{branch_3_detail_a}}
+      {{branch_3_detail_b}}
+      {{branch_3_detail_c}}
+    {{branch_4_label}}
+      {{branch_4_detail_a}}
+      {{branch_4_detail_b}}
+      {{branch_4_detail_c}}
+    {{branch_5_label}}
+      {{branch_5_detail_a}}
+      {{branch_5_detail_b}}
+      {{branch_5_detail_c}}
+```
+
+---
+
+*Generated by Summarize Pro v1.0.0 | Mode: mindmap | Depth: {{depth_level}} | Language: {{language}}*
+*Source: {{source}} | Processed: {{process_timestamp}} | Cache: {{cache_hash}}*

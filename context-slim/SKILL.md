@@ -1,11 +1,32 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │   🗜  C O N T E X T  S L I M  🗜        │
+    │                                          │
+    │   BEFORE:                                │
+    │   ████████████████████████░░ 92% FULL!   │
+    │                                          │
+    │            ╔═══════╗                     │
+    │     ──────▶║ SLIM  ║──────▶              │
+    │            ╚═══════╝                     │
+    │                                          │
+    │   AFTER:                                 │
+    │   ████████░░░░░░░░░░░░░░░░ 34% FREE!    │
+    │                                          │
+    │    "Save 40-70% of your context."        │
+    ╰──────────────────────────────────────────╯
+```
+
 # Context Slim
+
+`🗜 -70% Tokens` `📊 Dashboard` `🔍 Dedup` `⚡ Auto-Compress` `v1.0.0`
+
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
 > Intelligent context window optimizer. Compresses, prioritizes, and manages context to prevent overflow while preserving critical information. Save 40-70% of your context budget.
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** context, optimization, memory, compression, performance, tokens
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `context` `optimization` `memory` `compression` `performance` `tokens`
 
 ---
 

@@ -1,11 +1,30 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │    📝 S U M M A R I Z E  P R O 📝       │
+    │                                          │
+    │          📄📄📄📄📄                     │
+    │           ╲  ╲ │ ╱  ╱                    │
+    │            ╲  ╲│╱  ╱                     │
+    │             ▼  ▼  ▼                      │
+    │          ┌──────────┐                    │
+    │          │  ✨TL;DR │  "7 modes.         │
+    │          │  ══════  │   8 languages.     │
+    │          │  ▪ ▪ ▪   │   Zero fluff."     │
+    │          └──────────┘                    │
+    ╰──────────────────────────────────────────╯
+```
+
 # Summarize Pro
+
+`📝 7 Modes` `🌍 8 Languages` `🔗 Chain-of-Density` `💾 Cached` `v1.0.0`
+
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
 > Advanced multi-format summarization with 7 output modes, multi-language support, chain-of-density compression, and intelligent caching.
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** summarization, productivity, multi-language, content, documents
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `summarization` `productivity` `multi-language` `content` `documents`
 
 ---
 

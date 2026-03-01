@@ -1,0 +1,329 @@
+{
+  "version": "1.0.0",
+  "description": "Pre-defined team templates for common organizational structures. Each template defines roles, their configurations, and interaction patterns.",
+  "templates": {
+    "startup": {
+      "name": "Startup Team",
+      "description": "A lean, full-stack team for early-stage projects. All members wear multiple hats. Speed and iteration over process and documentation.",
+      "ideal_for": ["MVPs", "proof of concepts", "hackathons", "solo founder projects"],
+      "team_size": 5,
+      "roles": [
+        {
+          "role": "ceo",
+          "title": "Founder / CEO",
+          "model": "claude-opus-4-6",
+          "temperature": 0.3,
+          "responsibilities": ["Vision", "Strategy", "Fundraising", "Key decisions"],
+          "additional_hats": ["Product Manager", "Sales Lead"],
+          "priority": 1
+        },
+        {
+          "role": "cto",
+          "title": "Technical Co-founder / CTO",
+          "model": "claude-opus-4-6",
+          "temperature": 0.2,
+          "responsibilities": ["Architecture", "Tech stack", "Hands-on coding", "DevOps"],
+          "additional_hats": ["Lead Developer", "Security"],
+          "priority": 2
+        },
+        {
+          "role": "developer",
+          "title": "Full-Stack Developer",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.1,
+          "responsibilities": ["Feature development", "Testing", "Bug fixes"],
+          "additional_hats": ["QA"],
+          "count": 2,
+          "priority": 3
+        },
+        {
+          "role": "designer",
+          "title": "Product Designer",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.5,
+          "responsibilities": ["UX/UI", "User research", "Brand"],
+          "additional_hats": ["Content Writer", "Marketing Design"],
+          "priority": 3
+        }
+      ],
+      "workflow": {
+        "cadence": "daily standups, weekly reviews",
+        "decision_speed": "fast (< 24 hours for most decisions)",
+        "communication": "direct, informal, async-first",
+        "documentation": "minimal - README, API docs, decision log only"
+      },
+      "budget_profile": {
+        "model_mix": "60% gemini-2.5-pro, 30% claude-opus-4-6, 10% gemini-2.5-flash",
+        "estimated_monthly_cost": "$150-250"
+      }
+    },
+    "dev-team": {
+      "name": "Development Team",
+      "description": "A structured engineering team for building and maintaining software products. Emphasis on code quality, testing, and reliable delivery.",
+      "ideal_for": ["Software products", "Platform development", "API services", "Mobile apps"],
+      "team_size": 8,
+      "roles": [
+        {
+          "role": "cto",
+          "title": "Tech Lead",
+          "model": "claude-opus-4-6",
+          "temperature": 0.2,
+          "responsibilities": ["Architecture", "Code review", "Technical decisions", "Sprint planning"],
+          "priority": 1
+        },
+        {
+          "role": "developer",
+          "title": "Senior Backend Developer",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.1,
+          "responsibilities": ["API development", "Database design", "Performance optimization"],
+          "specialization": "backend",
+          "count": 2,
+          "priority": 2
+        },
+        {
+          "role": "developer",
+          "title": "Senior Frontend Developer",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.1,
+          "responsibilities": ["UI implementation", "State management", "Responsive design"],
+          "specialization": "frontend",
+          "count": 2,
+          "priority": 2
+        },
+        {
+          "role": "developer",
+          "title": "DevOps Engineer",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.1,
+          "responsibilities": ["CI/CD", "Infrastructure", "Monitoring", "Deployment"],
+          "specialization": "devops",
+          "priority": 2
+        },
+        {
+          "role": "designer",
+          "title": "UX/UI Designer",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.5,
+          "responsibilities": ["Wireframes", "Visual design", "Design system", "Accessibility"],
+          "priority": 3
+        },
+        {
+          "role": "researcher",
+          "title": "QA / Test Engineer",
+          "model": "gemini-2.5-flash",
+          "temperature": 0.1,
+          "responsibilities": ["Test strategy", "Test automation", "Bug triage", "Quality metrics"],
+          "specialization": "qa",
+          "priority": 3
+        }
+      ],
+      "workflow": {
+        "cadence": "2-week sprints, daily standups, sprint review + retro",
+        "decision_speed": "moderate (architectural decisions need 1-3 days)",
+        "communication": "structured - PRs, issue tracker, design docs",
+        "documentation": "comprehensive - ADRs, API docs, runbooks, design specs"
+      },
+      "budget_profile": {
+        "model_mix": "70% gemini-2.5-pro, 15% claude-opus-4-6, 15% gemini-2.5-flash",
+        "estimated_monthly_cost": "$200-350"
+      }
+    },
+    "content": {
+      "name": "Content Team",
+      "description": "A team focused on content creation, marketing, and brand building. Combines research, writing, design, and strategy.",
+      "ideal_for": ["Content marketing", "Blog management", "Social media", "Brand campaigns", "SEO"],
+      "team_size": 6,
+      "roles": [
+        {
+          "role": "ceo",
+          "title": "Content Director",
+          "model": "claude-opus-4-6",
+          "temperature": 0.4,
+          "responsibilities": ["Content strategy", "Editorial calendar", "Brand voice", "Performance KPIs"],
+          "priority": 1
+        },
+        {
+          "role": "researcher",
+          "title": "SEO & Market Researcher",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.3,
+          "responsibilities": ["Keyword research", "Competitor content analysis", "Trend identification", "Audience insights"],
+          "specialization": "seo",
+          "priority": 2
+        },
+        {
+          "role": "developer",
+          "title": "Content Writer (Long-form)",
+          "model": "claude-opus-4-6",
+          "temperature": 0.6,
+          "responsibilities": ["Blog posts", "White papers", "Case studies", "Landing pages"],
+          "specialization": "writing",
+          "count": 2,
+          "priority": 2
+        },
+        {
+          "role": "developer",
+          "title": "Social Media & Copy Writer",
+          "model": "gemini-2.5-flash",
+          "temperature": 0.7,
+          "responsibilities": ["Social posts", "Ad copy", "Email campaigns", "Headlines"],
+          "specialization": "copywriting",
+          "priority": 3
+        },
+        {
+          "role": "designer",
+          "title": "Visual Content Designer",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.5,
+          "responsibilities": ["Social graphics", "Infographics", "Brand assets", "Video thumbnails"],
+          "priority": 3
+        }
+      ],
+      "workflow": {
+        "cadence": "weekly editorial meetings, monthly content reviews",
+        "decision_speed": "fast for daily content, weekly for campaigns",
+        "communication": "brief-based, editorial calendar driven",
+        "documentation": "style guide, brand book, content templates"
+      },
+      "budget_profile": {
+        "model_mix": "40% gemini-2.5-pro, 30% claude-opus-4-6, 30% gemini-2.5-flash",
+        "estimated_monthly_cost": "$100-200"
+      }
+    },
+    "research": {
+      "name": "Research Team",
+      "description": "A team focused on deep research, analysis, and knowledge synthesis. Produces reports, competitive intelligence, and strategic recommendations.",
+      "ideal_for": ["Market analysis", "Technical evaluation", "Due diligence", "Strategic planning", "Academic research"],
+      "team_size": 5,
+      "roles": [
+        {
+          "role": "ceo",
+          "title": "Research Director",
+          "model": "claude-opus-4-6",
+          "temperature": 0.3,
+          "responsibilities": ["Research agenda", "Quality review", "Synthesis", "Strategic recommendations"],
+          "priority": 1
+        },
+        {
+          "role": "researcher",
+          "title": "Senior Analyst (Market)",
+          "model": "claude-opus-4-6",
+          "temperature": 0.3,
+          "responsibilities": ["Market sizing", "Competitive landscape", "Trend analysis", "Opportunity mapping"],
+          "specialization": "market",
+          "priority": 2
+        },
+        {
+          "role": "researcher",
+          "title": "Senior Analyst (Technical)",
+          "model": "claude-opus-4-6",
+          "temperature": 0.2,
+          "responsibilities": ["Technology evaluation", "Architecture review", "Feasibility assessment", "Benchmarking"],
+          "specialization": "technical",
+          "priority": 2
+        },
+        {
+          "role": "researcher",
+          "title": "Data Analyst",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.1,
+          "responsibilities": ["Data collection", "Statistical analysis", "Visualization", "Pattern detection"],
+          "specialization": "data",
+          "priority": 3
+        },
+        {
+          "role": "researcher",
+          "title": "Research Associate",
+          "model": "gemini-2.5-flash",
+          "temperature": 0.3,
+          "responsibilities": ["Source gathering", "Fact checking", "Summary writing", "Bibliography"],
+          "specialization": "associate",
+          "priority": 3
+        }
+      ],
+      "workflow": {
+        "cadence": "weekly research reviews, bi-weekly presentations",
+        "decision_speed": "deliberate (quality over speed, 1-2 weeks per report)",
+        "communication": "structured reports, annotated bibliographies",
+        "documentation": "extensive - research logs, methodology docs, source databases"
+      },
+      "budget_profile": {
+        "model_mix": "40% claude-opus-4-6, 35% gemini-2.5-pro, 25% gemini-2.5-flash",
+        "estimated_monthly_cost": "$200-350"
+      }
+    },
+    "security": {
+      "name": "Security Team",
+      "description": "A team focused on security analysis, threat assessment, vulnerability management, and compliance. Defensive and proactive security operations.",
+      "ideal_for": ["Security audits", "Penetration testing", "Compliance", "Incident response", "Threat intelligence"],
+      "team_size": 6,
+      "roles": [
+        {
+          "role": "cto",
+          "title": "Chief Security Officer (CSO)",
+          "model": "claude-opus-4-6",
+          "temperature": 0.2,
+          "responsibilities": ["Security strategy", "Risk assessment", "Policy definition", "Incident escalation"],
+          "priority": 1
+        },
+        {
+          "role": "researcher",
+          "title": "Threat Intelligence Analyst",
+          "model": "claude-opus-4-6",
+          "temperature": 0.2,
+          "responsibilities": ["Threat monitoring", "Attack pattern analysis", "IOC tracking", "MITRE ATT&CK mapping"],
+          "specialization": "threat-intel",
+          "priority": 2
+        },
+        {
+          "role": "developer",
+          "title": "Security Engineer",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.1,
+          "responsibilities": ["Security tooling", "Vulnerability scanning", "Patch management", "Security automation"],
+          "specialization": "security-engineering",
+          "count": 2,
+          "priority": 2
+        },
+        {
+          "role": "researcher",
+          "title": "Compliance Analyst",
+          "model": "gemini-2.5-pro",
+          "temperature": 0.2,
+          "responsibilities": ["Regulatory compliance", "Policy documentation", "Audit preparation", "Risk register"],
+          "specialization": "compliance",
+          "priority": 3
+        },
+        {
+          "role": "developer",
+          "title": "Incident Responder",
+          "model": "gemini-2.5-flash",
+          "temperature": 0.1,
+          "responsibilities": ["Incident triage", "Log analysis", "Forensics support", "Runbook execution"],
+          "specialization": "incident-response",
+          "priority": 2
+        }
+      ],
+      "workflow": {
+        "cadence": "daily threat briefings, weekly security reviews, monthly audits",
+        "decision_speed": "immediate for incidents, measured for policy changes",
+        "communication": "structured alerts, severity-based escalation",
+        "documentation": "incident reports, audit logs, policy documents, threat models"
+      },
+      "budget_profile": {
+        "model_mix": "35% claude-opus-4-6, 40% gemini-2.5-pro, 25% gemini-2.5-flash",
+        "estimated_monthly_cost": "$250-400"
+      }
+    }
+  },
+  "common_settings": {
+    "max_context_per_agent": 100000,
+    "communication_protocol": "BT-PROTO",
+    "escalation_timeout_minutes": 30,
+    "meeting_format": "structured_agenda",
+    "decision_log": true,
+    "knowledge_sharing": true,
+    "retrospective_cadence": "bi-weekly"
+  }
+}

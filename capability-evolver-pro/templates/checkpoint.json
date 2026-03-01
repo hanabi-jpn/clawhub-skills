@@ -1,0 +1,146 @@
+{
+  "$comment": "Example checkpoint format for Capability Evolver Pro. This file shows the structure of a state snapshot created before each evolution.",
+  "checkpoint_id": "chk-20260301-143022",
+  "timestamp": "2026-03-01T14:30:22Z",
+  "version": "1.0.0",
+  "tier": "conservative",
+  "trigger": {
+    "type": "pre-evolution",
+    "strategy": "optimize",
+    "evolution_id": "evo-20260301-143022"
+  },
+  "health_score": {
+    "overall": 82,
+    "components": {
+      "error_rate": {
+        "weight": 0.3,
+        "score": 85,
+        "raw_value": 0.03,
+        "detail": "3 errors in 100 operations"
+      },
+      "task_completion": {
+        "weight": 0.3,
+        "score": 88,
+        "raw_value": 0.88,
+        "detail": "88 of 100 tasks completed successfully"
+      },
+      "response_quality": {
+        "weight": 0.2,
+        "score": 75,
+        "raw_value": 0.75,
+        "detail": "6 corrections in 24 interactions"
+      },
+      "efficiency": {
+        "weight": 0.2,
+        "score": 72,
+        "raw_value": 1850,
+        "detail": "1850 avg tokens per task"
+      }
+    }
+  },
+  "state_snapshot": {
+    "memory_files": [
+      {
+        "path": ".evolver-pro/memory/patterns.json",
+        "sha256": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+        "size_bytes": 4096,
+        "content_backup": true
+      },
+      {
+        "path": ".evolver-pro/memory/blocklist.json",
+        "sha256": "f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5d4c3b2a1f6e5",
+        "size_bytes": 512,
+        "content_backup": true
+      }
+    ],
+    "config": {
+      "path": ".evolver-pro/config.json",
+      "sha256": "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+      "content": {
+        "tier": "conservative",
+        "max_evolutions_per_hour": 5,
+        "auto_rollback_threshold": 10,
+        "health_floor": 50,
+        "strategies_enabled": ["repair", "optimize", "innovate", "harden"],
+        "sandbox_cleanup": true,
+        "continuous_max_cycles": 5,
+        "continuous_interval_minutes": 30
+      }
+    },
+    "evolution_log_tail": [
+      {
+        "id": "evo-20260228-091500",
+        "timestamp": "2026-02-28T09:15:00Z",
+        "strategy": "repair",
+        "result": "applied",
+        "health_before": 78,
+        "health_after": 82,
+        "changes_summary": "Fixed recurring TypeError in config parser by adding null check"
+      },
+      {
+        "id": "evo-20260228-140000",
+        "timestamp": "2026-02-28T14:00:00Z",
+        "strategy": "optimize",
+        "result": "skipped",
+        "health_before": 82,
+        "health_after": 82,
+        "changes_summary": "Proposed prompt compression did not improve efficiency metrics"
+      },
+      {
+        "id": "evo-20260228-183000",
+        "timestamp": "2026-02-28T18:30:00Z",
+        "strategy": "optimize",
+        "result": "applied",
+        "health_before": 82,
+        "health_after": 84,
+        "changes_summary": "Reduced context loading from 3 files to 1 merged file"
+      },
+      {
+        "id": "evo-20260301-090000",
+        "timestamp": "2026-03-01T09:00:00Z",
+        "strategy": "harden",
+        "result": "applied",
+        "health_before": 84,
+        "health_after": 82,
+        "changes_summary": "Added input validation rules; minor health dip from stricter error counting"
+      },
+      {
+        "id": "evo-20260301-120000",
+        "timestamp": "2026-03-01T12:00:00Z",
+        "strategy": "innovate",
+        "result": "rolled-back",
+        "health_before": 82,
+        "health_after": 71,
+        "changes_summary": "New pattern detection caused false positives; rolled back, pattern added to blocklist"
+      }
+    ],
+    "custom_instructions_hash": "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890ab",
+    "skill_configs": [
+      {
+        "skill": "capability-evolver-pro",
+        "version": "1.0.0",
+        "config_hash": "deadbeef01234567deadbeef01234567deadbeef01234567deadbeef01234567"
+      }
+    ]
+  },
+  "metadata": {
+    "agent_id": "agent-main",
+    "session_id": "session-20260301-1400",
+    "checkpoint_size_bytes": 12288,
+    "creation_duration_ms": 45,
+    "parent_checkpoint_id": "chk-20260301-120000",
+    "total_checkpoints": 23,
+    "disk_usage_bytes": 282624
+  },
+  "rollback_instructions": {
+    "description": "To restore this checkpoint, replace all files listed in state_snapshot.memory_files with their backed-up content, restore config, and reset evolution-log to evolution_log_tail.",
+    "steps": [
+      "Stop any running evolution processes",
+      "Copy checkpoint memory files back to their original paths",
+      "Restore config.json from checkpoint",
+      "Truncate evolution-log.jsonl to checkpoint point",
+      "Recalculate health score",
+      "Log rollback event"
+    ]
+  }
+}

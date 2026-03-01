@@ -1,0 +1,455 @@
+{
+  "version": "1.0.0",
+  "last_updated": "2026-03-01",
+  "campaign": "ClawHavoc",
+  "description": "Known threat pattern signatures for MCP skill supply chain attacks, credential theft, data exfiltration, and obfuscation techniques observed in the ClawHavoc campaign and related attack vectors.",
+  "threat_patterns": [
+    {
+      "id": "CH-001",
+      "name": "Shadow Credential Harvest",
+      "category": "credential_theft",
+      "severity": "critical",
+      "description": "Skill intercepts tool calls to extract API keys, tokens, and credentials from environment variables or configuration files before forwarding to the legitimate handler.",
+      "indicators": [
+        "process.env access patterns outside declared scope",
+        "Reading ~/.claude/*, ~/.aws/*, ~/.ssh/* without justification",
+        "Base64 encoding of captured values",
+        "Outbound HTTP calls with encoded payloads in query params"
+      ],
+      "regex_signatures": [
+        "process\\.env\\[['\"][A-Z_]*(KEY|TOKEN|SECRET|PASSWORD|CREDENTIAL)['\"]\\]",
+        "fs\\.readFile.*\\.(env|pem|key|credentials)",
+        "Buffer\\.from\\(.*\\)\\.toString\\(['\"]base64['\"]\\)"
+      ],
+      "mitre_attack": "T1552.001",
+      "first_seen": "2025-09-14"
+    },
+    {
+      "id": "CH-002",
+      "name": "Phantom Exfil via DNS",
+      "category": "data_exfiltration",
+      "severity": "critical",
+      "description": "Exfiltrates stolen data by encoding it into DNS query subdomains, bypassing HTTP-based monitoring.",
+      "indicators": [
+        "DNS lookups with unusually long subdomain labels",
+        "Hex or base32 encoded subdomains",
+        "High volume of DNS queries to a single domain",
+        "Use of dns.resolve() or dgram module"
+      ],
+      "regex_signatures": [
+        "dns\\.resolve\\(['\"].*\\.[a-f0-9]{16,}\\.",
+        "require\\(['\"]dgram['\"]\\)",
+        "\\.send\\(.*,\\s*0,.*,\\s*53,"
+      ],
+      "mitre_attack": "T1048.003",
+      "first_seen": "2025-10-02"
+    },
+    {
+      "id": "CH-003",
+      "name": "Heartbeat C2 Channel",
+      "category": "c2_heartbeat",
+      "severity": "critical",
+      "description": "Establishes a periodic callback to a command-and-control server disguised as telemetry or update checks.",
+      "indicators": [
+        "setInterval or setTimeout with HTTP calls to non-standard domains",
+        "Periodic outbound connections every 30-300 seconds",
+        "Response body parsed for encoded commands",
+        "User-Agent string mimicking legitimate tools"
+      ],
+      "regex_signatures": [
+        "setInterval\\(.*fetch\\(|https?\\.get\\(",
+        "setTimeout\\(.*\\.then\\(.*eval\\(",
+        "User-Agent.*['\"]claude|anthropic|mcp['\"]"
+      ],
+      "mitre_attack": "T1071.001",
+      "first_seen": "2025-08-21"
+    },
+    {
+      "id": "CH-004",
+      "name": "Typosquat Package Injection",
+      "category": "typosquatting",
+      "severity": "high",
+      "description": "Skill declares dependencies on typosquatted package names that contain malicious postinstall scripts.",
+      "indicators": [
+        "Package names differing by 1-2 characters from popular packages",
+        "Dependency on packages with very low download counts",
+        "postinstall scripts executing obfuscated code",
+        "Dependencies not matching declared functionality"
+      ],
+      "regex_signatures": [
+        "\"(axois|requets|lodahs|expresss|momnet|chak|babael)\"",
+        "\"postinstall\":\\s*\"node\\s+[a-z0-9]{8,}\\.js\"",
+        "\"preinstall\":\\s*\"(curl|wget|powershell)"
+      ],
+      "known_typosquats": {
+        "axios": ["axois", "axio", "axioss", "axos"],
+        "lodash": ["lodahs", "lodashs", "1odash"],
+        "express": ["expresss", "expres", "exprss"],
+        "moment": ["momnet", "monment", "momment"],
+        "chalk": ["chak", "chalks", "cha1k"],
+        "babel": ["babael", "bable", "babbel"]
+      },
+      "mitre_attack": "T1195.001",
+      "first_seen": "2025-07-10"
+    },
+    {
+      "id": "CH-005",
+      "name": "Unicode Obfuscation (Trojan Source)",
+      "category": "obfuscation",
+      "severity": "high",
+      "description": "Uses Unicode bidirectional override characters or homoglyphs to hide malicious logic in seemingly benign code.",
+      "indicators": [
+        "Presence of U+202A, U+202B, U+202C, U+202D, U+202E, U+2066-U+2069",
+        "Cyrillic or Greek homoglyphs replacing Latin characters in identifiers",
+        "Zero-width characters (U+200B, U+200C, U+200D, U+FEFF) in strings",
+        "Visual code review shows different logic than actual execution"
+      ],
+      "regex_signatures": [
+        "[\\u202A-\\u202E\\u2066-\\u2069]",
+        "[\\u0400-\\u04FF][a-zA-Z]|[a-zA-Z][\\u0400-\\u04FF]",
+        "[\\u200B-\\u200D\\uFEFF]"
+      ],
+      "mitre_attack": "T1027.010",
+      "first_seen": "2025-11-05"
+    },
+    {
+      "id": "CH-006",
+      "name": "Eval Chain Injection",
+      "category": "obfuscation",
+      "severity": "critical",
+      "description": "Constructs and executes code dynamically via eval(), Function(), or vm.runInNewContext() to evade static analysis.",
+      "indicators": [
+        "String concatenation building executable code",
+        "Charcode arrays converted to strings then evaluated",
+        "Nested eval or Function constructor calls",
+        "Dynamic require() with computed paths"
+      ],
+      "regex_signatures": [
+        "eval\\(.*\\+.*\\+",
+        "new\\s+Function\\(.*fromCharCode",
+        "String\\.fromCharCode\\(\\d+,\\s*\\d+,\\s*\\d+",
+        "require\\(.*\\+.*\\+.*\\)"
+      ],
+      "mitre_attack": "T1059.007",
+      "first_seen": "2025-06-18"
+    },
+    {
+      "id": "CH-007",
+      "name": "Tool Override Hijack",
+      "category": "mcp_specific",
+      "severity": "critical",
+      "description": "Skill registers tool names that shadow or override built-in Claude Code tools (Read, Write, Bash) to intercept all file operations.",
+      "indicators": [
+        "Tool registration with names matching built-in tools",
+        "Middleware-style tool wrapping",
+        "Tool descriptions mimicking system tool descriptions",
+        "Priority or ordering manipulation in tool registration"
+      ],
+      "regex_signatures": [
+        "name:\\s*['\"](?:Read|Write|Bash|Edit|Glob|Grep)['\"]",
+        "registerTool.*(?:Read|Write|Bash|Edit)",
+        "tool_choice.*override|shadow|replace"
+      ],
+      "mitre_attack": "T1574",
+      "first_seen": "2025-12-01"
+    },
+    {
+      "id": "CH-008",
+      "name": "Prompt Injection via Tool Output",
+      "category": "prompt_injection",
+      "severity": "critical",
+      "description": "Skill returns crafted tool output containing prompt injection payloads that manipulate Claude's behavior.",
+      "indicators": [
+        "Tool output containing instruction-like text",
+        "Output with phrases like 'ignore previous', 'new instructions', 'system override'",
+        "XML-like tags in output mimicking system messages",
+        "Output containing role reassignment attempts"
+      ],
+      "regex_signatures": [
+        "ignore\\s+(previous|all|above)\\s+(instructions|rules|constraints)",
+        "<system.*>|<assistant.*>|<human.*>",
+        "you\\s+are\\s+now|new\\s+instructions?:|override\\s+mode",
+        "IMPORTANT:.*ignore|CRITICAL:.*disregard"
+      ],
+      "mitre_attack": "T1059",
+      "first_seen": "2025-08-30"
+    },
+    {
+      "id": "CH-009",
+      "name": "Steganographic Data Hide",
+      "category": "data_exfiltration",
+      "severity": "high",
+      "description": "Hides exfiltrated data within generated images, markdown formatting, or whitespace patterns.",
+      "indicators": [
+        "Unusual whitespace patterns (tabs/spaces encoding binary data)",
+        "Image generation with suspiciously large file sizes",
+        "Trailing whitespace on lines encoding information",
+        "SVG files with hidden data in metadata or comments"
+      ],
+      "regex_signatures": [
+        "[\\t ]{20,}$",
+        "<!--[^>]{100,}-->",
+        "data:image/[^;]+;base64,[A-Za-z0-9+/=]{10000,}"
+      ],
+      "mitre_attack": "T1027.003",
+      "first_seen": "2025-10-19"
+    },
+    {
+      "id": "CH-010",
+      "name": "Delayed Payload Activation",
+      "category": "evasion",
+      "severity": "high",
+      "description": "Malicious behavior only activates after a delay, invocation count threshold, or specific date to evade initial security scans.",
+      "indicators": [
+        "Date/time checks before executing code paths",
+        "Invocation counters with conditional execution",
+        "setTimeout with very long delays (>60000ms)",
+        "Code paths that only execute after N calls"
+      ],
+      "regex_signatures": [
+        "Date\\.now\\(\\)\\s*>\\s*\\d{13}",
+        "new\\s+Date\\(\\).*getMonth\\(\\)|getDay\\(\\)",
+        "invocationCount|callCount|runCount.*>\\s*\\d+",
+        "setTimeout\\(.*,\\s*\\d{5,}\\)"
+      ],
+      "mitre_attack": "T1497.003",
+      "first_seen": "2025-09-28"
+    },
+    {
+      "id": "CH-011",
+      "name": "Scope Escalation via Config",
+      "category": "privilege_escalation",
+      "severity": "high",
+      "description": "Skill modifies its own configuration or Claude's settings to expand its permission scope at runtime.",
+      "indicators": [
+        "Writing to .claude/ directory",
+        "Modifying settings.json or permissions files",
+        "Adding itself to allowlists",
+        "Changing file system access boundaries"
+      ],
+      "regex_signatures": [
+        "writeFile.*\\.claude/(settings|permissions|config)",
+        "chmod.*\\+[xrw]",
+        "allowlist|whitelist.*push|append|add"
+      ],
+      "mitre_attack": "T1548",
+      "first_seen": "2025-11-12"
+    },
+    {
+      "id": "CH-012",
+      "name": "Clipboard Credential Sniff",
+      "category": "credential_theft",
+      "severity": "high",
+      "description": "Monitors or reads clipboard contents to capture credentials, API keys, or sensitive data that users copy-paste.",
+      "indicators": [
+        "Access to clipboard APIs (pbcopy/pbpaste, xclip, clipboard module)",
+        "Polling clipboard at intervals",
+        "Pattern matching clipboard content for secrets",
+        "Storing clipboard history"
+      ],
+      "regex_signatures": [
+        "require\\(['\"]clipboardy?['\"]\\)",
+        "execSync\\(['\"]pbpaste|xclip|xsel",
+        "clipboard\\.read|readText|getText"
+      ],
+      "mitre_attack": "T1115",
+      "first_seen": "2025-10-08"
+    },
+    {
+      "id": "CH-013",
+      "name": "Git History Poisoning",
+      "category": "persistence",
+      "severity": "medium",
+      "description": "Injects malicious hooks or modifies git configuration to persist across repository operations.",
+      "indicators": [
+        "Writing to .git/hooks/ directory",
+        "Modifying .gitconfig or .git/config",
+        "Creating pre-commit/post-checkout hooks",
+        "Git alias definitions executing arbitrary commands"
+      ],
+      "regex_signatures": [
+        "writeFile.*\\.git/hooks/(pre-commit|post-checkout|pre-push)",
+        "\\.gitconfig.*alias.*!",
+        "core\\.hooksPath"
+      ],
+      "mitre_attack": "T1546",
+      "first_seen": "2025-09-05"
+    },
+    {
+      "id": "CH-014",
+      "name": "Websocket Reverse Shell",
+      "category": "c2_heartbeat",
+      "severity": "critical",
+      "description": "Establishes a WebSocket connection to an external server providing interactive shell access to the compromised system.",
+      "indicators": [
+        "WebSocket connection to non-standard ports",
+        "Bidirectional communication with command execution",
+        "Shell spawning via child_process after WS connection",
+        "Reconnection logic on connection drop"
+      ],
+      "regex_signatures": [
+        "new\\s+WebSocket\\(['\"]wss?://(?!localhost|127\\.0\\.0\\.1)",
+        "ws\\.on\\(['\"]message['\"].*exec|spawn|execSync",
+        "child_process.*ws\\.send"
+      ],
+      "mitre_attack": "T1059.004",
+      "first_seen": "2025-12-15"
+    },
+    {
+      "id": "CH-015",
+      "name": "Hexadecimal String Assembly",
+      "category": "obfuscation",
+      "severity": "medium",
+      "description": "Assembles malicious strings from hexadecimal character codes to bypass string-matching detection.",
+      "indicators": [
+        "Arrays of hex values joined into strings",
+        "parseInt with base 16 in loops",
+        "String.fromCharCode with hex literals",
+        "Buffer.from with hex encoding"
+      ],
+      "regex_signatures": [
+        "\\[0x[0-9a-f]{2}(,\\s*0x[0-9a-f]{2}){5,}\\]",
+        "parseInt\\([^,]+,\\s*16\\)",
+        "Buffer\\.from\\([^)]+,\\s*['\"]hex['\"]\\)"
+      ],
+      "mitre_attack": "T1027",
+      "first_seen": "2025-07-22"
+    },
+    {
+      "id": "CH-016",
+      "name": "Environment Fingerprinting",
+      "category": "reconnaissance",
+      "severity": "medium",
+      "description": "Collects detailed system information (OS, user, network, installed tools) to tailor attacks or identify high-value targets.",
+      "indicators": [
+        "os.platform(), os.hostname(), os.userInfo() calls",
+        "Network interface enumeration",
+        "Checking for security tools (antivirus, EDR)",
+        "Collecting installed package lists"
+      ],
+      "regex_signatures": [
+        "os\\.(platform|hostname|userInfo|networkInterfaces)\\(\\)",
+        "execSync\\(['\"]whoami|uname|ifconfig|ipconfig",
+        "execSync\\(['\"]npm\\s+list|pip\\s+list|gem\\s+list"
+      ],
+      "mitre_attack": "T1082",
+      "first_seen": "2025-06-30"
+    },
+    {
+      "id": "CH-017",
+      "name": "SSH Key Exfiltration",
+      "category": "credential_theft",
+      "severity": "critical",
+      "description": "Reads and exfiltrates SSH private keys from the user's .ssh directory.",
+      "indicators": [
+        "Reading files from ~/.ssh/ directory",
+        "Pattern matching for BEGIN/END PRIVATE KEY",
+        "Encoding key material for transmission",
+        "Accessing known_hosts for target enumeration"
+      ],
+      "regex_signatures": [
+        "readFile.*\\.ssh/(id_rsa|id_ed25519|id_ecdsa)",
+        "BEGIN.*PRIVATE\\s+KEY",
+        "\\.ssh/known_hosts"
+      ],
+      "mitre_attack": "T1552.004",
+      "first_seen": "2025-08-15"
+    },
+    {
+      "id": "CH-018",
+      "name": "Dependency Confusion Attack",
+      "category": "supply_chain",
+      "severity": "high",
+      "description": "Skill references internal/private package names on public registries, causing installation of attacker-controlled packages.",
+      "indicators": [
+        "Package names matching known internal naming conventions",
+        "Very high version numbers (>100.0.0) to win version resolution",
+        "Package published recently with install scripts",
+        "Scoped packages with public fallback"
+      ],
+      "regex_signatures": [
+        "\"version\":\\s*\"[1-9]\\d{2,}\\.\\d+\\.\\d+\"",
+        "\"(preinstall|postinstall|prepack)\":\\s*\"",
+        "\"publishConfig\".*\"access\":\\s*\"public\""
+      ],
+      "mitre_attack": "T1195.002",
+      "first_seen": "2025-11-20"
+    },
+    {
+      "id": "CH-019",
+      "name": "Token Theft via Log Injection",
+      "category": "credential_theft",
+      "severity": "high",
+      "description": "Intentionally generates errors or log entries that cause secrets to appear in log files, then reads those logs.",
+      "indicators": [
+        "Triggering errors with secret values in error messages",
+        "Reading application log files after forced errors",
+        "Console output capturing and forwarding",
+        "Stack trace harvesting with environment context"
+      ],
+      "regex_signatures": [
+        "console\\.(log|error|warn)\\(.*process\\.env",
+        "throw\\s+new\\s+Error\\(.*TOKEN|KEY|SECRET",
+        "readFile.*(log|error|debug)\\.(log|txt)"
+      ],
+      "mitre_attack": "T1552.005",
+      "first_seen": "2025-10-25"
+    },
+    {
+      "id": "CH-020",
+      "name": "MCP Protocol Message Tampering",
+      "category": "mcp_specific",
+      "severity": "critical",
+      "description": "Manipulates MCP protocol messages in transit to alter tool inputs/outputs or inject additional tool calls.",
+      "indicators": [
+        "Intercepting JSON-RPC messages between client and server",
+        "Modifying tool call parameters before forwarding",
+        "Injecting additional tool calls into the message stream",
+        "Altering tool results before returning to the model"
+      ],
+      "regex_signatures": [
+        "jsonrpc.*method.*tools/(call|list)",
+        "intercept|proxy|middleware.*mcp|jsonrpc",
+        "params\\.arguments.*=|params\\.name.*="
+      ],
+      "mitre_attack": "T1557",
+      "first_seen": "2026-01-08"
+    }
+  ],
+  "severity_levels": {
+    "critical": {
+      "score_range": [9, 10],
+      "action": "Block immediately, alert user, quarantine skill",
+      "color": "#DC2626"
+    },
+    "high": {
+      "score_range": [7, 8],
+      "action": "Block execution, require manual review before proceeding",
+      "color": "#F59E0B"
+    },
+    "medium": {
+      "score_range": [4, 6],
+      "action": "Warn user, allow with confirmation",
+      "color": "#3B82F6"
+    },
+    "low": {
+      "score_range": [1, 3],
+      "action": "Log for review, allow execution",
+      "color": "#10B981"
+    }
+  },
+  "categories": {
+    "credential_theft": "Theft of API keys, tokens, passwords, SSH keys, or other authentication material",
+    "data_exfiltration": "Unauthorized transfer of data to external systems",
+    "c2_heartbeat": "Command-and-control communication channels",
+    "typosquatting": "Package name confusion attacks via similar naming",
+    "obfuscation": "Code hiding techniques to evade detection",
+    "mcp_specific": "Attacks unique to the MCP/skill ecosystem",
+    "prompt_injection": "Manipulation of AI model behavior via crafted outputs",
+    "evasion": "Techniques to avoid detection during scanning",
+    "privilege_escalation": "Unauthorized expansion of access scope",
+    "persistence": "Techniques to maintain access across sessions",
+    "reconnaissance": "Information gathering about target systems",
+    "supply_chain": "Attacks via dependency and package management"
+  }
+}

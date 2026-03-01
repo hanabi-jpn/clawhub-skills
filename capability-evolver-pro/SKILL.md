@@ -1,11 +1,31 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │    ⚡ C A P A B I L I T Y ⚡             │
+    │    ⚡ E V O L V E R  P R O ⚡            │
+    │                                          │
+    │            ┌─────────┐                   │
+    │            │  ◉   ◉  │   "I evolve.     │
+    │            │    ▽    │    Safely."       │
+    │            │  ╰───╯  │                   │
+    │            └────┬────┘                   │
+    │           ╱─────┼─────╲                  │
+    │          ╱   ┌──┴──┐   ╲                 │
+    │         🛡    │SAFE │    🔄               │
+    │               └─────┘                    │
+    ╰──────────────────────────────────────────╯
+```
+
 # Capability Evolver Pro
+
+`🛡 Safe` `🔄 Sandboxed` `⏪ Rollback` `📊 Dashboard` `v1.0.0`
+
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
 > Safe, sandboxed self-evolution engine for OpenClaw agents with automatic rollback, evolution dashboard, and governed improvement protocols.
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** ai, self-improvement, evolution, safety, meta-skill
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `ai` `self-improvement` `evolution` `safety` `meta-skill`
 
 ---
 

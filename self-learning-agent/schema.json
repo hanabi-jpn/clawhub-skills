@@ -1,0 +1,443 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clawhub.dev/skills/self-learning-agent/schema.json",
+  "title": "Self-Learning Agent - Learning Event Schema",
+  "description": "JSON Schema for learning events captured by Self-Learning Agent. Each line in learnings.jsonl and global error/pattern files conforms to one of the defined event types.",
+  "oneOf": [
+    { "$ref": "#/$defs/errorLearning" },
+    { "$ref": "#/$defs/patternLearning" },
+    { "$ref": "#/$defs/preferenceLearning" },
+    { "$ref": "#/$defs/workflowLearning" }
+  ],
+  "$defs": {
+    "baseLearning": {
+      "type": "object",
+      "required": ["id", "type", "category", "context", "project", "frequency", "impact", "created", "status"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^learn-[0-9]{13,}$",
+          "description": "Unique learning ID using timestamp in milliseconds",
+          "examples": ["learn-1709312400000"]
+        },
+        "type": {
+          "type": "string",
+          "enum": ["error", "pattern", "preference", "workflow"],
+          "description": "Classification of the learning event"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["syntax", "runtime", "config", "network", "permission", "dependency", "logic", "workflow", "style", "tooling", "testing", "deployment", "documentation"],
+          "description": "Error or knowledge category"
+        },
+        "context": {
+          "type": "string",
+          "maxLength": 500,
+          "description": "Brief description of the situation when this learning was captured"
+        },
+        "project": {
+          "type": "string",
+          "description": "Project name or identifier where this learning originated"
+        },
+        "frequency": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10,
+          "description": "Number of times this learning has been useful (capped at 10)"
+        },
+        "impact": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Severity/importance of the problem this learning solves (0.0=trivial, 1.0=critical)"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this learning was first captured"
+        },
+        "last_used": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp when this learning was last applied or referenced"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["active", "promoted", "archived", "merged", "conflicted"],
+          "description": "Current lifecycle status of this learning"
+        },
+        "promotion_score": {
+          "type": "number",
+          "minimum": 0.0,
+          "description": "Calculated score: frequency * impact * recency_weight. Used for global promotion decisions."
+        },
+        "source": {
+          "type": "string",
+          "enum": ["auto-capture", "manual", "import", "lateral-transfer", "promotion"],
+          "description": "How this learning was created"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Searchable tags for knowledge graph indexing"
+        },
+        "related_learnings": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "IDs of related learning events for graph connections"
+        },
+        "compressed_form": {
+          "type": "string",
+          "maxLength": 100,
+          "description": "Ultra-concise one-liner version for context budget optimization"
+        }
+      }
+    },
+
+    "errorLearning": {
+      "allOf": [
+        { "$ref": "#/$defs/baseLearning" },
+        {
+          "type": "object",
+          "required": ["error", "fix"],
+          "properties": {
+            "type": { "const": "error" },
+            "error": {
+              "type": "string",
+              "maxLength": 1000,
+              "description": "The error message, exception, or failure description"
+            },
+            "error_type": {
+              "type": "string",
+              "description": "Programmatic error type (e.g., ImportError, TypeError, ENOENT)",
+              "examples": ["ImportError", "TypeError", "ENOENT", "EACCES", "ConnectionRefusedError"]
+            },
+            "exit_code": {
+              "type": "integer",
+              "description": "Process exit code if applicable"
+            },
+            "command": {
+              "type": "string",
+              "description": "The command or tool invocation that triggered the error"
+            },
+            "file_path": {
+              "type": "string",
+              "description": "File path where the error occurred"
+            },
+            "line_number": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Line number where the error occurred"
+            },
+            "fix": {
+              "type": "string",
+              "maxLength": 1000,
+              "description": "The solution that resolved the error"
+            },
+            "fix_verified": {
+              "type": "boolean",
+              "description": "Whether the fix was verified to actually resolve the issue",
+              "default": false
+            },
+            "stack_trace_hash": {
+              "type": "string",
+              "description": "Hash of the stack trace for deduplication"
+            },
+            "environment": {
+              "type": "object",
+              "description": "Environment details relevant to the error",
+              "properties": {
+                "os": { "type": "string" },
+                "runtime": { "type": "string" },
+                "runtime_version": { "type": "string" },
+                "package_manager": { "type": "string" }
+              }
+            }
+          }
+        }
+      ]
+    },
+
+    "patternLearning": {
+      "allOf": [
+        { "$ref": "#/$defs/baseLearning" },
+        {
+          "type": "object",
+          "required": ["pattern", "application"],
+          "properties": {
+            "type": { "const": "pattern" },
+            "pattern": {
+              "type": "string",
+              "maxLength": 500,
+              "description": "Description of the recognized workflow or coding pattern"
+            },
+            "application": {
+              "type": "string",
+              "maxLength": 500,
+              "description": "How to apply this pattern in practice"
+            },
+            "anti_pattern": {
+              "type": "string",
+              "description": "The incorrect approach this pattern replaces"
+            },
+            "languages": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Programming languages this pattern applies to"
+            },
+            "frameworks": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Frameworks this pattern applies to"
+            },
+            "success_rate": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "How often applying this pattern leads to success"
+            },
+            "example_before": {
+              "type": "string",
+              "description": "Code or workflow example before applying the pattern"
+            },
+            "example_after": {
+              "type": "string",
+              "description": "Code or workflow example after applying the pattern"
+            }
+          }
+        }
+      ]
+    },
+
+    "preferenceLearning": {
+      "allOf": [
+        { "$ref": "#/$defs/baseLearning" },
+        {
+          "type": "object",
+          "required": ["preference_key", "preference_value"],
+          "properties": {
+            "type": { "const": "preference" },
+            "preference_key": {
+              "type": "string",
+              "description": "Dot-notation key for the preference (e.g., 'coding.style.indent')",
+              "examples": ["coding.style.indent", "git.commit.style", "testing.framework"]
+            },
+            "preference_value": {
+              "description": "The preferred value (string, number, boolean, or object)",
+              "oneOf": [
+                { "type": "string" },
+                { "type": "number" },
+                { "type": "boolean" },
+                { "type": "object" }
+              ]
+            },
+            "confidence": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 1,
+              "description": "How confident the system is about this preference (based on consistency of user behavior)"
+            },
+            "observations": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Number of times this preference was observed"
+            },
+            "overrides": {
+              "type": "object",
+              "description": "Project-specific overrides for this preference",
+              "additionalProperties": true
+            }
+          }
+        }
+      ]
+    },
+
+    "workflowLearning": {
+      "allOf": [
+        { "$ref": "#/$defs/baseLearning" },
+        {
+          "type": "object",
+          "required": ["workflow_name", "steps"],
+          "properties": {
+            "type": { "const": "workflow" },
+            "workflow_name": {
+              "type": "string",
+              "description": "Name of the workflow or process"
+            },
+            "steps": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["order", "action"],
+                "properties": {
+                  "order": { "type": "integer", "minimum": 1 },
+                  "action": { "type": "string" },
+                  "tool": { "type": "string" },
+                  "notes": { "type": "string" },
+                  "optional": { "type": "boolean", "default": false }
+                }
+              },
+              "description": "Ordered steps in the workflow"
+            },
+            "trigger_conditions": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Conditions that indicate this workflow should be suggested"
+            },
+            "estimated_duration": {
+              "type": "string",
+              "description": "Estimated time to complete the workflow",
+              "examples": ["30s", "5m", "1h"]
+            },
+            "success_criteria": {
+              "type": "string",
+              "description": "How to determine if the workflow completed successfully"
+            }
+          }
+        }
+      ]
+    },
+
+    "promotionEvent": {
+      "type": "object",
+      "description": "Event logged when a learning is promoted from project to global scope",
+      "required": ["event_type", "timestamp", "learning_id", "from_project", "promotion_score"],
+      "properties": {
+        "event_type": {
+          "const": "promotion"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "learning_id": {
+          "type": "string",
+          "description": "ID of the learning being promoted"
+        },
+        "from_project": {
+          "type": "string",
+          "description": "Source project of the learning"
+        },
+        "promotion_score": {
+          "type": "number",
+          "description": "Score at time of promotion"
+        },
+        "cross_project_count": {
+          "type": "integer",
+          "minimum": 3,
+          "description": "Number of projects where this learning was observed"
+        },
+        "projects_observed": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of projects where this learning appeared"
+        },
+        "merged_with": {
+          "type": "string",
+          "description": "ID of existing global learning this was merged with (if any)"
+        }
+      }
+    },
+
+    "compressionEvent": {
+      "type": "object",
+      "description": "Event logged when context compression is performed",
+      "required": ["event_type", "timestamp", "tokens_before", "tokens_after", "learnings_affected"],
+      "properties": {
+        "event_type": {
+          "const": "compression"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "strategy": {
+          "type": "string",
+          "enum": ["merge", "summarize", "prioritize", "truncate"],
+          "description": "Compression strategy used"
+        },
+        "tokens_before": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Token count before compression"
+        },
+        "tokens_after": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Token count after compression"
+        },
+        "learnings_affected": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "Number of learnings modified during compression"
+        },
+        "learnings_archived": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of learnings moved to archive"
+        },
+        "merges_performed": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Number of learning pairs that were merged"
+        }
+      }
+    },
+
+    "globalIndex": {
+      "type": "object",
+      "description": "Schema for the fast lookup index (index.json)",
+      "required": ["version", "last_updated", "by_category", "by_keyword", "by_project"],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "total_learnings": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "by_category": {
+          "type": "object",
+          "description": "Map of category -> array of learning IDs",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "by_keyword": {
+          "type": "object",
+          "description": "Map of keyword -> array of learning IDs",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "by_project": {
+          "type": "object",
+          "description": "Map of project name -> array of learning IDs",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "top_scored": {
+          "type": "array",
+          "description": "Top 20 learnings by promotion score for fast context loading",
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "score": { "type": "number" },
+              "compressed_form": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

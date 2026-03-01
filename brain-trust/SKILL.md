@@ -1,11 +1,33 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │   🏛  B R A I N  T R U S T  🏛          │
+    │                                          │
+    │              ┌─────┐                     │
+    │              │ CEO │                     │
+    │              └──┬──┘                     │
+    │         ┌───────┼───────┐                │
+    │      ┌──┴──┐ ┌──┴──┐ ┌─┴───┐            │
+    │      │ CTO │ │ CFO │ │ CMO │            │
+    │      └──┬──┘ └──┬──┘ └──┬──┘            │
+    │    ┌────┼────┐  │   ┌───┼───┐           │
+    │   🧑‍💻  🔍  🧪  📊  ✍  🎨  📢          │
+    │   Dev  Rev  QA  Ana  Wri Des SEO        │
+    │                                          │
+    │    "Your AI company. One command."       │
+    ╰──────────────────────────────────────────╯
+```
+
 # Brain Trust
+
+`🏛 Multi-Agent` `👥 10+ Roles` `🗳 Consensus` `📋 Meetings` `v1.0.0`
+
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
 > Multi-agent hierarchical orchestration engine. Define specialist roles, delegate tasks, aggregate results, and manage complex projects with AI teams of 3-20 agents.
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** multi-agent, orchestration, teamwork, delegation, project-management
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `multi-agent` `orchestration` `teamwork` `delegation` `project-management`
 
 ---
 

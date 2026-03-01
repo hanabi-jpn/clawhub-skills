@@ -1,0 +1,238 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://clawhub.dev/skills/capability-evolver-pro/schema.json",
+  "title": "Capability Evolver Pro - Evolution Event Schema",
+  "description": "JSON Schema for evolution events logged by Capability Evolver Pro. Each line in evolution-log.jsonl conforms to this schema.",
+  "type": "object",
+  "required": ["id", "timestamp", "version", "strategy", "tier", "result", "health_before", "health_after", "changes"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^evo-[0-9]{8}-[0-9]{6}$",
+      "description": "Unique evolution event ID in format evo-YYYYMMDD-HHMMSS",
+      "examples": ["evo-20260301-143022"]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the evolution was executed"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Capability Evolver Pro version that generated this event",
+      "examples": ["1.0.0"]
+    },
+    "strategy": {
+      "type": "string",
+      "enum": ["repair", "optimize", "innovate", "harden"],
+      "description": "Evolution strategy used for this cycle"
+    },
+    "tier": {
+      "type": "string",
+      "enum": ["conservative", "balanced", "aggressive"],
+      "description": "Safety tier active during this evolution"
+    },
+    "trigger": {
+      "type": "string",
+      "enum": ["manual", "continuous", "review", "auto-repair"],
+      "description": "How this evolution was triggered",
+      "default": "manual"
+    },
+    "result": {
+      "type": "string",
+      "enum": ["applied", "skipped", "rolled-back", "error"],
+      "description": "Final outcome of the evolution"
+    },
+    "health_before": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Health score before the evolution was applied"
+    },
+    "health_after": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Health score after the evolution was applied (or attempted)"
+    },
+    "health_components": {
+      "type": "object",
+      "description": "Detailed health score breakdown after evolution",
+      "properties": {
+        "error_rate": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "raw_value": { "type": "number", "minimum": 0, "maximum": 1 },
+            "detail": { "type": "string" }
+          },
+          "required": ["score", "raw_value"]
+        },
+        "task_completion": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "raw_value": { "type": "number", "minimum": 0, "maximum": 1 },
+            "detail": { "type": "string" }
+          },
+          "required": ["score", "raw_value"]
+        },
+        "response_quality": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "raw_value": { "type": "number", "minimum": 0, "maximum": 1 },
+            "detail": { "type": "string" }
+          },
+          "required": ["score", "raw_value"]
+        },
+        "efficiency": {
+          "type": "object",
+          "properties": {
+            "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+            "raw_value": { "type": "number", "minimum": 0 },
+            "detail": { "type": "string" }
+          },
+          "required": ["score", "raw_value"]
+        }
+      }
+    },
+    "changes": {
+      "type": "array",
+      "description": "List of changes proposed and/or applied during this evolution",
+      "items": {
+        "type": "object",
+        "required": ["type", "target", "description", "status"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["modify", "create", "delete", "merge", "rewrite"],
+            "description": "Type of change operation"
+          },
+          "target": {
+            "type": "string",
+            "description": "File path or resource identifier that was changed",
+            "examples": [".evolver-pro/memory/patterns.json"]
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of what was changed and why"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["proposed", "sandbox-passed", "sandbox-failed", "applied", "rolled-back"],
+            "description": "Status of this individual change"
+          },
+          "diff_summary": {
+            "type": "string",
+            "description": "Brief summary of the diff (e.g., '+3 lines, -1 line')"
+          },
+          "validation_results": {
+            "type": "object",
+            "description": "Results of sandbox validation for this change",
+            "properties": {
+              "tests_run": { "type": "integer", "minimum": 0 },
+              "tests_passed": { "type": "integer", "minimum": 0 },
+              "tests_failed": { "type": "integer", "minimum": 0 },
+              "pass_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+              "errors": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "checkpoint_id": {
+      "type": "string",
+      "pattern": "^chk-[0-9]{8}-[0-9]{6}$",
+      "description": "ID of the checkpoint created before this evolution",
+      "examples": ["chk-20260301-143022"]
+    },
+    "rollback_info": {
+      "type": "object",
+      "description": "Present only if result is 'rolled-back'",
+      "properties": {
+        "reason": {
+          "type": "string",
+          "description": "Why the rollback was triggered"
+        },
+        "health_drop": {
+          "type": "integer",
+          "description": "How many points health dropped before rollback was triggered"
+        },
+        "restored_checkpoint_id": {
+          "type": "string",
+          "description": "Checkpoint ID that was restored"
+        },
+        "auto_triggered": {
+          "type": "boolean",
+          "description": "Whether rollback was automatic (true) or manual (false)"
+        }
+      },
+      "required": ["reason", "restored_checkpoint_id"]
+    },
+    "blocklist_additions": {
+      "type": "array",
+      "description": "Patterns added to blocklist as a result of this evolution (if any)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pattern_signature": {
+            "type": "string",
+            "description": "Unique signature identifying the blocked pattern"
+          },
+          "reason": {
+            "type": "string",
+            "description": "Why this pattern was blocked"
+          },
+          "regression_type": {
+            "type": "string",
+            "enum": ["health_drop", "error_spike", "validation_failure", "user_rejected"]
+          }
+        },
+        "required": ["pattern_signature", "reason"]
+      }
+    },
+    "pattern_updates": {
+      "type": "array",
+      "description": "Patterns that were updated in the patterns database",
+      "items": {
+        "type": "object",
+        "properties": {
+          "pattern_name": { "type": "string" },
+          "previous_success_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+          "new_success_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+          "total_applications": { "type": "integer", "minimum": 1 },
+          "promoted_to_proven": { "type": "boolean" }
+        },
+        "required": ["pattern_name", "new_success_rate", "total_applications"]
+      }
+    },
+    "duration_ms": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total time taken for this evolution cycle in milliseconds"
+    },
+    "tokens_used": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Total tokens consumed during this evolution cycle"
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Session ID during which this evolution occurred"
+    },
+    "agent_id": {
+      "type": "string",
+      "description": "Agent identifier that performed this evolution"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Optional human-readable notes about this evolution"
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,11 +1,33 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │   📈 F X  T R A D E R  P R O 📉         │
+    │                                          │
+    │     $  €  £  ¥  A$  C$  ₣               │
+    │                                          │
+    │     ┌───┐ ╱╲  ╱╲  ╱╲                    │
+    │     │BUY│╱  ╲╱  ╲╱  ╲╱╲                 │
+    │     └───┘               ╲                │
+    │                    ┌─────┤               │
+    │     "The FIRST     │SELL │               │
+    │      FX skill      └─────┘               │
+    │      on ClawHub."                        │
+    │                                          │
+    │   ═══╦══════════╦══════════╦═══          │
+    │    M5║    M30   ║    H4   ║  D           │
+    ╰──────────────────────────────────────────╯
+```
+
 # FX Trader Pro
 
-> Professional forex trading agent for OANDA with multi-timeframe technical analysis, risk management, and automated trade execution. The first traditional FX skill on ClawHub.
+`📈 28 Pairs` `🏦 OANDA` `📊 Multi-TF` `🛡 Risk Mgmt` `v1.0.0`
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** forex, trading, oanda, finance, technical-analysis, fx
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]() [![First FX Skill](https://img.shields.io/badge/ClawHub-First%20FX%20Skill-gold)]()
+
+> Professional forex trading agent for OANDA with multi-timeframe technical analysis, risk management, and automated trade execution. **The first and only traditional FX skill on ClawHub.**
+
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `forex` `trading` `oanda` `finance` `technical-analysis` `fx`
 
 ---
 

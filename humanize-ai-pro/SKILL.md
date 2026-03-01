@@ -1,11 +1,31 @@
+```
+    ╭──────────────────────────────────────────╮
+    │                                          │
+    │   ✍  H U M A N I Z E  A I  P R O  ✍    │
+    │                                          │
+    │         🤖 ──────────▶ 👤              │
+    │                                          │
+    │        ┌──────────┐                      │
+    │        │ AI Score │                      │
+    │        │ ████░░░░ │  73% ──▶ 12%        │
+    │        │ "Making  │                      │
+    │        │  robots  │  🇺🇸🇯🇵🇨🇳🇰🇷🇪🇸🇫🇷       │
+    │        │  sound   │  12 languages        │
+    │        │  human." │                      │
+    │        └──────────┘                      │
+    ╰──────────────────────────────────────────╯
+```
+
 # Humanize AI Pro
+
+`✍ 12 Languages` `🇯🇵 Japanese Deep` `📊 AI Scoring` `🔀 5 Modes` `v1.0.0`
+
+[![hanabi-jpn](https://img.shields.io/badge/by-hanabi--jpn-ff6b6b)](https://github.com/hanabi-jpn) [![Version](https://img.shields.io/badge/version-1.0.0-blue)]() [![License](https://img.shields.io/badge/license-MIT-green)]()
 
 > Multi-language AI text humanizer with 5 writing modes, statistical analysis, and meaning-preserving transformation. Supports English, Japanese, Chinese, Korean, and 10+ languages.
 
-**Author:** hanabi-jpn
-**Version:** 1.0.0
-**License:** MIT
-**Tags:** writing, humanize, ai-detection, multi-language, japanese, content
+**Author:** hanabi-jpn | **Version:** 1.0.0 | **License:** MIT
+**Tags:** `writing` `humanize` `ai-detection` `multi-language` `japanese` `content`
 
 ---
 
