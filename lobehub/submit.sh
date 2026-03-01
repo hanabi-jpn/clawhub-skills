@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ============================================================================
 # LobeHub Agent Submission Script
-# Submit 40 ClawHub skills as LobeHub agents
+# Submit 43 ClawHub skills as LobeHub agents (5 packs)
 #
 # Usage:
 #   ./submit.sh                 # Interactive mode
@@ -41,9 +41,9 @@ check_prerequisites() {
         exit 1
     fi
 
-    AGENT_COUNT=$(python3 -c "import json; print(len(json.load(open('$AGENTS_JSON'))))" 2>/dev/null || echo "0")
-    if [ "$AGENT_COUNT" -ne 40 ]; then
-        log_error "Expected 40 agents in agents.json, found $AGENT_COUNT"
+    AGENT_COUNT=$(python3 -c "import json; d=json.load(open('$AGENTS_JSON')); print(len(d.get('agents', d) if isinstance(d, dict) else d))" 2>/dev/null || echo "0")
+    if [ "$AGENT_COUNT" -lt 43 ]; then
+        log_error "Expected at least 43 agents in agents.json, found $AGENT_COUNT"
         exit 1
     fi
     log_ok "agents.json validated: $AGENT_COUNT agents"
@@ -109,12 +109,15 @@ auto_submit() {
 
     # Step 4: Generate individual agent files
     log_info "Step 3/5: Generating agent files..."
-    python3 << 'PYTHON_SCRIPT'
+    AGENTS_JSON="$AGENTS_JSON" python3 << 'PYTHON_SCRIPT'
 import json, os
 
 agents_path = os.environ.get("AGENTS_JSON", "agents.json")
 with open(agents_path) as f:
-    agents = json.load(f)
+    data = json.load(f)
+
+# Support both schemaVersion-1 wrapper and flat array
+agents = data.get("agents", data) if isinstance(data, dict) else data
 
 # LobeHub expects individual JSON files per agent in src/ directory
 src_dir = "src"
@@ -123,19 +126,17 @@ os.makedirs(src_dir, exist_ok=True)
 for agent in agents:
     agent_file = os.path.join(src_dir, f"{agent['identifier']}.json")
     agent_data = {
-        "author": agent["author"],
-        "config": {
-            "systemRole": agent["systemRole"]
-        },
-        "createdAt": "2026-03-01",
-        "homepage": f"https://github.com/hanabi-jpn/clawhub-skills/tree/main/{agent['identifier']}",
+        "author": agent.get("author", "hanabi-jpn"),
+        "config": agent.get("config", {"systemRole": agent.get("systemRole", "")}),
+        "createdAt": agent.get("createdAt", "2026-03-02"),
+        "homepage": agent.get("homepage", f"https://github.com/hanabi-jpn/clawhub-skills/tree/main/{agent['identifier']}"),
         "identifier": agent["identifier"],
-        "meta": {
+        "meta": agent.get("meta", {
             "avatar": "🤖",
-            "description": agent["description"],
-            "tags": agent["tags"],
-            "title": agent["title"]
-        },
+            "description": agent.get("description", ""),
+            "tags": agent.get("tags", []),
+            "title": agent.get("title", agent["identifier"])
+        }),
         "schemaVersion": 1
     }
     with open(agent_file, "w") as f:
@@ -148,15 +149,14 @@ PYTHON_SCRIPT
     # Step 5: Commit and push
     log_info "Step 4/5: Committing changes..."
     git add -A
-    git commit -m "feat: add 40 ClawHub AI agent skills by hanabi-jpn
+    git commit -m "feat: add 43 ClawHub AI agent skills by hanabi-jpn
 
-Add 40 specialized AI agent skills covering:
-- Japan SaaS integrations (freee, SmartHR, kintone, Backlog, etc.)
-- Security tools (Skill Guardian, Mac Sentinel, Repo Guardian, Credential Vault)
-- Productivity (Summarize Pro, Context Slim, Brain Trust, Agent Dashboard)
-- Creative (Nano Banana Ultra, Humanize AI Pro, JP Humanizer)
-- Trading (FX Trader Pro)
-- Japan business tools (LINE Agent, Rakuten Seller, PayPay Biz, etc.)
+Add 43 specialized AI agent skills organized in 5 packs:
+- ec-master-pack (9): Amazon, Rakuten, Yahoo, Shopify, EC-CUBE, etc.
+- finance-accounting-pack (10): freee, MoneyForward, Yayoi, PayPay, e-Tax, etc.
+- marketing-growth-pack (8): GA4, Google Ads, HubSpot, SEO, Humanizer, etc.
+- business-ops-pack (13): LINE, Slack, kintone, Backlog, SmartHR, etc.
+- security-devops-pack (3): Mac Sentinel, Repo Guardian, Credential Vault
 
 All skills by hanabi-jpn - https://github.com/hanabi-jpn/clawhub-skills"
 
@@ -164,23 +164,21 @@ All skills by hanabi-jpn - https://github.com/hanabi-jpn/clawhub-skills"
     git push origin "$BRANCH"
 
     gh pr create \
-        --title "feat: add 40 ClawHub AI agent skills by hanabi-jpn" \
+        --title "feat: add 43 ClawHub AI agent skills by hanabi-jpn" \
         --body "## Summary
 
-This PR adds 40 specialized AI agent skills from [ClawHub Skills](https://github.com/hanabi-jpn/clawhub-skills) by hanabi-jpn.
+This PR adds 43 specialized AI agent skills from [ClawHub Skills](https://github.com/hanabi-jpn/clawhub-skills) by hanabi-jpn, organized in 5 packs.
 
-### Categories
-- **Japan SaaS** (15): freee, SmartHR, kintone, Backlog, Chatwork, LINE, LINE WORKS, Sansan, MoneyForward, KING OF TIME, Jooto, Yayoi, Rakuten, BASE/STORES, Notion JP
-- **Security** (4): Skill Guardian, Mac Sentinel, Repo Guardian, Credential Vault
-- **Productivity** (6): Summarize Pro, Context Slim, Brain Trust, Agent Dashboard, Self-Learning Agent, Capability Evolver Pro
-- **Creative** (4): Nano Banana Ultra, Humanize AI Pro, JP Humanizer, JP SEO Writer
-- **Google** (4): GA4 Search Console, Google Ads, Google Workspace, Google Maps Biz
-- **Commerce/Finance** (5): FX Trader Pro, EC-CUBE Operator, Stripe Japan, PayPay Biz, JP Tax Calc
-- **Communication** (2): Social Media Publisher, Lark Workflow
+### Packs
+- **ec-master-pack** (9): Amazon Japan, Rakuten, Yahoo Shopping, Shopify Japan, EC-CUBE, MakeShop, Mercari Shops, BASE/STORES, Stripe Japan
+- **finance-accounting-pack** (10): freee, MoneyForward, Yayoi, PayPay Biz, JP Tax Calc, e-Tax, Japan Invoice, Misoca, AirPay, Square Japan
+- **marketing-growth-pack** (8): GA4 Search Console, Google Ads, Google Maps Biz, HubSpot Japan, JP Humanizer, JP SEO Writer, Sansan, Social Media Publisher
+- **business-ops-pack** (13): LINE, LINE WORKS, Slack Japan, kintone, Backlog, Chatwork, SmartHR, Notion JP, Google Workspace, KING OF TIME, Jooto, Lark Workflow, Cybozu Garoon
+- **security-devops-pack** (3): Mac Sentinel, Repo Guardian, Credential Vault
 
 ### All agents include
 - Full system prompts extracted from SKILL.md
-- Proper tags and descriptions
+- Proper tags, descriptions, and pack-specific avatars
 - Author attribution to hanabi-jpn
 
 Generated with ClawHub Skills LobeHub submission tool." \
@@ -202,7 +200,7 @@ manual_submit() {
     echo "The agents.json file is ready at:"
     echo "  $AGENTS_JSON"
     echo ""
-    echo "It contains 40 agents formatted for LobeHub."
+    echo "It contains 43 agents formatted for LobeHub."
     echo ""
     echo "=== Option A: Submit via GitHub PR ==="
     echo ""
@@ -219,23 +217,24 @@ manual_submit() {
     echo "   python3 -c \""
     echo "   import json, os"
     echo "   with open('$AGENTS_JSON') as f:"
-    echo "       agents = json.load(f)"
+    echo "       data = json.load(f)"
+    echo "   agents = data.get('agents', data) if isinstance(data, dict) else data"
     echo "   for a in agents:"
     echo "       with open(f'src/{a[\"identifier\"]}.json', 'w') as out:"
     echo "           json.dump({"
-    echo "               'author': a['author'],"
-    echo "               'config': {'systemRole': a['systemRole']},"
-    echo "               'createdAt': '2026-03-01',"
-    echo "               'homepage': f'https://github.com/hanabi-jpn/clawhub-skills/tree/main/{a[\"identifier\"]}',"
+    echo "               'author': a.get('author', 'hanabi-jpn'),"
+    echo "               'config': a.get('config', {}),"
+    echo "               'createdAt': a.get('createdAt', '2026-03-02'),"
+    echo "               'homepage': a.get('homepage', ''),"
     echo "               'identifier': a['identifier'],"
-    echo "               'meta': {'avatar': '🤖', 'description': a['description'], 'tags': a['tags'], 'title': a['title']},"
+    echo "               'meta': a.get('meta', {}),"
     echo "               'schemaVersion': 1"
     echo "           }, out, indent=2, ensure_ascii=False)"
     echo "   \""
     echo ""
     echo "5. Commit and push:"
     echo "   git add -A"
-    echo "   git commit -m 'feat: add 40 ClawHub AI agent skills'"
+    echo "   git commit -m 'feat: add 43 ClawHub AI agent skills'"
     echo "   git push origin add-clawhub-skills"
     echo ""
     echo "6. Create a PR at:"
@@ -262,7 +261,7 @@ manual_submit() {
 main() {
     echo ""
     echo "╔══════════════════════════════════════════════╗"
-    echo "║  LobeHub Agent Submission — 40 ClawHub Skills ║"
+    echo "║  LobeHub Agent Submission — 43 ClawHub Skills ║"
     echo "╚══════════════════════════════════════════════╝"
     echo ""
 
