@@ -1,3 +1,16 @@
+---
+name: "Summarize Pro"
+description: "7-mode intelligent summarizer with Chain-of-Density, 8 languages, and smart caching"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - summarization
+  - productivity
+  - multi-language
+  - content
+  - documents
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

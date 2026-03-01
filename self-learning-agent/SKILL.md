@@ -1,3 +1,16 @@
+---
+name: "Self-Learning Agent"
+description: "Cross-project learning engine with automatic failure capture and context-aware memory compression"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - ai
+  - learning
+  - memory
+  - cross-project
+  - self-improvement
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

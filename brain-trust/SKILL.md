@@ -1,3 +1,16 @@
+---
+name: "Brain Trust"
+description: "Multi-agent hierarchical orchestration with 10+ roles and consensus protocols"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - multi-agent
+  - orchestration
+  - teamwork
+  - ai-agents
+  - collaboration
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

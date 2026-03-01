@@ -1,3 +1,16 @@
+---
+name: "Lark Workflow"
+description: "Lark/Feishu自動化 — 承認フロー・Bot・文書管理"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - lark
+  - feishu
+  - workflow
+  - approval
+  - automation
+---
+
 # Lark Workflow
 
 ```

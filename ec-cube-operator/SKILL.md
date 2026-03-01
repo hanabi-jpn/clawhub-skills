@@ -1,3 +1,16 @@
+---
+name: "EC-CUBE Operator"
+description: "EC-CUBE 4.x 完全管理 — 商品・在庫・注文・RFM分析"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - ec-cube
+  - ecommerce
+  - japan
+  - inventory
+  - orders
+---
+
 # EC-CUBE Operator
 
 ```

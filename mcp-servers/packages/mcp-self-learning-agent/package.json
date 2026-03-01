@@ -1,0 +1,17 @@
+{
+  "name": "@hanabi-jpn/mcp-self-learning-agent",
+  "version": "1.0.0",
+  "description": "MCP server for Self-Learning Agent -- Cross-project learning engine with automatic failure capture and context-aware memory compression",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/self-learning-agent",
+  "main": "dist/index.js",
+  "bin": { "mcp-self-learning-agent": "dist/index.js" },
+  "files": ["dist", "server.json"],
+  "scripts": { "build": "tsc", "start": "node dist/index.js" },
+  "dependencies": { "@modelcontextprotocol/sdk": "^1.0.0" },
+  "devDependencies": { "typescript": "^5.4.0" },
+  "repository": { "type": "git", "url": "https://github.com/hanabi-jpn/clawhub-skills" },
+  "keywords": ["mcp", "mcp-server", "ai", "learning", "memory", "cross-project"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

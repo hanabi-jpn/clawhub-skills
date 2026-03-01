@@ -1,3 +1,16 @@
+---
+name: "JP SEO Writer"
+description: "日本語SEO記事自動生成 — 共起語分析・E-E-A-T対応"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - seo
+  - japan
+  - writing
+  - content
+  - e-e-a-t
+---
+
 # JP SEO Writer
 
 ```

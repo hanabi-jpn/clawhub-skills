@@ -1,3 +1,16 @@
+---
+name: "FX Trader Pro"
+description: "First FX trading skill on ClawHub — OANDA API, 28 currency pairs, risk management"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - fx
+  - trading
+  - oanda
+  - finance
+  - automation
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

@@ -1,3 +1,16 @@
+---
+name: "Rakuten Seller"
+description: "楽天市場ショップ運営AI — RMS API, レビュー・売上分析"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - rakuten
+  - ecommerce
+  - japan
+  - marketplace
+  - analytics
+---
+
 # Rakuten Seller
 
 ```

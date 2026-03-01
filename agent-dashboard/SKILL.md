@@ -1,3 +1,16 @@
+---
+name: "Agent Dashboard"
+description: "Real-time agent monitoring with health scoring, cost tracking, and web dashboard"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - monitoring
+  - dashboard
+  - analytics
+  - cost-tracking
+  - observability
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

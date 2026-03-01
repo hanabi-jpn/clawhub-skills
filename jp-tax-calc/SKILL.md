@@ -1,3 +1,16 @@
+---
+name: "JP Tax Calc"
+description: "日本の税金計算・確定申告支援 — 所得税・消費税・e-Tax連携"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - tax
+  - japan
+  - calculator
+  - e-tax
+  - accounting
+---
+
 # JP Tax Calc
 
 ```

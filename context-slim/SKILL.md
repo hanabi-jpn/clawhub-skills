@@ -1,3 +1,16 @@
+---
+name: "Context Slim"
+description: "Context window optimizer — save 40-70% with 3 compression strategies"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - context
+  - optimization
+  - compression
+  - tokens
+  - efficiency
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

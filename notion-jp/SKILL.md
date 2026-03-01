@@ -1,3 +1,16 @@
+---
+name: "Notion JP"
+description: "Notion日本語テンプレート — 20+ templates, 議事録自動生成"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - notion
+  - japan
+  - templates
+  - productivity
+  - documents
+---
+
 # Notion JP
 
 ```

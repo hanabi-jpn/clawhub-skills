@@ -1,0 +1,52 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.hanabi-jpn/fx-trader-pro",
+  "description": "Professional forex trading MCP server — OANDA API, 28 currency pairs, multi-timeframe technical analysis, risk management, and automated trade execution",
+  "repository": {
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@hanabi-jpn/mcp-fx-trader-pro",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "name": "OANDA_API_KEY",
+          "description": "OANDA v20 API token for authentication",
+          "required": true
+        },
+        {
+          "name": "OANDA_ACCOUNT_ID",
+          "description": "OANDA account ID (e.g., 101-001-12345678-001)",
+          "required": true
+        },
+        {
+          "name": "OANDA_ENVIRONMENT",
+          "description": "Trading environment: 'practice' (default) or 'live'",
+          "required": false
+        },
+        {
+          "name": "FX_RISK_PERCENT",
+          "description": "Risk per trade as percentage of equity (default: 2)",
+          "required": false
+        },
+        {
+          "name": "FX_MAX_POSITIONS",
+          "description": "Maximum concurrent positions (default: 3)",
+          "required": false
+        },
+        {
+          "name": "FX_DAILY_LOSS_LIMIT",
+          "description": "Daily loss limit as percentage of NAV (default: 3)",
+          "required": false
+        }
+      ]
+    }
+  ]
+}

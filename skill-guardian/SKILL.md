@@ -1,3 +1,16 @@
+---
+name: "Skill Guardian"
+description: "5-layer security scanner for AI agent skills — post-ClawHavoc protection"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - security
+  - scanning
+  - safety
+  - protection
+  - audit
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

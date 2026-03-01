@@ -1,3 +1,16 @@
+---
+name: "Capability Evolver Pro"
+description: "Safe sandboxed self-evolution engine with 5-layer safety, automatic rollback, and evolution dashboard"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - ai
+  - self-improvement
+  - evolution
+  - safety
+  - meta-skill
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

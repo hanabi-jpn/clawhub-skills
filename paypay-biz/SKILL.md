@@ -1,3 +1,16 @@
+---
+name: "PayPay Biz"
+description: "PayPay決済管理・売上分析 — 65M+ users, QR決済"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - paypay
+  - payment
+  - japan
+  - qr-code
+  - analytics
+---
+
 # PayPay Biz
 
 ```

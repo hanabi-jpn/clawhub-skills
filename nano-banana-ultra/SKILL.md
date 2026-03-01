@@ -1,3 +1,16 @@
+---
+name: "Nano Banana Ultra"
+description: "Multi-model AI image generation with Gemini, DALL-E, Stability AI, 30+ templates"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - image-generation
+  - ai-art
+  - gemini
+  - dalle
+  - creative
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

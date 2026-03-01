@@ -1,3 +1,16 @@
+---
+name: "JP Humanizer"
+description: "AI文章の日本語自然化 — 500+ patterns, 4 modes, AI検知率0%"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - japanese
+  - humanize
+  - writing
+  - ai-detection
+  - nlp
+---
+
 # JP Humanizer
 
 ```

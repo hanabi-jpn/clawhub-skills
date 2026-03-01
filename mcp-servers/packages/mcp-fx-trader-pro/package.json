@@ -1,0 +1,45 @@
+{
+  "name": "@hanabi-jpn/mcp-fx-trader-pro",
+  "version": "1.0.0",
+  "description": "MCP server for FX Trader Pro — OANDA API, 28 currency pairs, multi-timeframe analysis, risk management",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/fx-trader-pro",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "mcp-fx-trader-pro": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "server.json",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "npx tsc --watch"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills",
+    "directory": "mcp-servers/packages/mcp-fx-trader-pro"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "fx",
+    "trading",
+    "oanda",
+    "finance",
+    "technical-analysis",
+    "forex"
+  ],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

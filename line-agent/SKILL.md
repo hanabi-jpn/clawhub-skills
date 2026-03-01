@@ -1,3 +1,16 @@
+---
+name: "LINE Agent"
+description: "LINE公式アカウント自動応答・CRM — 96M+ users, Flex Messages, AI auto-response"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - line
+  - japan
+  - messaging
+  - crm
+  - automation
+---
+
 # LINE Agent
 
 ```

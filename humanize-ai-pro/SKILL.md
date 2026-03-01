@@ -1,3 +1,16 @@
+---
+name: "Humanize AI Pro"
+description: "Multi-language AI text humanizer with 12 languages, 500+ patterns, and 5 writing modes"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - writing
+  - humanize
+  - ai-detection
+  - multi-language
+  - japanese
+---
+
 ```
     ╭──────────────────────────────────────────╮
     │                                          │

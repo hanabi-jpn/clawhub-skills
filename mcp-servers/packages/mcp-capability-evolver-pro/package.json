@@ -1,0 +1,18 @@
+{
+  "name": "@hanabi-jpn/mcp-capability-evolver-pro",
+  "version": "1.0.0",
+  "description": "MCP server for Capability Evolver Pro -- Safe sandboxed self-evolution engine with 5-layer safety, automatic rollback, and evolution dashboard",
+  "type": "module",
+  "mcpName": "io.github.hanabi-jpn/capability-evolver-pro",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": { "mcp-capability-evolver-pro": "dist/index.js" },
+  "files": ["dist", "server.json"],
+  "scripts": { "build": "tsc", "start": "node dist/index.js" },
+  "dependencies": { "@modelcontextprotocol/sdk": "^1.0.0" },
+  "devDependencies": { "typescript": "^5.4.0" },
+  "repository": { "type": "git", "url": "https://github.com/hanabi-jpn/clawhub-skills", "directory": "mcp-servers/packages/mcp-capability-evolver-pro" },
+  "keywords": ["mcp", "mcp-server", "ai", "self-evolution", "safety", "automation"],
+  "author": "hanabi-jpn",
+  "license": "MIT"
+}

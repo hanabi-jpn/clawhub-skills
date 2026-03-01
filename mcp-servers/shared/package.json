@@ -1,0 +1,17 @@
+{
+  "name": "@hanabi-jpn/mcp-shared",
+  "version": "1.0.0",
+  "description": "Shared base MCP server class for hanabi-jpn skills",
+  "type": "module",
+  "main": "dist/base-server.js",
+  "types": "dist/base-server.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

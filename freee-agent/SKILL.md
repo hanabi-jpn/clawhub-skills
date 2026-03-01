@@ -1,3 +1,16 @@
+---
+name: "Freee Agent"
+description: "freee会計・人事労務 自動化 — AI仕訳・P/L・B/S・確定申告"
+author: "hanabi-jpn"
+version: "1.0.0"
+tags:
+  - freee
+  - accounting
+  - japan
+  - tax
+  - automation
+---
+
 # Freee Agent
 
 ```

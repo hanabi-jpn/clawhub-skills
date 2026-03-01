@@ -1,0 +1,26 @@
+{
+  "name": "@hanabi-jpn/mcp-servers",
+  "private": true,
+  "version": "1.0.0",
+  "description": "MCP server monorepo for all hanabi-jpn ClawHub skills",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "build:shared": "cd shared && npx tsc",
+    "clean": "rm -rf packages/*/dist",
+    "publish-all": "./scripts/publish-all.sh",
+    "generate-all": "./scripts/generate-all.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hanabi-jpn/clawhub-skills"
+  },
+  "author": "hanabi-jpn",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@modelcontextprotocol/sdk": "^1.0.0"
+  }
+}
