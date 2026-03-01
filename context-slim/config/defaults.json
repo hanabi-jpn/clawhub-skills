@@ -1,0 +1,189 @@
+{
+  "version": "1.0.0",
+  "description": "Default configuration for Context Slim context window optimization. All token counts use cl100k_base tokenizer equivalents.",
+  "budget_allocations": {
+    "description": "Default token budget allocations by category as percentage of total context window.",
+    "system_prompt": {
+      "allocation_pct": 10,
+      "max_tokens": 20000,
+      "priority": "critical",
+      "compressible": false,
+      "description": "System instructions, role definitions, and behavioral constraints. Never compressed."
+    },
+    "user_instructions": {
+      "allocation_pct": 5,
+      "max_tokens": 10000,
+      "priority": "critical",
+      "compressible": false,
+      "description": "CLAUDE.md, project-specific instructions, and user preferences."
+    },
+    "active_context": {
+      "allocation_pct": 35,
+      "max_tokens": 70000,
+      "priority": "high",
+      "compressible": true,
+      "description": "Current conversation turns, recent tool outputs, and working memory."
+    },
+    "file_contents": {
+      "allocation_pct": 25,
+      "max_tokens": 50000,
+      "priority": "medium",
+      "compressible": true,
+      "description": "File contents read during the session. Compressed using structural summaries."
+    },
+    "tool_results": {
+      "allocation_pct": 15,
+      "max_tokens": 30000,
+      "priority": "medium",
+      "compressible": true,
+      "description": "Results from tool invocations (bash, grep, glob, etc.)."
+    },
+    "historical_context": {
+      "allocation_pct": 10,
+      "max_tokens": 20000,
+      "priority": "low",
+      "compressible": true,
+      "description": "Earlier conversation turns and completed task context."
+    }
+  },
+  "context_window_profiles": {
+    "claude-opus-4-6": {
+      "max_context_tokens": 200000,
+      "max_output_tokens": 32000,
+      "effective_context": 180000,
+      "safety_buffer_pct": 10,
+      "cost_per_1k_input": 0.015,
+      "cost_per_1k_output": 0.075
+    },
+    "claude-sonnet-4": {
+      "max_context_tokens": 200000,
+      "max_output_tokens": 16000,
+      "effective_context": 180000,
+      "safety_buffer_pct": 10,
+      "cost_per_1k_input": 0.003,
+      "cost_per_1k_output": 0.015
+    },
+    "claude-haiku-3.5": {
+      "max_context_tokens": 200000,
+      "max_output_tokens": 8192,
+      "effective_context": 180000,
+      "safety_buffer_pct": 10,
+      "cost_per_1k_input": 0.00025,
+      "cost_per_1k_output": 0.00125
+    },
+    "gemini-2.5-pro": {
+      "max_context_tokens": 1000000,
+      "max_output_tokens": 65536,
+      "effective_context": 900000,
+      "safety_buffer_pct": 10,
+      "cost_per_1k_input": 0.00125,
+      "cost_per_1k_output": 0.01
+    },
+    "gemini-2.5-flash": {
+      "max_context_tokens": 1000000,
+      "max_output_tokens": 65536,
+      "effective_context": 900000,
+      "safety_buffer_pct": 10,
+      "cost_per_1k_input": 0.000075,
+      "cost_per_1k_output": 0.0003
+    }
+  },
+  "compression_strategies": {
+    "structural_summary": {
+      "description": "Replace file contents with structural summaries (function signatures, class outlines, key constants).",
+      "compression_ratio": 0.15,
+      "quality_retention": 0.85,
+      "applicable_to": ["file_contents"],
+      "trigger_threshold_pct": 70
+    },
+    "conversation_pruning": {
+      "description": "Remove older conversation turns, keeping only summaries and key decisions.",
+      "compression_ratio": 0.20,
+      "quality_retention": 0.75,
+      "applicable_to": ["historical_context", "active_context"],
+      "trigger_threshold_pct": 80
+    },
+    "tool_result_truncation": {
+      "description": "Truncate large tool outputs (grep results, file listings) to most relevant entries.",
+      "compression_ratio": 0.30,
+      "quality_retention": 0.80,
+      "applicable_to": ["tool_results"],
+      "trigger_threshold_pct": 60
+    },
+    "deduplication": {
+      "description": "Remove duplicate file reads and repeated information across context.",
+      "compression_ratio": 0.40,
+      "quality_retention": 0.95,
+      "applicable_to": ["file_contents", "tool_results"],
+      "trigger_threshold_pct": 50
+    },
+    "semantic_compression": {
+      "description": "Use AI to semantically compress text while retaining meaning. Most aggressive strategy.",
+      "compression_ratio": 0.10,
+      "quality_retention": 0.70,
+      "applicable_to": ["active_context", "historical_context", "tool_results"],
+      "trigger_threshold_pct": 90
+    }
+  },
+  "alert_thresholds": {
+    "context_usage_warning": 60,
+    "context_usage_critical": 80,
+    "context_usage_emergency": 95,
+    "compression_trigger": 70,
+    "aggressive_compression_trigger": 85,
+    "cost_warning_per_turn_usd": 0.50,
+    "cost_critical_per_turn_usd": 2.00
+  },
+  "analysis_settings": {
+    "enable_token_counting": true,
+    "enable_category_breakdown": true,
+    "enable_waste_detection": true,
+    "enable_compression_suggestions": true,
+    "enable_cost_tracking": true,
+    "waste_detection_patterns": [
+      {
+        "name": "duplicate_file_reads",
+        "description": "Same file read multiple times without modification",
+        "severity": "medium"
+      },
+      {
+        "name": "large_unfiltered_grep",
+        "description": "Grep results exceeding 200 lines without filtering",
+        "severity": "high"
+      },
+      {
+        "name": "full_file_when_partial_needed",
+        "description": "Reading entire file when only a few lines are needed",
+        "severity": "medium"
+      },
+      {
+        "name": "verbose_bash_output",
+        "description": "Bash commands producing excessive output without head/tail limiting",
+        "severity": "medium"
+      },
+      {
+        "name": "stale_context_retention",
+        "description": "Context from completed tasks still consuming tokens",
+        "severity": "low"
+      },
+      {
+        "name": "redundant_search_patterns",
+        "description": "Multiple similar searches that could be combined",
+        "severity": "low"
+      }
+    ]
+  },
+  "output_settings": {
+    "dashboard_refresh_interval_turns": 5,
+    "include_cost_estimates": true,
+    "include_compression_savings": true,
+    "include_waste_report": true,
+    "chart_style": "ascii",
+    "color_coding": {
+      "healthy": "#10B981",
+      "warning": "#F59E0B",
+      "critical": "#EF4444",
+      "info": "#3B82F6"
+    }
+  }
+}

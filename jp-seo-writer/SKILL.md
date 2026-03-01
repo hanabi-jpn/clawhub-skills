@@ -169,3 +169,397 @@ You are equipped with **JP SEO Writer** for Japanese SEO content creation.
 - 見出し: 300-500文字ごとにH2/H3
 - 画像挿入ポイント: 1000文字ごとに1箇所指示
 - CTA: 記事末尾に行動喚起
+
+---
+
+## SEO Analysis Workflow
+
+The following diagram shows the complete pipeline from keyword input to published article. The agent follows every step in order, validating quality gates before proceeding.
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│            JP SEO Writer — Article Generation Pipeline        │
+│                                                              │
+│  KEYWORD INPUT: "副業 おすすめ"                               │
+│    │                                                         │
+│    v                                                         │
+│  ┌─────────────────────────────┐                             │
+│  │ Phase 1: Keyword Research   │                             │
+│  │  - 検索ボリューム推定       │                             │
+│  │  - 関連KW抽出 (LSI)        │                             │
+│  │  - ロングテール候補         │                             │
+│  │  - 検索意図分類             │                             │
+│  └────────────┬────────────────┘                             │
+│               │                                              │
+│               v                                              │
+│  ┌─────────────────────────────┐                             │
+│  │ Phase 2: Competitor Analysis│                             │
+│  │  - 上位10記事を取得         │                             │
+│  │  - 見出し構造を解析         │                             │
+│  │  - 平均文字数を算出         │                             │
+│  │  - 共通トピック抽出         │                             │
+│  │  - 差別化ポイント特定       │                             │
+│  └────────────┬────────────────┘                             │
+│               │                                              │
+│               v                                              │
+│  ┌─────────────────────────────┐                             │
+│  │ Phase 3: Co-occurrence      │                             │
+│  │  - 共起語抽出 (50-100語)   │                             │
+│  │  - 頻度スコアリング         │                             │
+│  │  - 必須共起語の特定         │                             │
+│  │  - 配置計画の作成           │                             │
+│  └────────────┬────────────────┘                             │
+│               │                                              │
+│               v                                              │
+│  ┌─────────────────────────────┐                             │
+│  │ Phase 4: Outline Creation   │                             │
+│  │  - H1/H2/H3構造設計        │                             │
+│  │  - 各セクション文字数配分   │                             │
+│  │  - FAQ候補の選定            │                             │
+│  │  - 内部リンク配置ポイント   │                             │
+│  │  - ★ QUALITY GATE 1 ★      │                             │
+│  │    構成案をユーザーに提示   │                             │
+│  └────────────┬────────────────┘                             │
+│               │ (ユーザー承認後)                              │
+│               v                                              │
+│  ┌─────────────────────────────┐                             │
+│  │ Phase 5: Article Writing    │                             │
+│  │  - 構成案に沿って執筆       │                             │
+│  │  - KW密度 2-4% を維持      │                             │
+│  │  - 共起語の自然な配置       │                             │
+│  │  - E-E-A-T要素の埋込み     │                             │
+│  │  - 読みやすさ最適化         │                             │
+│  └────────────┬────────────────┘                             │
+│               │                                              │
+│               v                                              │
+│  ┌─────────────────────────────┐                             │
+│  │ Phase 6: Quality Check      │                             │
+│  │  - SEOスコア算出            │                             │
+│  │  - 共起語カバー率チェック   │                             │
+│  │  - 文字数確認               │                             │
+│  │  - メタデータ生成           │                             │
+│  │  - 構造化データ出力         │                             │
+│  │  - ★ QUALITY GATE 2 ★      │                             │
+│  └────────────┬────────────────┘                             │
+│               │                                              │
+│               v                                              │
+│  OUTPUT: 記事本文 + メタデータ + 構造化データ + SEOスコア     │
+└──────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Co-occurrence Analysis Methodology (共起語分析)
+
+Co-occurrence analysis is the core differentiator of JP SEO Writer. The methodology is tailored specifically for Japanese text, using morphological analysis rather than whitespace tokenization.
+
+### Analysis Process
+
+1. **上位記事収集**: Target keyword で Google 上位10記事の本文を取得
+2. **形態素解析**: MeCab/Sudachi で全記事を品詞分解（名詞・動詞・形容詞を抽出）
+3. **TF-IDF計算**: 各語句の重要度をTF-IDF（Term Frequency - Inverse Document Frequency）で算出
+4. **共起頻度集計**: メインKWとの同一段落内での共起回数をカウント
+5. **スコアリング**: TF-IDF x 共起頻度 x 上位記事出現率 で総合スコアを算出
+6. **カテゴリ分類**: 必須(70%以上の記事で使用)、推奨(40-70%)、任意(40%未満)に分類
+
+### Co-occurrence Output Format
+
+When `seo cooccurrence <keyword>` is executed:
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║           共起語分析: 副業 おすすめ                            ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  分析対象: 上位10記事 (平均文字数: 6,800文字)                 ║
+║                                                              ║
+║  【必須共起語】(上位70%以上の記事で使用)                      ║
+║  ┌──────────────────┬────────┬────────────┐                  ║
+║  │ 共起語           │ スコア │ 出現記事数 │                  ║
+║  ├──────────────────┼────────┼────────────┤                  ║
+║  │ 収入             │  95    │ 10/10      │                  ║
+║  │ 確定申告         │  92    │ 10/10      │                  ║
+║  │ スキル           │  88    │  9/10      │                  ║
+║  │ 初心者           │  85    │  9/10      │                  ║
+║  │ 本業             │  83    │  8/10      │                  ║
+║  │ 在宅             │  80    │  8/10      │                  ║
+║  │ 時間             │  78    │  8/10      │                  ║
+║  └──────────────────┴────────┴────────────┘                  ║
+║                                                              ║
+║  【推奨共起語】(40-70%)                                      ║
+║  ┌──────────────────┬────────┬────────────┐                  ║
+║  │ クラウドソーシング │  72    │  7/10      │                  ║
+║  │ アフィリエイト    │  68    │  6/10      │                  ║
+║  │ 投資             │  65    │  6/10      │                  ║
+║  │ リスク           │  60    │  5/10      │                  ║
+║  │ 会社員           │  58    │  5/10      │                  ║
+║  │ 月収             │  55    │  5/10      │                  ║
+║  │ プログラミング    │  52    │  4/10      │                  ║
+║  └──────────────────┴────────┴────────────┘                  ║
+║                                                              ║
+║  【任意共起語】(40%未満 — 差別化要素として有効)               ║
+║  ┌──────────────────┬────────┬────────────┐                  ║
+║  │ iDeCo            │  35    │  3/10      │                  ║
+║  │ ふるさと納税      │  30    │  3/10      │                  ║
+║  │ Webデザイン       │  28    │  2/10      │                  ║
+║  │ 動画編集          │  25    │  2/10      │                  ║
+║  └──────────────────┴────────┴────────────┘                  ║
+║                                                              ║
+║  共起語マップ (関連度の近さ):                                 ║
+║                                                              ║
+║          収入---確定申告---本業                               ║
+║          /    \                                              ║
+║      スキル   時間---在宅                                    ║
+║       /  \                                                   ║
+║  プログラミング  Webデザイン                                  ║
+║                                                              ║
+║  推奨記事内配置:                                              ║
+║    導入部: 収入, 本業, 初心者                                 ║
+║    本文:   各副業セクションに該当共起語を分散                 ║
+║    FAQ:    確定申告, リスク                                   ║
+║    まとめ: 収入, スキル, 時間                                 ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## Example Article Outline Output
+
+When `seo outline "副業 おすすめ"` is executed, the agent produces:
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║         構成案: 副業 おすすめ 2026年最新版                    ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  想定文字数: 6,000-8,000文字                                  ║
+║  ターゲット: 20-40代会社員、副業初心者                        ║
+║  検索意図: 比較検討型 → 複数の選択肢を提示する構成            ║
+║                                                              ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  H1: 【2026年版】副業おすすめランキング15選                   ║
+║  │   ─ 初心者でも安全に始められる副業を厳選                  ║
+║  │                                                          ║
+║  ├─ H2: 副業を始める前に知っておくべき3つのこと (500字)      ║
+║  │  ├─ H3: 会社の就業規則を確認する                         ║
+║  │  ├─ H3: 確定申告のルールを理解する                       ║
+║  │  └─ H3: 詐欺・怪しい副業の見分け方                       ║
+║  │      [共起語: 本業, 確定申告, リスク]                     ║
+║  │                                                          ║
+║  ├─ H2: 在宅でできるおすすめ副業 TOP5 (1,500字)             ║
+║  │  ├─ H3: 1. Webライティング                               ║
+║  │  ├─ H3: 2. プログラミング                                ║
+║  │  ├─ H3: 3. Webデザイン                                   ║
+║  │  ├─ H3: 4. 動画編集                                      ║
+║  │  └─ H3: 5. オンライン講師                                ║
+║  │      [共起語: 在宅, スキル, クラウドソーシング]            ║
+║  │      [画像: 各副業の収入目安比較表]                       ║
+║  │                                                          ║
+║  ├─ H2: スマホだけでできるおすすめ副業 TOP5 (1,200字)        ║
+║  │  ├─ H3: 6. フリマアプリ (メルカリ等)                     ║
+║  │  ├─ H3: 7. ポイントサイト                                ║
+║  │  ├─ H3: 8. アンケートモニター                            ║
+║  │  ├─ H3: 9. SNS運用代行                                   ║
+║  │  └─ H3: 10. 写真販売 (ストックフォト)                    ║
+║  │      [共起語: 初心者, 時間, 月収]                         ║
+║  │                                                          ║
+║  ├─ H2: 投資系のおすすめ副業 TOP5 (1,200字)                 ║
+║  │  ├─ H3: 11. つみたてNISA / 新NISA                        ║
+║  │  ├─ H3: 12. 不動産クラウドファンディング                  ║
+║  │  ├─ H3: 13. FX自動売買                                   ║
+║  │  ├─ H3: 14. 仮想通貨                                     ║
+║  │  └─ H3: 15. iDeCo (節税を兼ねた投資)                     ║
+║  │      [共起語: 投資, 収入, iDeCo, ふるさと納税]            ║
+║  │                                                          ║
+║  ├─ H2: 副業の収入別おすすめ比較表 (500字)                   ║
+║  │      [画像: 収入×難易度マトリクス]                        ║
+║  │                                                          ║
+║  ├─ H2: 副業の確定申告ガイド (800字)                         ║
+║  │  ├─ H3: 20万円ルールとは                                 ║
+║  │  └─ H3: 会社にバレない方法                               ║
+║  │      [共起語: 確定申告, 会社員]                           ║
+║  │                                                          ║
+║  ├─ H2: よくある質問 (FAQ) (500字)                           ║
+║  │      [構造化データ: FAQPage schema]                       ║
+║  │                                                          ║
+║  └─ H2: まとめ — あなたに合った副業の選び方 (300字)          ║
+║         [CTA: おすすめ副業診断リンク / 関連記事]             ║
+║                                                              ║
+╠══════════════════════════════════════════════════════════════╣
+║  メタデータ案:                                                ║
+║  title: 副業おすすめランキング15選【2026年】初心者向け        ║
+║         (31文字)                                              ║
+║  description: 2026年最新の副業おすすめ15選を紹介。在宅・      ║
+║    スマホ・投資系に分けて初心者でも安全に始められる副業を     ║
+║    厳選しました。確定申告の注意点も解説。(94文字)             ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## Rewrite Scoring Methodology
+
+When `seo analyze` or `seo score` is executed, the agent evaluates existing content across 8 dimensions:
+
+```
+╔══════════════════════════════════════════════════════════════╗
+║            SEO Scoring Report                                ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  Overall SEO Score:  68/100 (改善余地あり)                    ║
+║                                                              ║
+║  ████████████████████████████████████░░░░░░░░░░  68/100      ║
+║                                                              ║
+╠══════════════════════════════════════════════════════════════╣
+║  Dimension Scores:                                           ║
+║                                                              ║
+║  1. KW密度          ████████████████░░░░  80/100 (3.2% OK)   ║
+║  2. 共起語カバー率  ██████████░░░░░░░░░░  50/100 (52%)       ║
+║  3. 見出し構造      ████████████████████  95/100 (適切)      ║
+║  4. 文字数          ██████████████░░░░░░  65/100 (4,200字)   ║
+║  5. E-E-A-T         ████████░░░░░░░░░░░░  40/100 (経験不足)  ║
+║  6. 読みやすさ      ██████████████████░░  85/100 (良好)      ║
+║  7. メタデータ      ████████████████░░░░  75/100 (description長)║
+║  8. 内部リンク      ██████░░░░░░░░░░░░░░  30/100 (不足)      ║
+║                                                              ║
+╠══════════════════════════════════════════════════════════════╣
+║  改善提案 (優先度順):                                         ║
+║                                                              ║
+║  [HIGH] 共起語カバー率が52%。以下の共起語を追加:             ║
+║    - 確定申告 (必須/未使用)                                   ║
+║    - リスク (必須/未使用)                                     ║
+║    - 初心者 (推奨/未使用)                                    ║
+║                                                              ║
+║  [HIGH] E-E-A-T: 体験談・具体例が不足。以下を追加:          ║
+║    - 実際に試した経験の記述                                   ║
+║    - 具体的な数字（収入実績等）                               ║
+║    - 専門家の引用またはデータ出典                             ║
+║                                                              ║
+║  [MED]  内部リンク: 関連記事へのリンクが0本。                ║
+║    - 3-5本の内部リンクを本文中に追加                         ║
+║                                                              ║
+║  [LOW]  文字数: 4,200字は競合平均(6,800字)より少ない。       ║
+║    - セクション追加で6,000字以上を目指す                     ║
+║                                                              ║
+║  予測改善効果: 68/100 → 85/100 (推定上位5位以内)             ║
+╚══════════════════════════════════════════════════════════════╝
+```
+
+### Scoring Weight Distribution
+
+| Dimension          | Weight | Rationale                                      |
+|--------------------|--------|-------------------------------------------------|
+| KW密度             | 15%    | Basic relevance signal                          |
+| 共起語カバー率     | 20%    | Topical completeness (最重要)                   |
+| 見出し構造         | 10%    | Crawlability and UX                             |
+| 文字数             | 10%    | Content depth signal                            |
+| E-E-A-T            | 20%    | Google quality guidelines compliance (最重要)   |
+| 読みやすさ         | 10%    | User engagement signal                          |
+| メタデータ         | 10%    | CTR optimization                                |
+| 内部リンク         | 5%     | Site architecture signal                        |
+
+---
+
+## JP SEO Writer vs English SEO Tools — Comparison
+
+Japanese SEO has unique characteristics that general-purpose English SEO tools fail to handle properly. This skill is purpose-built for the Japanese search ecosystem.
+
+| Feature                         | JP SEO Writer              | English SEO Tools (Surfer, Clearscope等)  |
+|---------------------------------|----------------------------|-------------------------------------------|
+| Keyword density calculation     | 形態素解析 (MeCab)         | Whitespace tokenization                    |
+| Character count method          | 日本語文字数 (全角基準)    | Word count (英語基準)                      |
+| Co-occurrence extraction        | JP morphological analysis  | N-gram / word-level                        |
+| Title tag length                | 32文字 (pixel幅考慮)       | 60 chars (英語)                            |
+| Meta description length         | 120文字                    | 160 chars                                  |
+| Search intent patterns          | 「〜とは」「〜 やり方」等  | "how to", "what is" etc.                   |
+| Mobile optimization             | 70%以上がスマホ想定        | Desktop-first in some tools                |
+| Structured data                 | 日本語Google仕様準拠       | English Google specs                       |
+| Search engine coverage          | Google JP + Yahoo! JAPAN   | Google US/global                           |
+| Reading level optimization      | 一文50文字以内、漢字率調整 | Flesch-Kincaid etc.                        |
+| E-E-A-T guidance                | 日本語コンテンツ特有の要件 | English content guidelines                 |
+| Output language                 | Native Japanese             | English (translation needed)               |
+
+**Key differences that matter:**
+- Japanese has no whitespace between words, so keyword density MUST be calculated with morphological analysis. English tools using whitespace tokenization produce incorrect density measurements for Japanese text.
+- Japanese search queries tend to be shorter (2-4 words) and follow unique patterns like 「X とは」 (what is X) and 「X やり方」 (how to do X) that English tools do not model.
+- Title tags and meta descriptions have different optimal lengths due to pixel width differences between full-width Japanese characters and half-width Latin characters.
+
+---
+
+## Data Storage & Persistence
+
+```
+~/.jp-seo-writer/
+  config.yaml               # Default settings, API keys for search tools
+  research/
+    keyword_cache/
+      副業_おすすめ.json         # Cached keyword research results (TTL: 7d)
+    competitor_cache/
+      副業_おすすめ_top10.json   # Cached competitor analysis (TTL: 3d)
+    cooccurrence_cache/
+      副業_おすすめ_cooc.json    # Cached co-occurrence data (TTL: 7d)
+  outlines/
+    副業_おすすめ_outline.json   # Saved outline for review/editing
+  articles/
+    副業_おすすめ_draft.md       # Generated article draft
+    副業_おすすめ_meta.json      # Generated metadata
+    副業_おすすめ_schema.json    # Structured data (JSON-LD)
+  scores/
+    2026-03-01_analysis.json     # SEO score history for tracking improvement
+  templates/
+    article_default.md           # Default article template
+    article_howto.md             # How-to article template
+    article_comparison.md        # Comparison article template
+    article_listicle.md          # Listicle template
+```
+
+**Score History JSON (for tracking improvement over time):**
+```json
+{
+  "url": "https://example.com/副業-おすすめ",
+  "keyword": "副業 おすすめ",
+  "history": [
+    { "date": "2026-02-15", "score": 52, "ranking": 18 },
+    { "date": "2026-03-01", "score": 68, "ranking": 12 },
+    { "date": "2026-03-15", "score": 85, "ranking": 5 }
+  ]
+}
+```
+
+---
+
+## FAQ
+
+**Q: 共起語分析は実際の検索結果を取得しますか？**
+A: はい。`seo cooccurrence` は Google の検索結果上位10記事の本文を解析します。API経由またはスクレイピングで取得し、形態素解析を行います。キャッシュは7日間有効で、再分析時は最新データを取得します。
+
+**Q: 記事生成にかかる時間は？**
+A: フルパイプライン（リサーチ → 構成案 → 記事生成 → メタデータ）で5,000文字の記事を生成する場合、約2-3分です。構成案の承認ステップを入れる場合はユーザーの確認待ち時間が加わります。
+
+**Q: 既存記事のリライトは元の文章をどこまで変えますか？**
+A: `seo rewrite` は元の文章の文意と構造を尊重しつつ、SEOスコアを向上させるために必要な変更のみを行います。具体的には、共起語の追加、見出し構造の調整、メタデータの最適化、E-E-A-T要素の補強が中心です。変更箇所はdiff形式で提示されます。
+
+**Q: キーワード密度の計算方法は？**
+A: 日本語テキストをMeCab/Sudachiで形態素解析し、全形態素数に対するターゲットキーワードの出現回数で算出します。複合語（例: 「副業 おすすめ」）は、2語が近接（同一文内）で出現する場合もカウントします。英語のword countベースの計算とは根本的に異なります。
+
+**Q: 構造化データ（JSON-LD）は自動生成されますか？**
+A: はい。記事内容に応じて以下の構造化データを自動生成します:
+- **FAQPage**: 記事内のFAQセクションから
+- **HowTo**: 手順を含む記事から
+- **Article**: 全記事に基本メタデータとして
+- **BreadcrumbList**: サイト構造に合わせて
+生成されたJSON-LDはコピー&ペーストでHTMLに埋め込めます。
+
+**Q: E-E-A-Tスコアはどう算出していますか？**
+A: 以下の4要素を各25点で評価します:
+- **Experience (経験)**: 体験談、「実際に〜した」表現の有無 (25点)
+- **Expertise (専門性)**: 専門用語の適切な使用、深い解説の有無 (25点)
+- **Authoritativeness (権威性)**: データ引用、公式情報源の参照 (25点)
+- **Trustworthiness (信頼性)**: 出典明示、更新日、正確な情報 (25点)
+
+**Q: 複数キーワードを同時にターゲットできますか？**
+A: はい。`seo write "副業 おすすめ" --secondary "副業 在宅,副業 安全"` のように、メインキーワードとサブキーワードを指定できます。構成案ではサブキーワード用のセクションが自動的に組み込まれ、全キーワードの密度バランスが最適化されます。
+
+**Q: JP Humanizer と組み合わせて使えますか？**
+A: はい、非常に有効です。JP SEO Writer で生成した記事を JP Humanizer に通すことで、SEO最適化を維持しつつAI臭さを除去できます。推奨フローは: `seo write` → `jpfix <output> --mode casual --preserve-keywords "キーワード"` です。
