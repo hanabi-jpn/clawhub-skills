@@ -1,0 +1,38 @@
+name: Publish MCP Packages
+on: [workflow_dispatch]
+permissions:
+  contents: read
+  packages: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@hanabi-jpn'
+      - name: Build and publish all packages
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd mcp-servers/packages
+          SUCCESS=0; FAIL=0; SKIP=0
+          TOTAL=$(ls -d mcp-* | wc -l | tr -d ' ')
+          for pkg_dir in mcp-*; do
+            echo "[$((SUCCESS+FAIL+SKIP+1))/$TOTAL] $pkg_dir"
+            cd "$pkg_dir"
+            npm install 2>/dev/null || true
+            if npx tsc 2>/dev/null; then
+              if npm publish 2>&1; then
+                echo "  Published"; SUCCESS=$((SUCCESS+1))
+              else
+                echo "  Skip/Fail"; SKIP=$((SKIP+1))
+              fi
+            else
+              echo "  Build fail"; FAIL=$((FAIL+1))
+            fi
+            cd ..
+          done
+          echo "Results: $SUCCESS published, $SKIP skipped, $FAIL failed of $TOTAL"
