@@ -36,7 +36,7 @@ tags:
   ╚══════════════════════════════════════════════════════════════╝
 ```
 
-`skill: base-stores-agent` | `version: 1.0.0` | `platforms: BASE + STORES` | `shops: 1.4M+` | `dual-engine: unified CLI`
+`claude-code` `base` `stores` `ecommerce` `japan`
 
 [![Author](https://img.shields.io/badge/author-hanabi--jpn-orange)]()
 [![Version](https://img.shields.io/badge/version-1.0.0-blue)]()

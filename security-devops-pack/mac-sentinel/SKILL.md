@@ -47,7 +47,7 @@ tags:
 [![CVE](https://img.shields.io/badge/mitigates-CVE--2025--59536-critical)]()
 [![Platform](https://img.shields.io/badge/platform-macOS_13%2B-lightgrey)]()
 
-**Your Mac is a fortress — but Claude Code opens gates. Mac Sentinel makes sure nothing hostile walks through.**
+> **Your Mac is a fortress — but Claude Code opens gates. Mac Sentinel makes sure nothing hostile walks through.**
 
 ---
 

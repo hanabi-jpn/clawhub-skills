@@ -15,18 +15,14 @@ tags:
 ---
 
 ```
-   ██████╗██╗  ██╗ █████╗ ████████╗██╗    ██╗ ██████╗ ██████╗ ██╗  ██╗
-  ██╔════╝██║  ██║██╔══██╗╚══██╔══╝██║    ██║██╔═══██╗██╔══██╗██║ ██╔╝
-  ██║     ███████║███████║   ██║   ██║ █╗ ██║██║   ██║██████╔╝█████╔╝
-  ██║     ██╔══██║██╔══██║   ██║   ██║███╗██║██║   ██║██╔══██╗██╔═██╗
-  ╚██████╗██║  ██║██║  ██║   ██║   ╚███╔███╔╝╚██████╔╝██║  ██║██║  ██╗
-   ╚═════╝╚═╝  ╚═╝╚═╝  ╚═╝   ╚═╝    ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝
-              █████╗  ██████╗ ███████╗███╗   ██╗████████╗
-             ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝
-             ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║
-             ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║
-             ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║
-             ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝
+╔═══════════════════════════════════════════════════╗
+║  ┌───────────────────────────────────────────┐    ║
+║  │  C H A T W O R K   A G E N T             │    ║
+║  │     ━━━━━━━━━━━━━━━━━━━━━━                │    ║
+║  │  💬 Messages → Tasks → Rooms → Bots      │    ║
+║  │     Japan's #1 Business Chat Platform     │    ║
+║  └───────────────────────────────────────────┘    ║
+╚═══════════════════════════════════════════════════╝
 ```
 
 `chatwork` `api-v2` `business-chat` `japan-saas` `task-automation`
@@ -237,9 +233,9 @@ $ cw webhook list
 
   Webhook ID   Room            Events              URL                           Status
   ───────────  ──────────────  ──────────────────  ────────────────────────────  ──────
-  WH-001       開発チーム       message_created     https://bot.example.com/cw    active
-  WH-002       営業部連絡       message_created     https://crm.example.com/hook  active
-  WH-003       全社アナウンス   member_joined        https://hr.example.com/hook   paused
+  WH-001       開発チーム       message_created     https://hooks.chatwork.com/incoming/bot    active
+  WH-002       営業部連絡       message_created     https://api.salesforce.com/webhook/cw  active
+  WH-003       全社アナウンス   member_joined        https://api.smarthr.jp/webhook/cw   paused
 
   Total: 3 webhooks (2 active, 1 paused)
 ```

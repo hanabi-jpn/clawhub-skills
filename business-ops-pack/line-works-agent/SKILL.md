@@ -530,15 +530,26 @@ $ lw admin stats
 
 ## Data Storage
 
-| Item | Location | Purpose | Retention |
-|---|---|---|---|
-| JWT tokens | `~/.lw-agent/auth/tokens.json` | Cached access tokens | Until expiry (24h) |
-| Private key ref | `~/.lw-agent/config.json` | Path to PEM key file | Persistent |
-| Sent message log | `~/.lw-agent/sent.log` | Audit trail of sent messages | 180 days |
-| Broadcast reports | `~/.lw-agent/broadcasts/` | Delivery reports with read receipts | 90 days |
-| Template store | `~/.lw-agent/templates/` | Flex/carousel message templates | Persistent |
-| Contact cache | `~/.lw-agent/cache/contacts.json` | Organization directory cache | 1 hour |
-| Config | `~/.lw-agent/config.json` | Domain, preferences, bot IDs | Persistent |
+```
+~/.lw-agent/
+├── config/
+│   └── config.json
+├── auth/
+│   └── tokens.json
+├── cache/
+│   ├── contacts.json
+│   └── groups.json
+├── templates/
+│   ├── flex/
+│   └── carousel/
+├── broadcasts/
+│   └── reports/
+├── logs/
+│   ├── sent.log
+│   └── errors.log
+└── secrets/
+    └── .private_key_ref
+```
 
 Private keys are never copied or cached -- only the file path is stored. JWT tokens are encrypted at rest. All message content in the sent log is stored as SHA-256 hashes, not plaintext, to comply with data protection policies.
 

@@ -143,6 +143,24 @@ All endpoints use `{ECCUBE_BASE_URL}/api/v1/` as base. Authentication via Bearer
 | PUT | `/stock/{product_class_id}` | Update stock quantity |
 | POST | `/stock/adjust` | Batch stock adjustment (入庫/出庫/棚卸) |
 
+### Behavioral Guidelines
+
+1. Language: すべての応答は日本語。EC-CUBEの日本語管理画面用語に準拠
+2. Safety: 商品削除・在庫変更は実行前に確認プロンプトを表示
+3. Data Integrity: 注文データの変更は履歴を自動記録
+4. Rate Limiting: EC-CUBE APIの制限を遵守（サーバー負荷に応じた自動調整）
+5. Error Transparency: APIエラーは原因と対処法を日本語で説明
+6. Backup: 破壊的操作前に自動バックアップ作成
+7. Idempotency: 同じコマンド複数回実行でも副作用なし
+8. Validation: 商品データ投入前にCSVバリデーション実行
+9. Tax Compliance: 消費税率（標準10%/軽減8%）を正確に適用
+10. Privacy: 顧客個人情報はログに記録しない
+11. Timezone: JST(UTC+9)をデフォルトとして全日時処理に適用
+12. Batch Safety: 100件以上の一括操作は段階的実行（20件ずつ）
+13. Cache: 商品カタログは1時間キャッシュ、在庫は即時反映
+14. Audit Trail: 全操作をローカルログに記録（.ec-cube-operator/logs/）
+15. Version Awareness: EC-CUBE 4.x APIバージョンとの互換性を常に確認
+
 ### Core Capabilities
 
 **1. Product Management:**

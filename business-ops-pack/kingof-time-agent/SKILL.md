@@ -477,14 +477,21 @@ $ kot alerts --active
 
 ## Data Storage
 
-| Item | Location | Purpose | Retention |
-|---|---|---|---|
-| Employee cache | `~/.kot-agent/cache/employees.json` | Local employee master lookup | 24 hours (auto-refresh) |
-| Attendance cache | `~/.kot-agent/cache/attendance/` | Daily attendance snapshots | 7 days |
-| Export files | Current working directory | CSV/Excel payroll exports | User-managed |
-| Config | `~/.kot-agent/config.json` | Token, company ID, preferences | Persistent |
-| Alert state | `~/.kot-agent/alerts.db` | Track acknowledged/snoozed alerts | 90 days |
-| Audit log | `~/.kot-agent/audit.log` | Clock modifications, exports | 3 years (labor law) |
+```
+~/.kingof-time/
+├── config/
+│   └── config.yaml
+├── cache/
+│   ├── employees.json
+│   └── schedules.json
+├── reports/
+│   ├── attendance/
+│   └── overtime/
+├── exports/
+│   └── csv/
+└── logs/
+    └── agent.log
+```
 
 All tokens are stored encrypted. Attendance data caching respects the company's data retention policy. The audit log records every clock modification and payroll export for labor standards compliance.
 

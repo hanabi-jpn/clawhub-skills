@@ -45,7 +45,7 @@ tags:
 
 `claude-code` `lark` `feishu` `workflow` `japan`
 
-> Lark/Feishu自動化エージェント。承認フロー、Bot通知、ドキュメント管理、カレンダー連携をAIで自動化。
+> **Lark/Feishu自動化エージェント。承認フロー、Bot通知、ドキュメント管理、カレンダー連携をAIで自動化。**
 
 **Author:** hanabi-jpn
 **Version:** 1.0.0
@@ -64,10 +64,12 @@ You are equipped with **Lark Workflow** for Lark/Feishu automation.
 
 ### Setup
 
-- `LARK_APP_ID` — Lark app ID
-- `LARK_APP_SECRET` — Lark app secret
-- `LARK_WEBHOOK_URL` — (optional) Bot webhook URL for quick notifications
-- `LARK_TENANT_KEY` — (optional) Tenant key for multi-tenant apps
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `LARK_APP_ID` | Lark app ID | Yes | — |
+| `LARK_APP_SECRET` | Lark app secret | Yes | — |
+| `LARK_WEBHOOK_URL` | Bot webhook URL for quick notifications | No | — |
+| `LARK_TENANT_KEY` | Tenant key for multi-tenant apps | No | — |
 
 API Base: `https://open.larksuite.com/open-apis/` (Global) or `https://open.feishu.cn/open-apis/` (China)
 
@@ -138,18 +140,142 @@ API Base: `https://open.larksuite.com/open-apis/` (Global) or `https://open.feis
 
 ### Commands
 
-**`lark send <chat-id|user-id> <message>`** — メッセージ送信
-**`lark send --card <template> <data>`** — カードメッセージ
-**`lark webhook <message>`** — Webhook Bot通知
+### `lark send <chat-id|user-id> <message>`
+
+Send a text message to a chat or user.
+
+```
+$ lark send oc_abc123 "本日のデプロイは17:00に実施します"
+✓ Message sent
+  Chat:       #dev-team (oc_abc123)
+  Message ID: om_1234567890
+  Type:       text
+  Timestamp:  2026-03-01 14:00:00 JST
+```
+
+### `lark send --card <template> <data>`
+
+Send an Interactive Card message.
+
+```
+$ lark send --card approval_notify '{"applicant":"田中","amount":50000,"reason":"出張費"}'
+✓ Card message sent
+  Chat:       #approvers (oc_def456)
+  Template:   approval_notify
+  Message ID: om_1234567891
+  Buttons:    [承認] [却下] [詳細を見る]
+  Timestamp:  2026-03-01 14:05:00 JST
+```
+
+### `lark webhook <message>`
+
+Send a quick notification via Webhook Bot.
+
+```
+$ lark webhook "デプロイ完了しました ✓ v2.3.1"
+✓ Webhook notification sent
+  URL:        https://open.larksuite.com/open-apis/bot/v2/hook/xxxx
+  Status:     200 OK
+  Timestamp:  2026-03-01 17:05:00 JST
+```
+
+### `lark chats`
+
+List all accessible chats.
+
+```
+$ lark chats
+╔════════════════════════════════════════════════════════════╗
+║              Lark チャット一覧                             ║
+╠════════════════════════════════════════════════════════════╣
+║  Chat ID      │ Name              │ Type    │ Members     ║
+╠═══════════════╪═══════════════════╪═════════╪═════════════╣
+║  oc_abc123    │ #dev-team         │ Group   │ 12          ║
+║  oc_def456    │ #approvers        │ Group   │  5          ║
+║  oc_ghi789    │ #general          │ Group   │ 48          ║
+║  oc_jkl012    │ #incidents        │ Group   │  8          ║
+║  ou_user001   │ 田中太郎 (DM)      │ P2P     │  2          ║
+╚════════════════════════════════════════════════════════════╝
+  Total: 5 chats (4 groups, 1 P2P)
+```
+
+### `lark approval create <template> <data>`
+
+Create a new approval instance from a template.
+
+```
+$ lark approval create expense --amount 50000 --reason "東京-大阪 出張費" --date 2026-03-01
+✓ Approval instance created
+  Instance ID:  inst_abc123456
+  Template:     経費申請 (expense)
+  Applicant:    田中太郎
+  Amount:       ¥50,000
+  Status:       PENDING
+  Approver(s):  鈴木部長 → 佐藤課長 (2段承認)
+  Notification: カードメッセージ送信済み
+```
+
+### `lark approval list`
+
+List approval instances with optional status filter.
+
+```
+$ lark approval list --status pending
+╔════════════════════════════════════════════════════════════════════╗
+║              承認一覧 (ステータス: 保留中)                         ║
+╠════════════════════════════════════════════════════════════════════╣
+║  ID             │ テンプレート │ 申請者   │ 金額     │ 経過時間   ║
+╠════════════════╪════════════╪══════════╪══════════╪════════════╣
+║  inst_abc123   │ 経費申請    │ 田中太郎  │ ¥50,000  │ 2h         ║
+║  inst_def456   │ 休暇申請    │ 鈴木花子  │ —        │ 1d 4h      ║
+║  inst_ghi789   │ 稟議書      │ 佐藤一郎  │ ¥200,000 │ 3d ⚠      ║
+╚════════════════════════════════════════════════════════════════════╝
+  Total pending: 3 (1 overdue > 48h)
+```
+
+### `lark docs [--search <query>]`
+
+Search documents in the workspace.
+
+```
+$ lark docs --search "議事録"
+╔════════════════════════════════════════════════════════════════╗
+║              ドキュメント検索結果: "議事録"                    ║
+╠════════════════════════════════════════════════════════════════╣
+║  # │ タイトル                    │ 種類  │ 更新日     │ 作成者 ║
+╠═══╪═══════════════════════════════╪═══════╪════════════╪═══════╣
+║  1 │ Q1計画 議事録 2026-03-01     │ Doc   │ 2026-03-01 │ 田中  ║
+║  2 │ 開発定例 議事録 2026-02-28   │ Doc   │ 2026-02-28 │ 鈴木  ║
+║  3 │ 議事録テンプレート            │ Doc   │ 2026-01-15 │ 佐藤  ║
+║  4 │ 経営会議 議事録 2026-02-25   │ Doc   │ 2026-02-25 │ 山田  ║
+╚════════════════════════════════════════════════════════════════╝
+  Found: 4 documents matching "議事録"
+```
+
+### `lark calendar events`
+
+List calendar events for a date range.
+
+```
+$ lark calendar events --from 2026-03-01 --to 2026-03-07
+╔════════════════════════════════════════════════════════════════════╗
+║              カレンダー: 2026-03-01 〜 2026-03-07                  ║
+╠════════════════════════════════════════════════════════════════════╣
+║  日時                │ イベント             │ 参加者      │ 場所   ║
+╠══════════════════════╪══════════════════════╪═════════════╪═══════╣
+║  03-01 10:00-10:30   │ デイリースタンドアップ │ dev-team    │ Zoom  ║
+║  03-01 14:00-15:00   │ Q1計画ミーティング    │ 田中,鈴木,佐藤│ 会議室A║
+║  03-03 11:00-11:30   │ 1on1 (田中×鈴木)     │ 田中,鈴木    │ Zoom  ║
+║  03-05 17:00-17:30   │ Sprint Review        │ dev-team    │ Zoom  ║
+║  03-07 17:00-17:30   │ 振り返り (KPT)        │ dev-team    │ Zoom  ║
+╚════════════════════════════════════════════════════════════════════╝
+  Total: 5 events this week
+```
+
 **`lark webhook --card <title> <content>`** — カード形式通知
-**`lark chats`** — チャット一覧
-**`lark approval create <template> <data>`** — 承認申請作成
-**`lark approval list [--status pending|approved|rejected]`** — 承認一覧
 **`lark approval <id>`** — 承認詳細
-**`lark docs [--search <query>]`** — ドキュメント検索
 **`lark doc create <title> [--template <template>]`** — ドキュメント作成
 **`lark doc <id>`** — ドキュメント内容
-**`lark calendar events [--from <date>] [--to <date>]`** — イベント一覧
 **`lark calendar create <title> <start> <end>`** — イベント作成
 **`lark sheet <id> read <range>`** — シート読み取り
 **`lark sheet <id> write <range> <data>`** — シート書き込み

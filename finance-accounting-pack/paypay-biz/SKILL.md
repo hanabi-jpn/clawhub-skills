@@ -180,6 +180,25 @@ Authentication: HMAC-SHA256 signature with API key and secret. All requests incl
 └──────────────────────────────────────────────────────────────┘
 ```
 
+### Behavioral Guidelines
+
+1. **Language:** Respond in Japanese by default. If the user writes in English, respond in English but keep PayPay-specific terms in Japanese with translations, e.g., "決済 (payment)", "返金 (refund)".
+2. **Monetary precision:** All amounts are in JPY (integer yen). Never use floating-point arithmetic for monetary calculations. Always display with comma separators (e.g., ¥1,234,567).
+3. **Idempotency enforcement:** Every payment creation must use a unique `merchantPaymentId`. The agent generates deterministic IDs and checks for duplicates before submission to prevent double charges.
+4. **Environment safety:** Default to `sandbox` environment. Never switch to `production` without explicit user confirmation. Display the current environment prominently in all output.
+5. **Refund validation:** Before processing a refund, verify: (a) the original payment exists and is COMPLETED, (b) the refund amount does not exceed the remaining refundable balance, (c) display a confirmation prompt unless `--confirm` is passed.
+6. **Fee calculation accuracy:** Always use the exact `PAYPAY_FEE_RATE` (default 1.98%). Display gross amount, fee amount, and net amount separately in all settlement reports.
+7. **QR code expiry awareness:** QR codes expire after 5 minutes by default. When generating a QR code, display the expiry timestamp and warn the user if the code is about to expire.
+8. **Rate limiting:** Respect PayPay API rate limits. Queue excess requests and retry with exponential backoff. Notify the user when requests are being throttled.
+9. **Webhook vs polling:** Prefer webhook notifications for payment status updates when available. Fall back to polling with 3-second intervals for up to 5 minutes, then report timeout.
+10. **Reconciliation integrity:** During daily reconciliation, never auto-dismiss discrepancies. Flag all mismatches for manual review and generate a discrepancy report.
+11. **Subscription safety:** Before canceling a subscription, display the subscriber's remaining billing period and any penalties. Require `--confirm` for cancellation.
+12. **Data privacy:** Never log or display full user PayPay IDs in plain text. Use masked format (e.g., `user_***abc`) in all output and logs.
+13. **Error transparency:** When an API call fails, display the full error code, human-readable message in Japanese, and a concrete resolution action. Never silently retry without notifying the user.
+14. **Audit logging:** Log every payment, refund, and cashback operation to `logs/api-calls.jsonl` with timestamp, operation type, merchant payment ID, and result status.
+15. **Pre-authorization flow:** When using pre-auth (仮売上), always remind the user of the capture deadline and the auto-void policy if capture is not completed in time.
+16. **Cross-skill coordination:** When freee Agent is available in the same session, offer to auto-generate accounting journal entries for PayPay settlements.
+
 ### Core Capabilities
 
 **1. 決済管理:**
@@ -326,6 +345,38 @@ For recurring payments (月額課金サービス):
 | INTERNAL_SERVER_ERROR | PayPay server error | Retry once, log for monitoring |
 
 **Idempotency:** All payment creation requests use `merchantPaymentId` as idempotency key. The agent generates unique IDs and prevents duplicate charges.
+
+**UNAUTHORIZED 認証エラー例:**
+```json
+{
+  "error": "UNAUTHORIZED",
+  "message": "PayPay APIキーまたはシークレットが無効です",
+  "action": "PAYPAY_API_KEY と PAYPAY_API_SECRET を確認してください",
+  "help": "https://developer.paypay.ne.jp/products/docs/apiauth"
+}
+```
+
+**UNACCEPTABLE_OP 操作エラー例:**
+```json
+{
+  "error": "UNACCEPTABLE_OP",
+  "message": "返金額（¥15,000）が元の決済額（¥12,000）を超えています",
+  "action": "返金額を元の決済額以下に修正してください。残り返金可能額: ¥12,000",
+  "payment_id": "MPM-2026-03-001",
+  "original_amount": 12000,
+  "refunded_total": 0
+}
+```
+
+**RATE_LIMIT レートリミットエラー例:**
+```json
+{
+  "error": "RATE_LIMIT",
+  "message": "APIリクエスト上限に達しました。しばらくお待ちください",
+  "action": "30秒後に自動リトライします。バッチ処理の場合はリクエスト間隔を広げてください",
+  "retry_after": 30
+}
+```
 
 ### Commands
 

@@ -15,18 +15,14 @@ tags:
 ---
 
 ```
-  ██████╗  █████╗  ██████╗██╗  ██╗██╗      ██████╗  ██████╗
-  ██╔══██╗██╔══██╗██╔════╝██║ ██╔╝██║     ██╔═══██╗██╔════╝
-  ██████╔╝███████║██║     █████╔╝ ██║     ██║   ██║██║  ███╗
-  ██╔══██╗██╔══██║██║     ██╔═██╗ ██║     ██║   ██║██║   ██║
-  ██████╔╝██║  ██║╚██████╗██║  ██╗███████╗╚██████╔╝╚██████╔╝
-  ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝
-       █████╗  ██████╗ ███████╗███╗   ██╗████████╗
-      ██╔══██╗██╔════╝ ██╔════╝████╗  ██║╚══██╔══╝
-      ███████║██║  ███╗█████╗  ██╔██╗ ██║   ██║
-      ██╔══██║██║   ██║██╔══╝  ██║╚██╗██║   ██║
-      ██║  ██║╚██████╔╝███████╗██║ ╚████║   ██║
-      ╚═╝  ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═══╝   ╚═╝
+╔═══════════════════════════════════════════════════╗
+║  ┌───────────────────────────────────────────┐    ║
+║  │  B A C K L O G   A G E N T               │    ║
+║  │     ━━━━━━━━━━━━━━━━━━━━━━                │    ║
+║  │  📋 Issues → Wiki → Git → Sprints        │    ║
+║  │     Nulab Project Management CLI          │    ║
+║  └───────────────────────────────────────────┘    ║
+╚═══════════════════════════════════════════════════╝
 ```
 
 `backlog` `nulab` `project-management` `issue-tracker` `git-hosting`
@@ -426,7 +422,7 @@ Yes. Use `--space other-team` to override `BACKLOG_SPACE_ID` per command, or mai
 Use `bl bulk --import ./issues.csv --project DEV`. The CSV must include columns matching field names (Summary, Type, Priority, Assignee, etc.). The agent validates all rows before importing.
 
 **9. Does the agent support Backlog's webhook events?**
-Yes. `bl webhook --create --project DEV --url https://ci.example.com/hook --events issue_created,git_pushed` configures event notifications for CI/CD integration.
+Yes. `bl webhook --create --project DEV --url https://ci.jenkins-server.local/webhook/backlog --events issue_created,git_pushed` configures event notifications for CI/CD integration.
 
 **10. Can I track time spent on issues?**
 Yes. Use `bl update DEV-143 --actual-hours 4.5` to log time. `bl report --project DEV --type timesheet --period 2026-03` generates timesheet reports grouped by assignee.

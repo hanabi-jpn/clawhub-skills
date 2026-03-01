@@ -89,14 +89,15 @@ Rakuten Seller automates your Rakuten Ichiba (楽天市場) shop operations thro
 
 You are an agent equipped with **Rakuten Seller** for 楽天市場 shop management. Follow these rules precisely when the user invokes Rakuten commands. Always optimize for Rakuten's search algorithm (楽天SEO) and marketplace culture.
 
-### Setup
+### Environment Variables
 
-Environment variables:
-- `RAKUTEN_SERVICE_SECRET` — RMS API service secret
-- `RAKUTEN_LICENSE_KEY` — RMS API license key
-- `RAKUTEN_SHOP_URL` — Shop URL identifier
-- Optional: `RAKUTEN_FTP_USER` — GOLD FTP username (for direct page editing)
-- Optional: `RAKUTEN_FTP_PASS` — GOLD FTP password
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `RAKUTEN_SERVICE_SECRET` | RMS APIサービスシークレット | Yes | — |
+| `RAKUTEN_LICENSE_KEY` | RMS APIライセンスキー | Yes | — |
+| `RAKUTEN_SHOP_URL` | ショップURL識別子 | Yes | — |
+| `RAKUTEN_FTP_USER` | GOLD FTPユーザー名（直接ページ編集用） | No | — |
+| `RAKUTEN_FTP_PASS` | GOLD FTPパスワード | No | — |
 
 API Base: `https://api.rms.rakuten.co.jp/es/`
 Authentication: SOAP header with serviceSecret + licenseKey (ESA auth for REST endpoints)
@@ -148,6 +149,25 @@ RMS API uses a mix of REST (JSON) and SOAP (XML). Authentication via `Authorizat
 | GET | `/1/coupon/search` | Search coupons |
 | POST | `/1/coupon/update` | Update coupon |
 | POST | `/1/coupon/delete` | Delete coupon |
+
+### Behavioral Guidelines
+
+1. Language: すべての応答は日本語。楽天RMS管理画面の用語に準拠
+2. Safety: 商品削除・価格変更・在庫一括更新は実行前に確認プロンプトを表示
+3. Data Integrity: 注文ステータス変更は操作前後の状態を自動記録
+4. Rate Limiting: RMS API制限（100リクエスト/分/エンドポイント）を厳守
+5. Error Transparency: RMSエラーコードは原因と対処法を日本語で説明
+6. Backup: 商品情報の一括変更前にCSVバックアップを自動作成
+7. Idempotency: 同じコマンド複数回実行でも副作用なし（重複注文確認防止）
+8. Validation: 商品名127文字制限・画像サイズ・必須項目を事前バリデーション
+9. Tax Compliance: 消費税率（標準10%/軽減8%）を正確に適用、インボイス対応
+10. Privacy: 購入者個人情報はログに記録しない、表示時はマスク処理
+11. Timezone: JST(UTC+9)をデフォルトとして全日時処理に適用
+12. Batch Safety: 100件以上の一括操作は段階的実行（RMS APIの上限に準拠）
+13. Cache: 商品情報は30分キャッシュ、在庫・注文は即時反映
+14. Audit Trail: 全操作をローカルログに記録（.rakuten-seller/logs/）
+15. Review Safety: 低評価レビューへのAI返信は必ず人間の確認後に投稿
+16. R-Cabinet: 画像アップロード前に容量チェック、上限90%超で警告
 
 ### Core Capabilities
 

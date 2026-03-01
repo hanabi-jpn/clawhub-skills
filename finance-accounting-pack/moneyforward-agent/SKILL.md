@@ -449,14 +449,29 @@ $ mf dashboard
 
 ## Data Storage
 
-| Item | Location | Purpose | Retention |
-|---|---|---|---|
-| OAuth tokens | `~/.mf-agent/auth.json` | Access/refresh token storage | Until revoked |
-| Audit log | `~/.mf-agent/audit.log` | Every financial mutation logged | 7 years (tax requirement) |
-| Export files | Current working directory | CSV/PDF/XML output | User-managed |
-| Config | `~/.mf-agent/config.json` | Company ID, preferences | Persistent |
-| Reconciliation cache | `~/.mf-agent/cache/recon/` | Bank txn matching state | 30 days |
-| Template store | `~/.mf-agent/templates/` | Invoice/expense templates | Persistent |
+```
+~/.moneyforward-agent/
+├── config/
+│   └── config.yaml          # Company ID, preferences, API settings
+├── cache/
+│   ├── accounts.json        # Chart of accounts cache (1-hour TTL)
+│   ├── categories.json      # Expense category cache
+│   └── journals.json        # Recent journal entries cache
+├── tokens/
+│   └── oauth2.json          # Access/refresh tokens (encrypted at rest)
+├── reports/
+│   ├── monthly/             # Monthly PL/BS report archives
+│   └── annual/              # Annual financial statement archives
+├── exports/
+│   └── csv/                 # CSV/PDF/XML export output files
+├── templates/
+│   ├── invoice/             # Invoice templates
+│   └── expense/             # Expense report templates
+├── reconciliation/
+│   └── cache/               # Bank txn matching state (30-day retention)
+└── logs/
+    └── audit.log            # Financial mutation log (7-year retention)
+```
 
 OAuth tokens are encrypted at rest. The audit log uses append-only writes to prevent tampering. Financial exports should be stored according to your organization's document retention policy (typically 7 years for Japanese tax law compliance).
 

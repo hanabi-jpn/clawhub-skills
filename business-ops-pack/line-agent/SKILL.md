@@ -39,7 +39,7 @@ tags:
 
 `claude-code` `line` `messaging-api` `chatbot` `japan`
 
-> LINE公式アカウント自動応答・CRM連携エージェント。メッセージ管理、リッチメニュー、セグメント配信、顧客管理をAIで自動化。
+> **LINE公式アカウント自動応答・CRM連携エージェント。メッセージ管理、リッチメニュー、セグメント配信、顧客管理をAIで自動化。**
 
 **Author:** hanabi-jpn
 **Version:** 1.0.0
@@ -95,11 +95,14 @@ You are an agent equipped with **LINE Agent** for LINE Official Account manageme
 ### Setup Requirements
 
 Environment variables:
-- `LINE_CHANNEL_ACCESS_TOKEN` — LINE Messaging API channel access token
-- `LINE_CHANNEL_SECRET` — Channel secret for webhook verification
-- Optional: `LINE_LIFF_ID` — LIFF app ID for rich interactions
-- Optional: `LINE_NOTIFY_TOKEN` — LINE Notify token for admin alerts
-- Optional: `LINE_BUSINESS_HOURS` — Business hours JSON (e.g., `{"start":"09:00","end":"18:00","tz":"Asia/Tokyo"}`)
+
+| Variable | Description | Required | Default |
+|----------|-------------|----------|---------|
+| `LINE_CHANNEL_ACCESS_TOKEN` | LINE Messaging API channel access token | Yes | — |
+| `LINE_CHANNEL_SECRET` | Channel secret for webhook verification | Yes | — |
+| `LINE_LIFF_ID` | LIFF app ID for rich interactions | No | — |
+| `LINE_NOTIFY_TOKEN` | LINE Notify token for admin alerts | No | — |
+| `LINE_BUSINESS_HOURS` | Business hours JSON (e.g., `{"start":"09:00","end":"18:00","tz":"Asia/Tokyo"}`) | No | — |
 
 API Base: `https://api.line.me/v2/bot/`
 
@@ -347,27 +350,231 @@ Authentication: Bearer token via `LINE_CHANNEL_ACCESS_TOKEN` in Authorization he
 
 ### Commands
 
-**`line send <user-id|all> <message>`** — Send message
-**`line send <user-id> --flex <template>`** — Send Flex Message
-**`line broadcast <message>`** — Broadcast to all followers
+### `line send <user-id|all> <message>`
+
+Send a text message to a specific user or all followers.
+
+```
+$ line send U1234abcd "本日限定クーポンをお届けします！"
+✓ Message sent to U1234abcd
+  Message ID: 1234567890
+  Type: text
+  Timestamp: 2026-03-01 14:00:00 JST
+  Quota used: 1,847 / 5,000 (36.9%)
+```
+
+### `line send <user-id> --flex <template>`
+
+Send a Flex Message using a predefined template.
+
+```
+$ line send U1234abcd --flex product-card --data '{"name":"有機抹茶セット","price":4980}'
+✓ Flex Message sent to U1234abcd
+  Template: product-card (商品カード)
+  Message ID: 1234567891
+  Timestamp: 2026-03-01 14:05:00 JST
+  Preview: https://liff.line.me/preview/1234567891
+```
+
+### `line broadcast <message>`
+
+Broadcast a message to all followers.
+
+```
+$ line broadcast "【お知らせ】3月のセール情報を更新しました！詳細はリッチメニューからご確認ください。"
+⚠ Broadcast to 12,847 followers. Estimated quota usage: 12,847
+  Current quota: 1,847 / 5,000 used
+  ✗ WARNING: Quota will be exceeded by 9,694 messages
+  Proceed anyway? (y/N): y
+✓ Broadcast queued
+  Message ID: 1234567892
+  Recipients: 12,847
+  Estimated delivery: ~2 minutes
+  Quota remaining: 0 (exceeded — overage charges apply)
+```
+
+### `line menu list`
+
+List all configured rich menus.
+
+```
+$ line menu list
+╔══════════════════════════════════════════════════════════╗
+║              LINE Rich Menu 一覧                        ║
+╠══════════════════════════════════════════════════════════╣
+║  ID              │ Name              │ Status   │ Users ║
+╠══════════════════╪═══════════════════╪══════════╪═══════╣
+║  richmenu-001    │ メインメニュー     │ DEFAULT  │ 11,234║
+║  richmenu-002    │ VIPメニュー        │ ACTIVE   │   234 ║
+║  richmenu-003    │ 新規ユーザー用     │ ACTIVE   │ 1,379 ║
+║  richmenu-004    │ セール用(下書き)   │ DRAFT    │     0 ║
+╚══════════════════════════════════════════════════════════╝
+  Total: 4 menus (3 active, 1 draft)
+```
+
+### `line users`
+
+List recent active users with tags and last interaction.
+
+```
+$ line users
+╔══════════════════════════════════════════════════════════════════╗
+║              最近のアクティブユーザー (上位20件)                 ║
+╠══════════════════════════════════════════════════════════════════╣
+║  User ID       │ 表示名       │ タグ          │ 最終応答       ║
+╠════════════════╪══════════════╪═══════════════╪════════════════╣
+║  U1234abcd     │ 田中太郎      │ VIP, 購入者    │ 2026-03-01 13:45║
+║  U5678efgh     │ 鈴木花子      │ リピーター     │ 2026-03-01 12:30║
+║  U9012ijkl     │ 佐藤一郎      │ 問い合わせ     │ 2026-03-01 11:20║
+║  U3456mnop     │ 山田美咲      │ 新規          │ 2026-03-01 10:05║
+║  ...           │ ...          │ ...           │ ...            ║
+╚══════════════════════════════════════════════════════════════════╝
+  Total active (30 days): 4,892 users
+```
+
+### `line user <user-id>`
+
+Display full user profile with interaction history.
+
+```
+$ line user U1234abcd
+╔══════════════════════════════════════════════════════════╗
+║              ユーザープロフィール                        ║
+╠══════════════════════════════════════════════════════════╣
+║  User ID:      U1234abcd                                ║
+║  表示名:        田中太郎                                 ║
+║  プロフィール画像: https://profile.line-scdn.net/...     ║
+║  ステータス:     フォロー中                               ║
+║  フォロー日:     2025-08-15                               ║
+║  タグ:          VIP, 購入者, メルマガ登録                  ║
+║  セグメント:     VIP (234人)                              ║
+║  リッチメニュー:  VIPメニュー (richmenu-002)               ║
+╠══════════════════════════════════════════════════════════╣
+║  直近のやり取り (5件):                                   ║
+║  03-01 13:45 ← 「注文した商品の配送状況を教えて」        ║
+║  03-01 13:45 → 「ご注文 #EC-047 は本日発送済みです」     ║
+║  02-28 10:20 ← 「ポイント残高を確認したい」              ║
+║  02-28 10:20 → 「現在のポイント残高は 2,480pt です」     ║
+║  02-25 09:00 → [Flex] セール告知カード                   ║
+╠══════════════════════════════════════════════════════════╣
+║  EC連携:                                                 ║
+║  購入回数: 8回 │ 累計金額: ¥78,400 │ 平均客単価: ¥9,800  ║
+║  最終購入: 2026-02-20 (有機抹茶セット ¥4,980)            ║
+╚══════════════════════════════════════════════════════════╝
+```
+
+### `line auto list`
+
+List all configured auto-response rules.
+
+```
+$ line auto list
+╔══════════════════════════════════════════════════════════════════╗
+║              自動応答ルール一覧                                  ║
+╠══════════════════════════════════════════════════════════════════╣
+║  # │ キーワード       │ 応答タイプ │ 応答内容(要約)     │ 発動数║
+╠═══╪══════════════════╪══════════╪═══════════════════╪════════╣
+║  1 │ 営業時間          │ FAQ      │ 平日9:00-18:00... │  312  ║
+║  2 │ 返品              │ FAQ      │ 返品ポリシー...    │  187  ║
+║  3 │ 送料              │ FAQ      │ ¥5,000以上で無料.. │  156  ║
+║  4 │ ポイント          │ FAQ      │ ポイント照会案内.. │   98  ║
+║  5 │ 注文確認          │ EC連携   │ 注文ステータス照会 │  245  ║
+║  6 │ **(AI fallback)** │ AI応答   │ LLM自由応答       │ 2,847 ║
+╚══════════════════════════════════════════════════════════════════╝
+  Total rules: 6 (5 keyword + 1 AI fallback)
+  AI応答成功率: 89.2%
+```
+
+### `line auto test <message>`
+
+Test auto-response matching without actually sending a reply.
+
+```
+$ line auto test "営業時間を教えてください"
+╔══════════════════════════════════════════════════════════╗
+║              自動応答テスト (ドライラン)                  ║
+╠══════════════════════════════════════════════════════════╣
+║  入力: 「営業時間を教えてください」                       ║
+║  マッチ: ルール #1 (キーワード: 営業時間)                ║
+║  Confidence: 0.97                                       ║
+║                                                         ║
+║  応答プレビュー:                                         ║
+║  ┌────────────────────────────────────────────┐          ║
+║  │ 営業時間のご案内です。                       │          ║
+║  │                                            │          ║
+║  │ 平日: 9:00〜18:00                           │          ║
+║  │ 土曜: 10:00〜15:00                          │          ║
+║  │ 日祝: 定休日                                │          ║
+║  │                                            │          ║
+║  │ お急ぎの場合はメールでお問い合わせください。  │          ║
+║  └────────────────────────────────────────────┘          ║
+║                                                         ║
+║  ✓ テスト完了 (送信されていません)                        ║
+╚══════════════════════════════════════════════════════════╝
+```
+
+### `line quota`
+
+Check message quota and current usage.
+
+```
+$ line quota
+╔══════════════════════════════════════════════════════════╗
+║              LINE メッセージ配信枠                       ║
+╠══════════════════════════════════════════════════════════╣
+║  プラン:         スタンダード (¥15,000/月)               ║
+║  月間配信枠:      30,000通                               ║
+║  使用済み:        8,234通 (27.4%)                        ║
+║  残り:           21,766通                                ║
+║  ████████░░░░░░░░░░░░░░░░░░░░  27.4%                   ║
+║                                                         ║
+║  今月の内訳:                                             ║
+║    Broadcast:    4,120通                                 ║
+║    Multicast:    2,890通                                 ║
+║    Push:         1,224通                                 ║
+║    Reply (無料):  4,114通 (枠にカウントされません)        ║
+║                                                         ║
+║  超過時料金:  ¥3/通 (追加メッセージ)                     ║
+║  リセット日:  2026-04-01                                 ║
+╚══════════════════════════════════════════════════════════╝
+```
+
+### `line health`
+
+Check API connectivity and token validity.
+
+```
+$ line health
+╔══════════════════════════════════════════════════════════╗
+║              LINE API ヘルスチェック                     ║
+╠══════════════════════════════════════════════════════════╣
+║  Channel Access Token:  ✓ VALID (期限: 2026-04-15)      ║
+║  Channel Secret:        ✓ CONFIGURED                    ║
+║  Webhook URL:           ✓ ACTIVE (https://example.com/webhook)║
+║  Webhook 検証:          ✓ 署名検証OK                     ║
+║  LIFF ID:               ✓ CONFIGURED (1234567890-abcdefg)║
+║  LINE Notify:           ✓ CONNECTED                     ║
+║                                                         ║
+║  API接続テスト:                                          ║
+║    /v2/bot/info          → 200 OK (48ms)                ║
+║    /v2/bot/message/quota → 200 OK (52ms)                ║
+║    /v2/bot/followers/ids → 200 OK (61ms)                ║
+║                                                         ║
+║  ステータス: ✓ 全システム正常                             ║
+╚══════════════════════════════════════════════════════════╝
+```
+
 **`line multicast <segment> <message>`** — Send to segment
 **`line narrowcast <audience-id> <message>`** — Send to audience group
-**`line menu list`** — List rich menus
 **`line menu create <template>`** — Create rich menu
 **`line menu swap <user-id> <menu-id>`** — Assign menu to user
-**`line users`** — List recent active users
 **`line users tag <user-id> <tag>`** — Tag user
-**`line user <user-id>`** — Full user profile with interaction history
 **`line segment create <name> <criteria>`** — Create segment
 **`line segment list`** — List segments
 **`line auto add <keyword> <response>`** — Add auto-response rule
-**`line auto list`** — List auto-response rules
-**`line auto test <message>`** — Test auto-response without sending
 **`line stats [--period day|week|month]`** — Analytics dashboard
 **`line stats --demographic`** — Follower demographics (age, gender, region)
 **`line webhook setup <url>`** — Configure webhook endpoint
-**`line quota`** — Check message quota and current usage
-**`line health`** — API connectivity and token validity check
 
 ### Comparison: LINE Agent vs Other LINE Marketing Tools
 

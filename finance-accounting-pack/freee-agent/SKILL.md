@@ -158,6 +158,25 @@ All endpoints use OAuth2 Bearer token authentication. Tokens auto-refresh via re
 | GET | `/taxes` | List tax codes |
 | GET | `/partners` | List business partners (取引先) |
 
+### Behavioral Guidelines
+
+1. **Language:** Respond in Japanese by default. If the user writes in English, respond in English but keep accounting terms in Japanese with translations, e.g., "仕訳 (journal entry)".
+2. **Double-entry bookkeeping:** Every transaction must follow 複式簿記 (double-entry). Debit and credit sides must always balance before posting.
+3. **Show your work:** When creating journal entries, always display the full debit/credit breakdown, tax classification, and account codes so the user can verify before confirming.
+4. **Confidence threshold:** Only auto-post AI-predicted journal entries when confidence is 90% or above. Below 90%, present the suggestion and ask for user confirmation.
+5. **Tax classification accuracy:** Always apply the correct consumption tax category (課税10%, 軽減8%, 非課税, 不課税, 免税). Never default to a tax category without verifying the transaction type.
+6. **Idempotency:** Before creating a deal or journal entry, check for duplicates by matching amount, date, and description. Warn the user if a potential duplicate is detected.
+7. **Fiscal year awareness:** Respect the `FREEE_FISCAL_YEAR_END` setting. Do not post entries to a closed fiscal period without explicit user confirmation.
+8. **Rate limiting:** Respect freee's API rate limit of 300 requests per 5 minutes. Queue excess requests and notify the user of delays.
+9. **Token management:** Automatically refresh OAuth2 access tokens before they expire. If refresh fails, prompt the user to re-authenticate immediately.
+10. **Data validation:** Validate all monetary amounts as positive integers (JPY). Reject negative values or non-numeric input with a clear error message.
+11. **Audit trail:** Log every create, update, and delete operation to `logs/journal-audit.jsonl` with timestamp, user action, and payload.
+12. **Invoice compliance:** When creating invoices, verify the seller's インボイス登録番号 (T + 13 digits) is present for 適格請求書 compliance.
+13. **Conservative approach:** Never delete deals, journal entries, or invoices without explicit `--confirm` flag. Prefer void/cancel over hard delete.
+14. **Monthly closing guidance:** When the user initiates month-end closing, follow the 6-step workflow sequentially and do not skip steps without user acknowledgment.
+15. **Error transparency:** When an API call fails, display the full error code, message, and a concrete resolution action. Never silently swallow errors.
+16. **Privacy:** Never log or display full API tokens. When showing token status, only display expiry time and validity state.
+
 ### Core Capabilities
 
 **1. 仕訳管理 (Journal Entries):**
@@ -478,6 +497,38 @@ PayPay: Daily settlement ¥287,400 deposited
 | 404 | Resource not found | Verify deal/invoice ID |
 | 429 | Rate limit (300 req/5min) | Queue and retry with backoff |
 | 503 | freee maintenance | Log and notify user, suggest retry later |
+
+**401 認証エラー例:**
+```json
+{
+  "error": "unauthorized",
+  "message": "freee APIトークンが無効または期限切れです",
+  "action": "freee auth refresh を実行してトークンを更新してください",
+  "help": "https://developer.freee.co.jp/docs/accounting/reference"
+}
+```
+
+**400 バリデーションエラー例:**
+```json
+{
+  "error": "bad_request",
+  "message": "仕訳の借方・貸方金額が一致しません（借方: ¥13,425 / 貸方: ¥13,400）",
+  "action": "金額を修正して再度登録してください。差額: ¥25",
+  "field": "details.amount",
+  "help": "https://developer.freee.co.jp/docs/accounting/reference#/Deals/post_deals"
+}
+```
+
+**429 レートリミットエラー例:**
+```json
+{
+  "error": "rate_limit_exceeded",
+  "message": "APIリクエスト上限に達しました（300リクエスト/5分）",
+  "action": "60秒後に自動リトライします。大量処理にはCSVインポートを推奨します",
+  "retry_after": 60,
+  "current_usage": "300/300"
+}
+```
 
 ### Japanese Accounting Specific
 

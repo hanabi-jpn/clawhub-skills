@@ -43,7 +43,7 @@ tags:
 
 `claude-code` `tax` `japan` `確定申告` `calculator`
 
-> 日本の税金計算・確定申告支援エージェント。所得税、消費税、法人税の計算とe-Tax連携。
+> **日本の税金計算・確定申告支援エージェント。所得税、消費税、法人税の計算とe-Tax連携。**
 
 **Author:** hanabi-jpn
 **Version:** 1.0.0

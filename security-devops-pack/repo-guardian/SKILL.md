@@ -48,7 +48,7 @@ tags:
 [![Defense](https://img.shields.io/badge/defense-repo_poisoning-red)]()
 [![Scans](https://img.shields.io/badge/attack_vectors-12%2B_covered-blueviolet)]()
 
-**Every `git clone` is an act of trust. Repo Guardian makes sure that trust is verified, not assumed.**
+> **Every `git clone` is an act of trust. Repo Guardian makes sure that trust is verified, not assumed.**
 
 ---
 
@@ -466,8 +466,8 @@ Added to allowlist:
 
 Current allowlist (3 entries):
   [1] https://github.com/anthropics/claude-code @ a1b2c3d ✓
-  [2] https://github.com/your-org/internal-tools @ f4e5d6c ✓
-  [3] https://github.com/your-org/shared-configs @ 7a8b9c0 ✓
+  [2] https://github.com/acme-corp/internal-tools @ f4e5d6c ✓
+  [3] https://github.com/acme-corp/shared-configs @ 7a8b9c0 ✓
 
 Note: Allowlist entries are pinned to specific commits.
 Pulling new commits requires re-scanning and re-allowlisting.

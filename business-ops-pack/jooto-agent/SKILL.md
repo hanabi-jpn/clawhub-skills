@@ -374,13 +374,22 @@ The agent maps to Jooto's list structure. Create custom lists in Jooto's web UI,
 
 ## Data Storage
 
-| Location | Purpose | Retention |
-|---|---|---|
-| `~/.jooto/config.yaml` | API key, org ID, preferences | Persistent until user deletes |
-| `~/.jooto/boards.json` | Cached board metadata | 5-minute TTL (configurable) |
-| `~/.jooto/audit.log` | Write operation log | Rolling 30 days, max 10MB |
-| `~/.jooto/exports/` | Exported CSV/JSON/MD files | User-managed |
-| `~/.jooto/recurring.json` | Recurring task schedules | Persistent |
+```
+~/.jooto/
+├── config/
+│   └── config.yaml
+├── cache/
+│   ├── boards.json
+│   └── members.json
+├── exports/
+│   ├── csv/
+│   ├── json/
+│   └── markdown/
+├── recurring/
+│   └── schedules.json
+└── logs/
+    └── audit.log
+```
 
 All data is stored locally on disk. No data is sent to third-party services beyond the official Jooto API. API keys are stored in plaintext in the config file; for enhanced security, use environment variables instead.
 

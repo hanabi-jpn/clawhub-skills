@@ -478,15 +478,24 @@ Yes. Use `yy assets list` to view fixed assets and `yy assets depreciate --year 
 
 ## Data Storage
 
-| Location | Purpose | Retention |
-|---|---|---|
-| `~/.yayoi/config.yaml` | API credentials, fiscal year settings, preferences | Persistent |
-| `~/.yayoi/rules.yaml` | Learned categorization rules (payee-to-category map) | Persistent, user-editable |
-| `~/.yayoi/categories-cache.json` | Cached chart of accounts from Yayoi API | 1-hour TTL |
-| `~/.yayoi/reconciliation.db` | SQLite database tracking reconciliation status | Persistent per fiscal year |
-| `~/.yayoi/exports/` | Generated reports, tax filings, CSV/JSON exports | User-managed |
-| `~/.yayoi/audit.log` | Financial operation log with before/after values | Rolling 7 years (tax retention) |
-| `~/.yayoi/invoices/` | Cached Misoca invoice PDFs | User-managed |
+```
+~/.yayoi/
+├── config.yaml               # API credentials, fiscal year settings, preferences
+├── rules.yaml                # Learned categorization rules (payee-to-category map)
+├── categories-cache.json     # Cached chart of accounts from Yayoi API (1-hour TTL)
+├── reconciliation.db         # SQLite database tracking reconciliation status
+├── exports/
+│   ├── tax-report-2025.pdf   # Generated tax reports
+│   ├── trial-balance-2025.csv # Trial balance exports
+│   └── transactions/         # CSV/JSON transaction exports
+├── invoices/
+│   ├── drafts/               # Draft Misoca invoice PDFs
+│   └── sent/                 # Sent invoice PDF archives
+├── assets/
+│   └── depreciation/         # Fixed asset depreciation schedules
+└── logs/
+    └── audit.log             # Financial operation log (7-year retention)
+```
 
 Financial audit logs are retained for 7 years by default, matching Japan's tax document retention requirements. All data is stored locally; no third-party services beyond Yayoi and Misoca APIs are contacted.
 

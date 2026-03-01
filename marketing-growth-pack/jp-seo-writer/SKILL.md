@@ -45,7 +45,7 @@ tags:
 
 `claude-code` `seo` `japanese` `content-writing` `nlp`
 
-> 日本語SEO記事自動生成エージェント。共起語分析、構成案作成、E-E-A-T対応の高品質記事を生成。
+> **日本語SEO記事自動生成エージェント。共起語分析、構成案作成、E-E-A-T対応の高品質記事を生成。**
 
 **Author:** hanabi-jpn
 **Version:** 1.0.0
@@ -180,16 +180,116 @@ You are equipped with **JP SEO Writer** for Japanese SEO content creation.
 - デフォルト: 3000-5000文字
 - `--length 8000` で長文対応
 - 構成案→本文→メタデータまで一括
+```
+$ seo write "格安SIM おすすめ" --length 5000
+
+ JP SEO Writer — Article Generation
+ Keyword: 格安SIM おすすめ | Target: 5,000文字
+
+ Phase 1: Keyword Research ............ DONE (推定月間検索: 33,100)
+ Phase 2: Competitor Analysis ......... DONE (上位10記事, 平均7,200文字)
+ Phase 3: Co-occurrence ............... DONE (必須共起語: 12, 推奨: 8)
+ Phase 4: Outline ..................... DONE (H2: 7, H3: 18)
+ Phase 5: Writing ..................... DONE (5,120文字)
+ Phase 6: Quality Check ............... DONE
+
+ Generated Article:
+ ─────────────────────────────────────────────
+ # 【2026年版】格安SIMおすすめランキング10選｜乗り換え手順も解説
+ ...（本文 5,120文字）...
+
+ SEO Score: 84/100
+ KW密度: 3.1% | 共起語カバー: 78% | E-E-A-T: 75/100
+ Output: ./articles/格安SIM_おすすめ_draft.md
+```
 
 **`seo analyze <url-or-file>`** — 既存記事のSEO診断
 
 **`seo rewrite <url-or-file> <keyword>`** — SEO改善リライト
+```
+$ seo rewrite ./blog/old_article.md "副業 在宅"
+
+ JP SEO Writer — SEO Rewrite
+ File: ./blog/old_article.md | Target KW: 副業 在宅
+
+ Current Score: 42/100
+ ┌──────────────────────┬──────────┬──────────┐
+ │ Dimension            │ Before   │ After    │
+ ├──────────────────────┼──────────┼──────────┤
+ │ KW密度               │ 0.8%     │ 2.9%     │
+ │ 共起語カバー率       │ 32%      │ 74%      │
+ │ 見出し構造           │ 60/100   │ 90/100   │
+ │ E-E-A-T              │ 35/100   │ 72/100   │
+ │ 文字数               │ 2,100字  │ 4,800字  │
+ └──────────────────────┴──────────┴──────────┘
+
+ Improvements Applied:
+   + 共起語「確定申告」「初心者」「スキル」を自然に追加
+   + H2見出し3つ追加（FAQ, 始め方, 注意点）
+   + E-E-A-T: 体験談セクション追加
+   + メタデータ最適化
+
+ SEO Score: 42/100 → 81/100
+ Output: ./blog/old_article_rewritten.md
+ Diff:   ./blog/old_article_diff.md
+```
 
 **`seo meta <keyword> <title>`** — メタデータ生成
+```
+$ seo meta "副業 おすすめ" "副業おすすめランキング15選"
+
+ JP SEO Writer — Meta Generation
+
+ title tag:
+   副業おすすめランキング15選【2026年】初心者向け (31文字)
+
+ meta description:
+   2026年最新の副業おすすめ15選を紹介。在宅・スマホ・投資系に分けて
+   初心者でも安全に始められる副業を厳選。確定申告の注意点も解説。(82文字)
+
+ OGP:
+   og:title       副業おすすめランキング15選【2026年版】
+   og:description  初心者でも安全に始められる副業15選を徹底比較。
+   og:type        article
+
+ Structured Data (JSON-LD):
+   @type: Article
+   headline: 副業おすすめランキング15選【2026年】初心者向け
+   datePublished: 2026-03-02
+   author: { @type: Person, name: "..." }
+```
 
 **`seo cooccurrence <keyword>`** — 共起語分析
 
 **`seo competitors <keyword>`** — 競合上位記事分析
+```
+$ seo competitors "プログラミング 独学"
+
+ JP SEO Writer — Competitor Analysis
+ Keyword: プログラミング 独学 | Top 10 Articles
+
+ ┌────┬──────────────────────────────────┬────────┬─────┬──────┐
+ │ #  │ Title                            │ 文字数 │ H2  │ Score│
+ ├────┼──────────────────────────────────┼────────┼─────┼──────┤
+ │ 1  │ プログラミング独学の完全ロード…  │ 12,400 │ 9   │ 92   │
+ │ 2  │ 【2026年】独学でプログラミング…  │ 8,800  │ 7   │ 88   │
+ │ 3  │ プログラミング独学は無理？経験…  │ 7,200  │ 8   │ 85   │
+ │ 4  │ 初心者がプログラミングを独学で…  │ 9,100  │ 6   │ 82   │
+ │ 5  │ プログラミング独学おすすめ勉強…  │ 6,500  │ 7   │ 79   │
+ └────┴──────────────────────────────────┴────────┼─────┼──────┤
+                                          平均     │ 7.4 │ 85.2 │
+                                                   └─────┴──────┘
+
+ 共通トピック (上位5記事中4以上):
+   学習言語選び, 学習サイト/教材, 挫折対策, ポートフォリオ, 学習期間
+
+ 差別化ポイント (上位記事に少ない切り口):
+   - AI活用した独学法 (1/10記事のみ)
+   - 独学→転職の具体的タイムライン (2/10記事のみ)
+   - 費用の内訳比較 (0/10記事)
+
+ 推奨戦略: 8,000文字以上、H2 7-9個、差別化ポイントを必ず含める
+```
 
 **`seo score <text> <keyword>`** — SEOスコア算出
 

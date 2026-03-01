@@ -49,7 +49,7 @@ tags:
 [![Encryption](https://img.shields.io/badge/encryption-AES--256--GCM-brightgreen)]()
 [![Keys](https://img.shields.io/badge/manages-API_keys_%7C_tokens_%7C_secrets-yellow)]()
 
-**API keys in plaintext are ticking time bombs. Credential Vault defuses them before they detonate.**
+> **API keys in plaintext are ticking time bombs. Credential Vault defuses them before they detonate.**
 
 ---
 
