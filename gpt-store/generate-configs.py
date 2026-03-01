@@ -2,14 +2,16 @@
 """
 GPT Store Configuration Generator for hanabi-jpn Skills
 ========================================================
-Reads all 40 SKILL.md files from the clawhub-skills directory
-and generates GPT Store-compatible JSON configuration files.
+Reads all 43 SKILL.md files from the clawhub-skills package directories
+(ec-master-pack/, finance-accounting-pack/, marketing-growth-pack/,
+business-ops-pack/, security-devops-pack/) and generates GPT Store-compatible
+JSON configuration files.
 
 Usage:
     python3 generate-configs.py
 
 Output:
-    configs/<skill-slug>.json  (40 files)
+    configs/<skill-slug>.json  (43 files)
 """
 
 import json

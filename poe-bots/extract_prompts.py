@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-Extract system prompts from all hanabi-jpn SKILL.md files.
+Extract system prompts from all 43 hanabi-jpn SKILL.md files.
 
-Reads each SKILL.md, extracts the content between "## System Prompt Instructions"
-(or "## System Prompt") and the next "##" heading at the same level, then saves
-each as a JSON file in the configs/ directory.
+Reads each SKILL.md from the package directories (ec-master-pack/,
+finance-accounting-pack/, marketing-growth-pack/, business-ops-pack/,
+security-devops-pack/), extracts the content between "## System Prompt
+Instructions" (or "## System Prompt") and the next "##" heading at the
+same level, then saves each as a JSON file in the configs/ directory.
 """
 
 import json
@@ -73,74 +75,57 @@ SKILL_DIRS = list(SKILL_PACKAGES.keys())
 
 # Metadata for each skill (display_name, description, tier)
 SKILL_META = {
-    "capability-evolver-pro": {
-        "display_name": "Capability Evolver Pro",
-        "description": "Safe, sandboxed self-evolution engine for AI agents with automatic rollback, evolution dashboard, and governed improvement protocols.",
-        "tier": "P1",
-    },
-    "self-learning-agent": {
-        "display_name": "Self-Learning Agent",
-        "description": "Cross-project learning engine with automatic failure capture, intelligent knowledge promotion, and context-aware memory compression.",
-        "tier": "P1",
-    },
-    "summarize-pro": {
-        "display_name": "Summarize Pro",
-        "description": "Advanced multi-format summarization with 7 output modes, multi-language support, chain-of-density compression, and intelligent caching.",
-        "tier": "P1",
-    },
-    "humanize-ai-pro": {
-        "display_name": "Humanize AI Pro",
-        "description": "Multi-language AI text humanizer with 5 writing modes, statistical analysis, and meaning-preserving transformation. 12+ languages including deep Japanese support.",
-        "tier": "P1",
-    },
-    "nano-banana-ultra": {
-        "display_name": "Nano Banana Ultra",
-        "description": "Advanced AI image generation and editing with multi-model support (Gemini, DALL-E, Stability AI), 30+ prompt templates, batch workflows, and gallery management.",
-        "tier": "P1",
-    },
-    "skill-guardian": {
-        "display_name": "Skill Guardian",
-        "description": "5-layer security scanner for AI agent skills. Detects malicious code, supply chain attacks, data exfiltration, and C2 backdoors.",
-        "tier": "P2",
-    },
-    "fx-trader-pro": {
-        "display_name": "FX Trader Pro",
-        "description": "Professional forex trading agent for OANDA with multi-timeframe technical analysis, risk management, and automated trade execution across 28 currency pairs.",
-        "tier": "P2",
-    },
-    "brain-trust": {
-        "display_name": "Brain Trust",
-        "description": "Multi-agent hierarchical orchestration engine. Define specialist roles (CEO, CTO, etc.), delegate tasks, run meetings, and make decisions through consensus.",
-        "tier": "P2",
-    },
-    "context-slim": {
-        "display_name": "Context Slim",
-        "description": "Intelligent context window optimizer. Compresses, prioritizes, and manages context to prevent overflow while preserving critical information. Save 40-70% tokens.",
-        "tier": "P2",
-    },
-    "agent-dashboard": {
-        "display_name": "Agent Dashboard",
-        "description": "Real-time monitoring and analytics for AI agents. Track performance, costs, task completion, and skill health with terminal and web dashboards.",
-        "tier": "P2",
-    },
-    "line-agent": {
-        "display_name": "LINE Agent",
-        "description": "LINE Official Account automation. Messaging, Rich Menus, segment delivery, CRM, and AI auto-response for Japan's #1 messaging platform (96M+ users).",
-        "tier": "P3",
-    },
+    # ── ec-master-pack ──
     "ec-cube-operator": {
         "display_name": "EC-CUBE Operator",
         "description": "EC-CUBE 4.x store management agent. Products, inventory, orders, customers, and analytics for Japan's largest open-source e-commerce platform.",
         "tier": "P3",
     },
-    "freee-agent": {
-        "display_name": "Freee Agent",
-        "description": "freee accounting and HR automation. Bookkeeping, expense management, invoicing, and financial reporting for Japanese businesses. Invoice system compliant.",
-        "tier": "P3",
-    },
     "rakuten-seller": {
         "display_name": "Rakuten Seller",
         "description": "Rakuten Ichiba shop automation via RMS API. Products, inventory, orders, reviews, and analytics for Japan's largest marketplace (55M+ monthly users).",
+        "tier": "P3",
+    },
+    "stripe-japan-agent": {
+        "display_name": "Stripe Japan Agent",
+        "description": "Payment management for Japan via Stripe. PayPay, konbini payments, subscriptions, invoicing, and revenue analytics.",
+        "tier": "P2",
+    },
+    "base-stores-agent": {
+        "display_name": "BASE & STORES Agent",
+        "description": "Manage Japanese EC shops on BASE and STORES. Products, orders, inventory, and analytics for instant-commerce platforms.",
+        "tier": "P3",
+    },
+    "amazon-japan-seller": {
+        "display_name": "Amazon Japan Seller",
+        "description": "Amazon.co.jp seller automation via SP-API. Product listings, FBA inventory, orders, advertising, and performance analytics for Japan's largest marketplace.",
+        "tier": "P3",
+    },
+    "yahoo-shopping-agent": {
+        "display_name": "Yahoo! Shopping Agent",
+        "description": "Yahoo! Shopping store automation via Commerce API. Product management, orders, promotions, and analytics for Yahoo! Japan's marketplace.",
+        "tier": "P3",
+    },
+    "mercari-shops-agent": {
+        "display_name": "Mercari Shops Agent",
+        "description": "Mercari Shops seller management. Product listings, order fulfillment, messaging, and sales analytics for Japan's largest flea market app (20M+ MAU).",
+        "tier": "P3",
+    },
+    "shopify-japan": {
+        "display_name": "Shopify Japan",
+        "description": "Shopify store management optimized for Japan. Products, orders, inventory, Japanese payment methods, and Shopify Flow automation.",
+        "tier": "P3",
+    },
+    "makeshop-agent": {
+        "display_name": "MakeShop Agent",
+        "description": "MakeShop by GMO store automation. Product management, orders, customer data, and analytics for Japan's feature-rich EC platform (22,000+ shops).",
+        "tier": "P3",
+    },
+
+    # ── finance-accounting-pack ──
+    "freee-agent": {
+        "display_name": "Freee Agent",
+        "description": "freee accounting and HR automation. Bookkeeping, expense management, invoicing, and financial reporting for Japanese businesses. Invoice system compliant.",
         "tier": "P3",
     },
     "paypay-biz": {
@@ -153,19 +138,46 @@ SKILL_META = {
         "description": "Japanese tax calculation and filing support. Income tax, consumption tax, corporate tax with e-Tax integration. Updated for 2026 tax law.",
         "tier": "P3",
     },
-    "notion-jp": {
-        "display_name": "Notion JP",
-        "description": "Notion workspace management with Japanese-optimized templates. Meeting notes, daily reports, project management, and approval workflows for Japanese businesses.",
+    "moneyforward-agent": {
+        "display_name": "MoneyForward Agent",
+        "description": "Cloud accounting automation via MoneyForward. Invoices, expenses, journal entries, and bank reconciliation for Japanese businesses.",
         "tier": "P3",
     },
+    "yayoi-agent": {
+        "display_name": "Yayoi Agent",
+        "description": "Accounting automation for Yayoi. Smart transaction import, Misoca invoicing, bank reconciliation, and tax filing support.",
+        "tier": "P3",
+    },
+    "misoca-agent": {
+        "display_name": "Misoca Agent",
+        "description": "Misoca cloud invoicing automation by Yayoi. Invoice creation, sending, status tracking, and Tekikaku Invoice compliance for Japanese businesses.",
+        "tier": "P3",
+    },
+    "airpay-agent": {
+        "display_name": "AirPay Agent",
+        "description": "AirPay payment terminal management by Recruit. Transaction history, settlement reports, and multi-payment method analytics (credit, QR, e-money).",
+        "tier": "P3",
+    },
+    "square-japan": {
+        "display_name": "Square Japan",
+        "description": "Square POS and payment management for Japan. Transactions, invoices, inventory, customer directory, and sales analytics via Square API.",
+        "tier": "P3",
+    },
+    "e-tax-agent": {
+        "display_name": "e-Tax Agent",
+        "description": "e-Tax electronic tax filing assistant for Japan. Guides kakutei shinkoku preparation, validates forms, and generates XML for National Tax Agency submission.",
+        "tier": "P3",
+    },
+    "japan-invoice": {
+        "display_name": "Japan Invoice",
+        "description": "Tekikaku Invoice System (qualified invoice) compliance agent. Generate, validate, and manage invoices meeting Japan's 2023 invoice requirements.",
+        "tier": "P3",
+    },
+
+    # ── marketing-growth-pack ──
     "jp-humanizer": {
         "display_name": "JP Humanizer",
         "description": "Japanese AI text humanization specialist. 500+ patterns, 4 modes (keigo/business/casual/SNS), achieving 0% AI detection for Japanese text.",
-        "tier": "P3",
-    },
-    "lark-workflow": {
-        "display_name": "Lark Workflow",
-        "description": "Lark/Feishu workspace automation. Approval workflows, bot notifications, document management, and calendar integration.",
         "tier": "P3",
     },
     "jp-seo-writer": {
@@ -173,16 +185,9 @@ SKILL_META = {
         "description": "Japanese SEO article generator with keyword research, co-occurrence analysis, content structure planning, and E-E-A-T compliance.",
         "tier": "P3",
     },
-
-    # ── Wave 2 (New 20) ──
     "google-ads-agent": {
         "display_name": "Google Ads Agent",
         "description": "AI-powered Google Ads campaign management. Create, optimize, audit, and report on PPC campaigns with bid optimization and keyword research.",
-        "tier": "P1",
-    },
-    "google-workspace-agent": {
-        "display_name": "Google Workspace Agent",
-        "description": "Unified Gmail, Calendar, Drive, Sheets, and Docs management. Automate your entire Google Workspace from a single agent.",
         "tier": "P1",
     },
     "ga4-search-console": {
@@ -195,15 +200,42 @@ SKILL_META = {
         "description": "Location intelligence for business. Geocoding, places search, routing optimization, and Google Business Profile management.",
         "tier": "P1",
     },
-    "stripe-japan-agent": {
-        "display_name": "Stripe Japan Agent",
-        "description": "Payment management for Japan via Stripe. PayPay, konbini payments, subscriptions, invoicing, and revenue analytics.",
-        "tier": "P2",
-    },
     "social-media-publisher": {
         "display_name": "Social Media Publisher",
         "description": "Cross-platform social media posting and analytics. X/Twitter, Instagram, TikTok, and LINE scheduling, content creation, and engagement tracking.",
         "tier": "P2",
+    },
+    "sansan-agent": {
+        "display_name": "Sansan Agent",
+        "description": "Business card and contact intelligence. Search, manage, and sync digitized cards for Japanese B2B networking with Sansan.",
+        "tier": "P3",
+    },
+    "hubspot-japan": {
+        "display_name": "HubSpot Japan",
+        "description": "HubSpot CRM and marketing automation for Japanese businesses. Contacts, deals, email campaigns, forms, and analytics with Japanese language support.",
+        "tier": "P2",
+    },
+
+    # ── business-ops-pack ──
+    "line-agent": {
+        "display_name": "LINE Agent",
+        "description": "LINE Official Account automation. Messaging, Rich Menus, segment delivery, CRM, and AI auto-response for Japan's #1 messaging platform (96M+ users).",
+        "tier": "P3",
+    },
+    "lark-workflow": {
+        "display_name": "Lark Workflow",
+        "description": "Lark/Feishu workspace automation. Approval workflows, bot notifications, document management, and calendar integration.",
+        "tier": "P3",
+    },
+    "notion-jp": {
+        "display_name": "Notion JP",
+        "description": "Notion workspace management with Japanese-optimized templates. Meeting notes, daily reports, project management, and approval workflows for Japanese businesses.",
+        "tier": "P3",
+    },
+    "google-workspace-agent": {
+        "display_name": "Google Workspace Agent",
+        "description": "Unified Gmail, Calendar, Drive, Sheets, and Docs management. Automate your entire Google Workspace from a single agent.",
+        "tier": "P1",
     },
     "chatwork-agent": {
         "display_name": "Chatwork Agent",
@@ -225,16 +257,6 @@ SKILL_META = {
         "description": "Project management on Nulab Backlog. Issues, wikis, milestones, Git integration, and sprint management for Japan's top PM tool.",
         "tier": "P3",
     },
-    "sansan-agent": {
-        "display_name": "Sansan Agent",
-        "description": "Business card and contact intelligence. Search, manage, and sync digitized cards for Japanese B2B networking with Sansan.",
-        "tier": "P3",
-    },
-    "moneyforward-agent": {
-        "display_name": "MoneyForward Agent",
-        "description": "Cloud accounting automation via MoneyForward. Invoices, expenses, journal entries, and bank reconciliation for Japanese businesses.",
-        "tier": "P3",
-    },
     "kingof-time-agent": {
         "display_name": "King of Time Agent",
         "description": "Attendance and time tracking automation. Daily/monthly reports, overtime alerts, and payroll sync via Japan's leading attendance system.",
@@ -250,16 +272,18 @@ SKILL_META = {
         "description": "Task and project management on Jooto. Kanban boards, task automation, and team workflows via PR TIMES' project management tool.",
         "tier": "P3",
     },
-    "base-stores-agent": {
-        "display_name": "BASE & STORES Agent",
-        "description": "Manage Japanese EC shops on BASE and STORES. Products, orders, inventory, and analytics for instant-commerce platforms.",
+    "slack-japan-agent": {
+        "display_name": "Slack Japan Agent",
+        "description": "Slack workspace automation for Japanese teams. Channel management, workflow builder, app integrations, and bilingual bot responses.",
         "tier": "P3",
     },
-    "yayoi-agent": {
-        "display_name": "Yayoi Agent",
-        "description": "Accounting automation for Yayoi. Smart transaction import, Misoca invoicing, bank reconciliation, and tax filing support.",
+    "cybozu-garoon": {
+        "display_name": "Cybozu Garoon",
+        "description": "Cybozu Garoon groupware automation. Schedule, workflow, bulletin board, and facility management for large Japanese enterprises (6,600+ companies).",
         "tier": "P3",
     },
+
+    # ── security-devops-pack ──
     "mac-sentinel": {
         "display_name": "Mac Sentinel",
         "description": "macOS security hardening for Claude Code. Pre-execution validation, malicious config detection, credential hygiene, and endpoint protection.",
@@ -333,7 +357,8 @@ def main():
     fail_count = 0
 
     for skill_slug in SKILL_DIRS:
-        skill_md = os.path.join(skills_dir, skill_slug, "SKILL.md")
+        package = SKILL_PACKAGES[skill_slug]
+        skill_md = os.path.join(skills_dir, package, skill_slug, "SKILL.md")
 
         if not os.path.exists(skill_md):
             print(f"  SKIP: {skill_md} not found")
